@@ -22,7 +22,9 @@ namespace matrixalchemy
         void create(std::string_view vertexSource, std::string_view fragmentSource);
         void release();
         void use() const;
+        void setBool(std::string_view name, bool value) const;
         void setMat4(std::string_view name, const glm::mat4 &value) const;
+        void setVec4(std::string_view name, const glm::vec4 &value) const;
 
     private:
         static unsigned int compileShader(unsigned int type, std::string_view source);

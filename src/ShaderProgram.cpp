@@ -76,11 +76,25 @@ namespace matrixalchemy
         glUseProgram(id_);
     }
 
+    void ShaderProgram::setBool(std::string_view name, bool value) const
+    {
+        const std::string uniformName(name);
+        const int location = glGetUniformLocation(id_, uniformName.c_str());
+        glUniform1i(location, value ? 1 : 0);
+    }
+
     void ShaderProgram::setMat4(std::string_view name, const glm::mat4 &value) const
     {
         const std::string uniformName(name);
         const int location = glGetUniformLocation(id_, uniformName.c_str());
         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+    }
+
+    void ShaderProgram::setVec4(std::string_view name, const glm::vec4 &value) const
+    {
+        const std::string uniformName(name);
+        const int location = glGetUniformLocation(id_, uniformName.c_str());
+        glUniform4fv(location, 1, glm::value_ptr(value));
     }
 
     unsigned int ShaderProgram::compileShader(unsigned int type, std::string_view source)

@@ -28,14 +28,14 @@ The current milestone provides a minimal OpenGL scene:
 - a rotating colored cube
 - a simple movable character placeholder
 - mouse-driven orbit camera controls
+- planar shadows projected onto the floor
 - optional Dear ImGui debug panel
 
 Upcoming milestones:
 
-1. Add planar shadows similar to the original DirectX sample.
-2. Add glTF model loading.
-3. Add lighting and material controls.
-4. Expand documentation as a beginner-friendly 3D graphics guide.
+1. Add glTF model loading.
+2. Add lighting and material controls.
+3. Expand documentation as a beginner-friendly 3D graphics guide.
 
 ## Tech Stack
 

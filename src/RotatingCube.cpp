@@ -92,10 +92,20 @@ namespace matrixalchemy
 
     void RotatingCube::draw(ShaderProgram &shader) const
     {
-        const glm::mat4 model = glm::translate(glm::mat4(1.0F), {-2.0F, 0.5F, -2.0F}) * glm::rotate(glm::mat4(1.0F), radians(rotationDegrees_), {0.0F, 1.0F, 0.0F});
-
-        shader.setMat4("uModel", model);
+        shader.setMat4("uModel", modelMatrix());
         mesh_.draw();
+    }
+
+    void RotatingCube::drawShadow(ShaderProgram &shader, const glm::mat4 &shadowMatrix) const
+    {
+        const glm::mat4 floorLift = glm::translate(glm::mat4(1.0F), {0.0F, 0.015F, 0.0F});
+        shader.setMat4("uModel", floorLift * shadowMatrix * modelMatrix());
+        mesh_.draw();
+    }
+
+    glm::mat4 RotatingCube::modelMatrix() const
+    {
+        return glm::translate(glm::mat4(1.0F), {-2.0F, 0.5F, -2.0F}) * glm::rotate(glm::mat4(1.0F), radians(rotationDegrees_), {0.0F, 1.0F, 0.0F});
     }
 
 } // namespace matrixalchemy

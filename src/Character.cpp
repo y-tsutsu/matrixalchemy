@@ -136,11 +136,21 @@ namespace matrixalchemy
 
     void Character::draw(ShaderProgram &shader) const
     {
-        const float bounce = std::sin(radians(bounceDegrees_)) * 0.08F;
-        const glm::mat4 model = glm::translate(glm::mat4(1.0F), {position_.x, bounce, position_.z}) * glm::rotate(glm::mat4(1.0F), radians(rotationDegrees_), {0.0F, 1.0F, 0.0F});
-
-        shader.setMat4("uModel", model);
+        shader.setMat4("uModel", modelMatrix());
         mesh_.draw();
+    }
+
+    void Character::drawShadow(ShaderProgram &shader, const glm::mat4 &shadowMatrix) const
+    {
+        const glm::mat4 floorLift = glm::translate(glm::mat4(1.0F), {0.0F, 0.015F, 0.0F});
+        shader.setMat4("uModel", floorLift * shadowMatrix * modelMatrix());
+        mesh_.draw();
+    }
+
+    glm::mat4 Character::modelMatrix() const
+    {
+        const float bounce = std::sin(radians(bounceDegrees_)) * 0.08F;
+        return glm::translate(glm::mat4(1.0F), {position_.x, bounce, position_.z}) * glm::rotate(glm::mat4(1.0F), radians(rotationDegrees_), {0.0F, 1.0F, 0.0F});
     }
 
 } // namespace matrixalchemy

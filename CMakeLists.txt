@@ -37,6 +37,7 @@ add_executable(matrixalchemy
   src/Main.cpp
   src/OrbitCamera.cpp
   src/RotatingCube.cpp
+  src/Shadow.cpp
   src/ShaderProgram.cpp)
 
 target_include_directories(matrixalchemy

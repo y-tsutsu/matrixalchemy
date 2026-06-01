@@ -2,6 +2,7 @@
 
 #include "matrixalchemy/FileSystem.hpp"
 #include "matrixalchemy/Gl.hpp"
+#include "matrixalchemy/Shadow.hpp"
 
 #if MATRIXALCHEMY_HAS_IMGUI
 #include "matrixalchemy/DebugUi.hpp"
@@ -213,8 +214,22 @@ namespace matrixalchemy
         shader_.use();
         shader_.setMat4("uProjection", projection);
         shader_.setMat4("uView", view);
+        shader_.setBool("uUseColorOverride", false);
 
         gridFloor_.draw(shader_);
+
+        const glm::mat4 shadowMatrix = planarShadowMatrix({0.0F, 1.0F, 0.0F, 0.0F}, {-3.0F, 6.0F, -4.0F, 1.0F});
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthMask(GL_FALSE);
+        shader_.setBool("uUseColorOverride", true);
+        shader_.setVec4("uColorOverride", {0.0F, 0.0F, 0.0F, 0.35F});
+        cube_.drawShadow(shader_, shadowMatrix);
+        character_.drawShadow(shader_, shadowMatrix);
+        shader_.setBool("uUseColorOverride", false);
+        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
+
         axisGizmo_.draw(shader_);
         cube_.draw(shader_);
         character_.draw(shader_);
