@@ -26,15 +26,16 @@ The current milestone provides a minimal OpenGL scene:
 - a checkerboard floor grid
 - RGB XYZ axes
 - a rotating colored cube
+- a simple movable character placeholder
+- mouse-driven orbit camera controls
 - optional Dear ImGui debug panel
 
 Upcoming milestones:
 
-1. Add a movable character placeholder.
-2. Add planar shadows similar to the original DirectX sample.
-3. Add glTF model loading.
-4. Add lighting and material controls.
-5. Expand documentation as a beginner-friendly 3D graphics guide.
+1. Add planar shadows similar to the original DirectX sample.
+2. Add glTF model loading.
+3. Add lighting and material controls.
+4. Expand documentation as a beginner-friendly 3D graphics guide.
 
 ## Tech Stack
 
@@ -123,8 +124,10 @@ Run:
 
 ## Controls
 
-- `Left` / `Right`: orbit camera horizontally
-- `Up` / `Down`: orbit camera vertically
+- `Left` / `Right`: turn the character
+- `Up` / `Down`: move the character forward/backward
+- Left mouse drag: orbit the camera
+- Mouse wheel: zoom the camera
 - `F1`: toggle the debug panel
 - `Esc`: quit
 

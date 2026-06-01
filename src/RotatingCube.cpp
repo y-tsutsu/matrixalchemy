@@ -92,7 +92,7 @@ namespace matrixalchemy
 
     void RotatingCube::draw(ShaderProgram &shader) const
     {
-        const glm::mat4 model = glm::translate(glm::mat4(1.0F), {0.0F, 0.5F, 0.0F}) * glm::rotate(glm::mat4(1.0F), radians(rotationDegrees_), {0.0F, 1.0F, 0.0F});
+        const glm::mat4 model = glm::translate(glm::mat4(1.0F), {-2.0F, 0.5F, -2.0F}) * glm::rotate(glm::mat4(1.0F), radians(rotationDegrees_), {0.0F, 1.0F, 0.0F});
 
         shader.setMat4("uModel", model);
         mesh_.draw();

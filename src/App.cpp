@@ -11,18 +11,7 @@
 
 #include <algorithm>
 #include <chrono>
-#include <cmath>
 #include <stdexcept>
-
-namespace
-{
-
-    float radians(float degrees)
-    {
-        return degrees * 3.14159265358979323846F / 180.0F;
-    }
-
-} // namespace
 
 namespace matrixalchemy
 {
@@ -39,6 +28,7 @@ namespace matrixalchemy
 #if MATRIXALCHEMY_HAS_IMGUI
         DebugUi::shutdown();
 #endif
+        character_.release();
         cube_.release();
         axisGizmo_.release();
         gridFloor_.release();
@@ -98,6 +88,45 @@ namespace matrixalchemy
         }
     }
 
+    void App::cursorPositionCallback(GLFWwindow *window, double x, double y)
+    {
+        auto *app = static_cast<App *>(glfwGetWindowUserPointer(window));
+        if (app != nullptr)
+        {
+            app->camera_.drag(x, y);
+        }
+    }
+
+    void App::mouseButtonCallback(GLFWwindow *window, int button, int action, int)
+    {
+        auto *app = static_cast<App *>(glfwGetWindowUserPointer(window));
+        if (app == nullptr || button != GLFW_MOUSE_BUTTON_LEFT)
+        {
+            return;
+        }
+
+        if (action == GLFW_PRESS)
+        {
+            double x = 0.0;
+            double y = 0.0;
+            glfwGetCursorPos(window, &x, &y);
+            app->camera_.beginDrag(x, y);
+        }
+        else if (action == GLFW_RELEASE)
+        {
+            app->camera_.endDrag();
+        }
+    }
+
+    void App::scrollCallback(GLFWwindow *window, double, double yOffset)
+    {
+        auto *app = static_cast<App *>(glfwGetWindowUserPointer(window));
+        if (app != nullptr)
+        {
+            app->camera_.zoom(yOffset);
+        }
+    }
+
     void App::initializeWindow()
     {
         if (glfwInit() == GLFW_FALSE)
@@ -118,6 +147,9 @@ namespace matrixalchemy
         glfwSetWindowUserPointer(window_, this);
         glfwSetFramebufferSizeCallback(window_, framebufferSizeCallback);
         glfwSetKeyCallback(window_, keyCallback);
+        glfwSetCursorPosCallback(window_, cursorPositionCallback);
+        glfwSetMouseButtonCallback(window_, mouseButtonCallback);
+        glfwSetScrollCallback(window_, scrollCallback);
         glfwMakeContextCurrent(window_);
         glfwSwapInterval(1);
     }
@@ -153,31 +185,21 @@ namespace matrixalchemy
         gridFloor_.create(5.0F, 10);
         axisGizmo_.create(5.0F);
         cube_.create(1.0F);
+        character_.create();
     }
 
     void App::processInput()
     {
-        if (glfwGetKey(window_, GLFW_KEY_LEFT) == GLFW_PRESS)
-        {
-            cameraTheta_ -= 1.0F;
-        }
-        if (glfwGetKey(window_, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        {
-            cameraTheta_ += 1.0F;
-        }
-        if (glfwGetKey(window_, GLFW_KEY_UP) == GLFW_PRESS)
-        {
-            cameraPhi_ = std::min(cameraPhi_ + 1.0F, 85.0F);
-        }
-        if (glfwGetKey(window_, GLFW_KEY_DOWN) == GLFW_PRESS)
-        {
-            cameraPhi_ = std::max(cameraPhi_ - 1.0F, -85.0F);
-        }
+        characterInput_.moveForward = glfwGetKey(window_, GLFW_KEY_UP) == GLFW_PRESS;
+        characterInput_.moveBackward = glfwGetKey(window_, GLFW_KEY_DOWN) == GLFW_PRESS;
+        characterInput_.turnLeft = glfwGetKey(window_, GLFW_KEY_LEFT) == GLFW_PRESS;
+        characterInput_.turnRight = glfwGetKey(window_, GLFW_KEY_RIGHT) == GLFW_PRESS;
     }
 
     void App::update(float deltaSeconds)
     {
         cube_.update(deltaSeconds);
+        character_.update(deltaSeconds, characterInput_);
     }
 
     void App::render()
@@ -185,16 +207,9 @@ namespace matrixalchemy
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         const float aspect = static_cast<float>(width_) / static_cast<float>(height_);
-        const glm::mat4 projection = glm::perspective(radians(60.0F), aspect, 0.1F, 100.0F);
+        const glm::mat4 projection = glm::perspective(glm::radians(60.0F), aspect, 0.1F, 100.0F);
+        const glm::mat4 view = camera_.viewMatrix();
 
-        const float theta = radians(cameraTheta_);
-        const float phi = radians(cameraPhi_);
-        const glm::vec3 cameraPosition = {
-            cameraRadius_ * std::cos(theta) * std::cos(phi),
-            cameraRadius_ * std::sin(phi),
-            cameraRadius_ * std::sin(theta) * std::cos(phi),
-        };
-        const glm::mat4 view = glm::lookAt(cameraPosition, cameraTarget_, {0.0F, 1.0F, 0.0F});
         shader_.use();
         shader_.setMat4("uProjection", projection);
         shader_.setMat4("uView", view);
@@ -202,6 +217,7 @@ namespace matrixalchemy
         gridFloor_.draw(shader_);
         axisGizmo_.draw(shader_);
         cube_.draw(shader_);
+        character_.draw(shader_);
 
 #if MATRIXALCHEMY_HAS_IMGUI
         if (showDebugUi_)

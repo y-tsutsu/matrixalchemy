@@ -1,7 +1,9 @@
 #pragma once
 
 #include "matrixalchemy/AxisGizmo.hpp"
+#include "matrixalchemy/Character.hpp"
 #include "matrixalchemy/GridFloor.hpp"
+#include "matrixalchemy/OrbitCamera.hpp"
 #include "matrixalchemy/RotatingCube.hpp"
 #include "matrixalchemy/ShaderProgram.hpp"
 
@@ -23,14 +25,19 @@ namespace matrixalchemy
         int run();
 
         [[nodiscard]] float cubeRotationDegrees() const { return cube_.rotationDegrees(); }
-        [[nodiscard]] float cameraRadius() const { return cameraRadius_; }
-        [[nodiscard]] float cameraThetaDegrees() const { return cameraTheta_; }
-        [[nodiscard]] float cameraPhiDegrees() const { return cameraPhi_; }
+        [[nodiscard]] float cameraRadius() const { return camera_.radius(); }
+        [[nodiscard]] float cameraThetaDegrees() const { return camera_.thetaDegrees(); }
+        [[nodiscard]] float cameraPhiDegrees() const { return camera_.phiDegrees(); }
+        [[nodiscard]] glm::vec3 characterPosition() const { return character_.position(); }
+        [[nodiscard]] float characterRotationDegrees() const { return character_.rotationDegrees(); }
         [[nodiscard]] bool debugUiVisible() const { return showDebugUi_; }
 
     private:
         static void framebufferSizeCallback(GLFWwindow *window, int width, int height);
         static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
+        static void cursorPositionCallback(GLFWwindow *window, double x, double y);
+        static void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
+        static void scrollCallback(GLFWwindow *window, double xOffset, double yOffset);
 
         void initializeWindow();
         void initializeOpenGL();
@@ -50,11 +57,9 @@ namespace matrixalchemy
         GridFloor gridFloor_;
         AxisGizmo axisGizmo_;
         RotatingCube cube_;
-
-        glm::vec3 cameraTarget_ = {0.0F, 0.5F, 0.0F};
-        float cameraRadius_ = 8.0F;
-        float cameraTheta_ = 45.0F;
-        float cameraPhi_ = 25.0F;
+        Character character_;
+        OrbitCamera camera_;
+        CharacterInput characterInput_;
     };
 
 } // namespace matrixalchemy
