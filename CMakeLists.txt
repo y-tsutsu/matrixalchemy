@@ -29,6 +29,9 @@ target_include_directories(matrixalchemy_glad
 
 add_executable(matrixalchemy
   src/App.cpp
+  src/AxisGizmo.cpp
+  src/ColoredMesh.cpp
+  src/GridFloor.cpp
   src/Main.cpp
   src/ShaderProgram.cpp)
 

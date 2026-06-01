@@ -8,6 +8,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <algorithm>
 #include <array>
 #include <chrono>
 #include <cmath>
@@ -301,6 +302,9 @@ namespace matrixalchemy
         {
             glDeleteVertexArrays(1, &cubeVao_);
         }
+        axisGizmo_.release();
+        gridFloor_.release();
+        shader_.release();
         if (window_ != nullptr)
         {
             glfwDestroyWindow(window_);
@@ -420,6 +424,9 @@ namespace matrixalchemy
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
+
+        gridFloor_.create(5.0F, 10);
+        axisGizmo_.create(5.0F);
     }
 
     void App::processInput()
@@ -466,12 +473,16 @@ namespace matrixalchemy
             cameraRadius_ * std::sin(theta) * std::cos(phi),
         };
         const glm::mat4 view = glm::lookAt(cameraPosition, cameraTarget_, {0.0F, 1.0F, 0.0F});
-        const glm::mat4 model = glm::rotate(glm::mat4(1.0F), radians(cubeRotation_), {0.0F, 1.0F, 0.0F});
+        const glm::mat4 cubeModel = glm::translate(glm::mat4(1.0F), {0.0F, 0.5F, 0.0F}) * glm::rotate(glm::mat4(1.0F), radians(cubeRotation_), {0.0F, 1.0F, 0.0F});
 
         shader_.use();
         shader_.setMat4("uProjection", projection);
         shader_.setMat4("uView", view);
-        shader_.setMat4("uModel", model);
+
+        gridFloor_.draw(shader_);
+        axisGizmo_.draw(shader_);
+
+        shader_.setMat4("uModel", cubeModel);
 
         glBindVertexArray(cubeVao_);
         glDrawArrays(GL_TRIANGLES, 0, 36);

@@ -13,7 +13,7 @@ namespace matrixalchemy
 
     ShaderProgram::~ShaderProgram()
     {
-        destroy();
+        release();
     }
 
     ShaderProgram::ShaderProgram(ShaderProgram &&other) noexcept
@@ -26,7 +26,7 @@ namespace matrixalchemy
     {
         if (this != &other)
         {
-            destroy();
+            release();
             id_ = other.id_;
             other.id_ = 0;
         }
@@ -58,8 +58,17 @@ namespace matrixalchemy
             throw std::runtime_error("Failed to link shader program: " + std::string(log.begin(), log.end()));
         }
 
-        destroy();
+        release();
         id_ = program;
+    }
+
+    void ShaderProgram::release()
+    {
+        if (id_ != 0)
+        {
+            glDeleteProgram(id_);
+            id_ = 0;
+        }
     }
 
     void ShaderProgram::use() const
@@ -95,15 +104,6 @@ namespace matrixalchemy
         }
 
         return shader;
-    }
-
-    void ShaderProgram::destroy()
-    {
-        if (id_ != 0)
-        {
-            glDeleteProgram(id_);
-            id_ = 0;
-        }
     }
 
 } // namespace matrixalchemy

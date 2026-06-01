@@ -20,12 +20,12 @@ namespace matrixalchemy
         ShaderProgram &operator=(ShaderProgram &&other) noexcept;
 
         void create(std::string_view vertexSource, std::string_view fragmentSource);
+        void release();
         void use() const;
         void setMat4(std::string_view name, const glm::mat4 &value) const;
 
     private:
         static unsigned int compileShader(unsigned int type, std::string_view source);
-        void destroy();
 
         unsigned int id_ = 0;
     };

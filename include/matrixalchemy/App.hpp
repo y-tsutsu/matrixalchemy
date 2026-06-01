@@ -1,5 +1,7 @@
 #pragma once
 
+#include "matrixalchemy/AxisGizmo.hpp"
+#include "matrixalchemy/GridFloor.hpp"
 #include "matrixalchemy/ShaderProgram.hpp"
 
 #include <GLFW/glfw3.h>
@@ -48,10 +50,12 @@ namespace matrixalchemy
         unsigned int cubeVao_ = 0;
         unsigned int cubeVbo_ = 0;
         ShaderProgram shader_;
+        GridFloor gridFloor_;
+        AxisGizmo axisGizmo_;
 
-        glm::vec3 cameraTarget_ = {0.0F, 0.0F, 0.0F};
-        float cameraRadius_ = 5.0F;
-        float cameraTheta_ = 35.0F;
+        glm::vec3 cameraTarget_ = {0.0F, 0.5F, 0.0F};
+        float cameraRadius_ = 8.0F;
+        float cameraTheta_ = 45.0F;
         float cameraPhi_ = 25.0F;
         float cubeRotation_ = 0.0F;
     };

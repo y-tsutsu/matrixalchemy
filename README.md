@@ -17,22 +17,23 @@ kind of experience with a modern, portable native stack.
 
 ## Current Milestone
 
-The first milestone creates a minimal OpenGL application:
+The current milestone provides a minimal OpenGL scene:
 
 - GLFW window and input handling
 - GLAD OpenGL function loading
 - GLM-based `model`, `view`, and `projection` matrices
+- a checkerboard floor grid
+- RGB XYZ axes
 - a rotating colored cube
 - optional Dear ImGui debug panel
 
 Upcoming milestones:
 
-1. Add a floor grid and XYZ axis.
-2. Add a movable character placeholder.
-3. Add planar shadows similar to the original DirectX sample.
-4. Add glTF model loading.
-5. Add lighting and material controls.
-6. Expand documentation as a beginner-friendly 3D graphics guide.
+1. Add a movable character placeholder.
+2. Add planar shadows similar to the original DirectX sample.
+3. Add glTF model loading.
+4. Add lighting and material controls.
+5. Expand documentation as a beginner-friendly 3D graphics guide.
 
 ## Tech Stack
 
