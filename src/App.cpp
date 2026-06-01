@@ -138,6 +138,8 @@ namespace matrixalchemy
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_DEPTH_BITS, 24);
+        glfwWindowHint(GLFW_STENCIL_BITS, 8);
 
         window_ = glfwCreateWindow(width_, height_, "Matrix Alchemy", nullptr, nullptr);
         if (window_ == nullptr)
@@ -205,7 +207,7 @@ namespace matrixalchemy
 
     void App::render()
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         const float aspect = static_cast<float>(width_) / static_cast<float>(height_);
         const glm::mat4 projection = glm::perspective(glm::radians(60.0F), aspect, 0.1F, 100.0F);
@@ -216,9 +218,15 @@ namespace matrixalchemy
         shader_.setMat4("uView", view);
         shader_.setBool("uUseColorOverride", false);
 
+        glEnable(GL_STENCIL_TEST);
+        glStencilMask(0xFF);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         gridFloor_.draw(shader_);
+        glStencilMask(0x00);
 
         const glm::mat4 shadowMatrix = planarShadowMatrix({0.0F, 1.0F, 0.0F, 0.0F}, {-3.0F, 6.0F, -4.0F, 1.0F});
+        glStencilFunc(GL_EQUAL, 1, 0xFF);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glDepthMask(GL_FALSE);
@@ -229,6 +237,8 @@ namespace matrixalchemy
         shader_.setBool("uUseColorOverride", false);
         glDepthMask(GL_TRUE);
         glDisable(GL_BLEND);
+        glStencilMask(0xFF);
+        glDisable(GL_STENCIL_TEST);
 
         axisGizmo_.draw(shader_);
         cube_.draw(shader_);
