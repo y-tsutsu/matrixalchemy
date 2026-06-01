@@ -13,7 +13,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
-find_package(PkgConfig REQUIRED)
+find_package(PkgConfig QUIET)
 
 find_package(glm CONFIG QUIET)
 if(NOT glm_FOUND)
@@ -68,7 +68,9 @@ if(MATRIXALCHEMY_ENABLE_IMGUI)
     target_link_libraries(matrixalchemy PRIVATE imgui::imgui)
     target_compile_definitions(matrixalchemy PRIVATE MATRIXALCHEMY_HAS_IMGUI=1)
   else()
-    pkg_check_modules(IMGUI QUIET IMPORTED_TARGET imgui)
+    if(PkgConfig_FOUND)
+      pkg_check_modules(IMGUI QUIET IMPORTED_TARGET imgui)
+    endif()
     if(TARGET PkgConfig::IMGUI)
       target_sources(matrixalchemy
         PRIVATE

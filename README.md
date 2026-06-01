@@ -94,9 +94,12 @@ Run:
 ./build/matrixalchemy
 ```
 
-## Windows / MSYS2 Setup
+## Windows / MSYS2 + vcpkg Setup
 
-Use the **UCRT64** shell.
+Use MSYS2 mainly for the shell and build tools. C++ libraries are managed by
+vcpkg so that the same dependencies can also be used from Visual Studio later.
+
+In the **UCRT64** shell, install the development tools:
 
 ```bash
 pacman -Syu
@@ -104,15 +107,24 @@ pacman -S \
   mingw-w64-ucrt-x86_64-toolchain \
   mingw-w64-ucrt-x86_64-cmake \
   mingw-w64-ucrt-x86_64-ninja \
-  mingw-w64-ucrt-x86_64-glfw \
-  mingw-w64-ucrt-x86_64-glm \
-  mingw-w64-ucrt-x86_64-imgui
+  git
+```
+
+Install vcpkg separately, then install this project's dependencies through the
+manifest:
+
+```bash
+git clone https://github.com/microsoft/vcpkg.git /c/dev/vcpkg
+/c/dev/vcpkg/bootstrap-vcpkg.sh
+/c/dev/vcpkg/vcpkg install --triplet x64-mingw-dynamic
 ```
 
 Configure and build:
 
 ```bash
-cmake -S . -B build -G Ninja
+cmake -S . -B build -G Ninja \
+  -DCMAKE_TOOLCHAIN_FILE=/c/dev/vcpkg/scripts/buildsystems/vcpkg.cmake \
+  -DVCPKG_TARGET_TRIPLET=x64-mingw-dynamic
 cmake --build build
 ```
 
@@ -120,6 +132,19 @@ Run:
 
 ```bash
 ./build/matrixalchemy.exe
+```
+
+## Windows / Visual Studio + vcpkg Setup
+
+Install vcpkg and use the same `vcpkg.json` manifest. A typical configure step
+from PowerShell is:
+
+```powershell
+cmake -S . -B build -G Ninja `
+  -DCMAKE_TOOLCHAIN_FILE=C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake `
+  -DVCPKG_TARGET_TRIPLET=x64-windows
+
+cmake --build build
 ```
 
 ## Controls
