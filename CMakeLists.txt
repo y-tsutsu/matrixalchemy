@@ -34,6 +34,7 @@ add_executable(matrixalchemy
   src/FileSystem.cpp
   src/GridFloor.cpp
   src/Main.cpp
+  src/RotatingCube.cpp
   src/ShaderProgram.cpp)
 
 target_include_directories(matrixalchemy

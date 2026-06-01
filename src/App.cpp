@@ -10,237 +10,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <algorithm>
-#include <array>
 #include <chrono>
 #include <cmath>
 #include <stdexcept>
 
 namespace
 {
-
-    constexpr std::array<float, 216> cubeVertices = {
-        -0.5F,
-        -0.5F,
-        -0.5F,
-        0.90F,
-        0.20F,
-        0.25F,
-        0.5F,
-        -0.5F,
-        -0.5F,
-        0.90F,
-        0.20F,
-        0.25F,
-        0.5F,
-        0.5F,
-        -0.5F,
-        0.90F,
-        0.20F,
-        0.25F,
-        0.5F,
-        0.5F,
-        -0.5F,
-        0.90F,
-        0.20F,
-        0.25F,
-        -0.5F,
-        0.5F,
-        -0.5F,
-        0.90F,
-        0.20F,
-        0.25F,
-        -0.5F,
-        -0.5F,
-        -0.5F,
-        0.90F,
-        0.20F,
-        0.25F,
-
-        -0.5F,
-        -0.5F,
-        0.5F,
-        0.20F,
-        0.60F,
-        0.95F,
-        0.5F,
-        -0.5F,
-        0.5F,
-        0.20F,
-        0.60F,
-        0.95F,
-        0.5F,
-        0.5F,
-        0.5F,
-        0.20F,
-        0.60F,
-        0.95F,
-        0.5F,
-        0.5F,
-        0.5F,
-        0.20F,
-        0.60F,
-        0.95F,
-        -0.5F,
-        0.5F,
-        0.5F,
-        0.20F,
-        0.60F,
-        0.95F,
-        -0.5F,
-        -0.5F,
-        0.5F,
-        0.20F,
-        0.60F,
-        0.95F,
-
-        -0.5F,
-        0.5F,
-        0.5F,
-        0.25F,
-        0.80F,
-        0.40F,
-        -0.5F,
-        0.5F,
-        -0.5F,
-        0.25F,
-        0.80F,
-        0.40F,
-        -0.5F,
-        -0.5F,
-        -0.5F,
-        0.25F,
-        0.80F,
-        0.40F,
-        -0.5F,
-        -0.5F,
-        -0.5F,
-        0.25F,
-        0.80F,
-        0.40F,
-        -0.5F,
-        -0.5F,
-        0.5F,
-        0.25F,
-        0.80F,
-        0.40F,
-        -0.5F,
-        0.5F,
-        0.5F,
-        0.25F,
-        0.80F,
-        0.40F,
-
-        0.5F,
-        0.5F,
-        0.5F,
-        0.95F,
-        0.70F,
-        0.20F,
-        0.5F,
-        0.5F,
-        -0.5F,
-        0.95F,
-        0.70F,
-        0.20F,
-        0.5F,
-        -0.5F,
-        -0.5F,
-        0.95F,
-        0.70F,
-        0.20F,
-        0.5F,
-        -0.5F,
-        -0.5F,
-        0.95F,
-        0.70F,
-        0.20F,
-        0.5F,
-        -0.5F,
-        0.5F,
-        0.95F,
-        0.70F,
-        0.20F,
-        0.5F,
-        0.5F,
-        0.5F,
-        0.95F,
-        0.70F,
-        0.20F,
-
-        -0.5F,
-        -0.5F,
-        -0.5F,
-        0.65F,
-        0.35F,
-        0.85F,
-        0.5F,
-        -0.5F,
-        -0.5F,
-        0.65F,
-        0.35F,
-        0.85F,
-        0.5F,
-        -0.5F,
-        0.5F,
-        0.65F,
-        0.35F,
-        0.85F,
-        0.5F,
-        -0.5F,
-        0.5F,
-        0.65F,
-        0.35F,
-        0.85F,
-        -0.5F,
-        -0.5F,
-        0.5F,
-        0.65F,
-        0.35F,
-        0.85F,
-        -0.5F,
-        -0.5F,
-        -0.5F,
-        0.65F,
-        0.35F,
-        0.85F,
-
-        -0.5F,
-        0.5F,
-        -0.5F,
-        0.15F,
-        0.75F,
-        0.80F,
-        0.5F,
-        0.5F,
-        -0.5F,
-        0.15F,
-        0.75F,
-        0.80F,
-        0.5F,
-        0.5F,
-        0.5F,
-        0.15F,
-        0.75F,
-        0.80F,
-        0.5F,
-        0.5F,
-        0.5F,
-        0.15F,
-        0.75F,
-        0.80F,
-        -0.5F,
-        0.5F,
-        0.5F,
-        0.15F,
-        0.75F,
-        0.80F,
-        -0.5F,
-        0.5F,
-        -0.5F,
-        0.15F,
-        0.75F,
-        0.80F,
-    };
 
     float radians(float degrees)
     {
@@ -264,14 +39,7 @@ namespace matrixalchemy
 #if MATRIXALCHEMY_HAS_IMGUI
         DebugUi::shutdown();
 #endif
-        if (cubeVbo_ != 0)
-        {
-            glDeleteBuffers(1, &cubeVbo_);
-        }
-        if (cubeVao_ != 0)
-        {
-            glDeleteVertexArrays(1, &cubeVao_);
-        }
+        cube_.release();
         axisGizmo_.release();
         gridFloor_.release();
         shader_.release();
@@ -382,23 +150,9 @@ namespace matrixalchemy
         const std::string fragmentShaderSource = readTextFile(resolveAssetPath("assets/shaders/color.frag"));
         shader_.create(vertexShaderSource, fragmentShaderSource);
 
-        glGenVertexArrays(1, &cubeVao_);
-        glGenBuffers(1, &cubeVbo_);
-
-        glBindVertexArray(cubeVao_);
-        glBindBuffer(GL_ARRAY_BUFFER, cubeVbo_);
-        glBufferData(GL_ARRAY_BUFFER, static_cast<long>(cubeVertices.size() * sizeof(float)), cubeVertices.data(), GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
-
         gridFloor_.create(5.0F, 10);
         axisGizmo_.create(5.0F);
+        cube_.create(1.0F);
     }
 
     void App::processInput()
@@ -423,11 +177,7 @@ namespace matrixalchemy
 
     void App::update(float deltaSeconds)
     {
-        cubeRotation_ += 45.0F * deltaSeconds;
-        if (cubeRotation_ >= 360.0F)
-        {
-            cubeRotation_ -= 360.0F;
-        }
+        cube_.update(deltaSeconds);
     }
 
     void App::render()
@@ -445,20 +195,13 @@ namespace matrixalchemy
             cameraRadius_ * std::sin(theta) * std::cos(phi),
         };
         const glm::mat4 view = glm::lookAt(cameraPosition, cameraTarget_, {0.0F, 1.0F, 0.0F});
-        const glm::mat4 cubeModel = glm::translate(glm::mat4(1.0F), {0.0F, 0.5F, 0.0F}) * glm::rotate(glm::mat4(1.0F), radians(cubeRotation_), {0.0F, 1.0F, 0.0F});
-
         shader_.use();
         shader_.setMat4("uProjection", projection);
         shader_.setMat4("uView", view);
 
         gridFloor_.draw(shader_);
         axisGizmo_.draw(shader_);
-
-        shader_.setMat4("uModel", cubeModel);
-
-        glBindVertexArray(cubeVao_);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
+        cube_.draw(shader_);
 
 #if MATRIXALCHEMY_HAS_IMGUI
         if (showDebugUi_)

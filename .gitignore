@@ -69,3 +69,6 @@ Testing/
 
 # Dear ImGui runtime state
 imgui.ini
+
+# Editor settings
+.vscode/
