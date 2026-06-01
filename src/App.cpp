@@ -1,5 +1,6 @@
 #include "matrixalchemy/App.hpp"
 
+#include "matrixalchemy/FileSystem.hpp"
 #include "matrixalchemy/Gl.hpp"
 
 #if MATRIXALCHEMY_HAS_IMGUI
@@ -16,37 +17,6 @@
 
 namespace
 {
-
-    constexpr const char *vertexShaderSource = R"glsl(
-#version 330 core
-
-layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec3 aColor;
-
-uniform mat4 uModel;
-uniform mat4 uView;
-uniform mat4 uProjection;
-
-out vec3 vColor;
-
-void main()
-{
-  vColor = aColor;
-  gl_Position = uProjection * uView * uModel * vec4(aPosition, 1.0);
-}
-)glsl";
-
-    constexpr const char *fragmentShaderSource = R"glsl(
-#version 330 core
-
-in vec3 vColor;
-out vec4 fragColor;
-
-void main()
-{
-  fragColor = vec4(vColor, 1.0);
-}
-)glsl";
 
     constexpr std::array<float, 216> cubeVertices = {
         -0.5F,
@@ -408,6 +378,8 @@ namespace matrixalchemy
 
     void App::initializeScene()
     {
+        const std::string vertexShaderSource = readTextFile(resolveAssetPath("assets/shaders/color.vert"));
+        const std::string fragmentShaderSource = readTextFile(resolveAssetPath("assets/shaders/color.frag"));
         shader_.create(vertexShaderSource, fragmentShaderSource);
 
         glGenVertexArrays(1, &cubeVao_);

@@ -31,6 +31,7 @@ add_executable(matrixalchemy
   src/App.cpp
   src/AxisGizmo.cpp
   src/ColoredMesh.cpp
+  src/FileSystem.cpp
   src/GridFloor.cpp
   src/Main.cpp
   src/ShaderProgram.cpp)
@@ -40,6 +41,7 @@ target_include_directories(matrixalchemy
     ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_compile_definitions(matrixalchemy PRIVATE GLFW_INCLUDE_NONE)
+target_compile_definitions(matrixalchemy PRIVATE MATRIXALCHEMY_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
 if(glm_FOUND)
   target_link_libraries(matrixalchemy PRIVATE glm::glm)

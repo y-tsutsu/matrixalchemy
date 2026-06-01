@@ -22,6 +22,7 @@ The current milestone provides a minimal OpenGL scene:
 - GLFW window and input handling
 - GLAD OpenGL function loading
 - GLM-based `model`, `view`, and `projection` matrices
+- GLSL shader files loaded from `assets/shaders`
 - a checkerboard floor grid
 - RGB XYZ axes
 - a rotating colored cube
@@ -133,3 +134,7 @@ The original DirectX sample used concepts like drawable/movable objects, a
 camera, a floor plane, XYZ axes, random cubes, a character model, and projected
 shadows. Matrix Alchemy intentionally keeps those ideas visible in the code so
 that the rendering pipeline can be learned by reading and changing the source.
+
+Shader sources live under `assets/shaders`. The executable looks for assets next
+to the binary, in the current working directory, and in the source tree, which
+keeps local development simple while leaving room for packaging later.
