@@ -25,6 +25,32 @@ namespace
         return nullptr;
     }
 
+    const cgltf_accessor *findColorAccessor(const cgltf_primitive &primitive)
+    {
+        for (cgltf_size index = 0; index < primitive.attributes_count; ++index)
+        {
+            const cgltf_attribute &attribute = primitive.attributes[index];
+            if (attribute.type == cgltf_attribute_type_color && attribute.index == 0)
+            {
+                return attribute.data;
+            }
+        }
+
+        return nullptr;
+    }
+
+    glm::vec3 readVertexColor(const cgltf_accessor *colors, cgltf_size index, const glm::vec3 &fallbackColor)
+    {
+        if (colors == nullptr)
+        {
+            return fallbackColor;
+        }
+
+        float color[4] = {fallbackColor.r, fallbackColor.g, fallbackColor.b, 1.0F};
+        cgltf_accessor_read_float(colors, index, color, 4);
+        return {color[0], color[1], color[2]};
+    }
+
     glm::mat4 nodeWorldTransform(const cgltf_node &node)
     {
         glm::mat4 transform(1.0F);
@@ -48,7 +74,7 @@ namespace matrixalchemy
     namespace
     {
 
-        std::vector<std::vector<ColoredVertex>> readMeshPrimitives(const cgltf_mesh &mesh, const glm::vec3 &color)
+        std::vector<std::vector<ColoredVertex>> readMeshPrimitives(const cgltf_mesh &mesh, const glm::vec3 &fallbackColor)
         {
             std::vector<std::vector<ColoredVertex>> primitives;
 
@@ -65,6 +91,7 @@ namespace matrixalchemy
                 {
                     continue;
                 }
+                const cgltf_accessor *colors = findColorAccessor(primitive);
 
                 std::vector<ColoredVertex> vertices;
                 if (primitive.indices != nullptr)
@@ -75,7 +102,7 @@ namespace matrixalchemy
                         const cgltf_size vertexIndex = cgltf_accessor_read_index(primitive.indices, index);
                         float position[3] = {};
                         cgltf_accessor_read_float(positions, vertexIndex, position, 3);
-                        vertices.push_back({{position[0], position[1], position[2]}, color});
+                        vertices.push_back({{position[0], position[1], position[2]}, readVertexColor(colors, vertexIndex, fallbackColor)});
                     }
                 }
                 else
@@ -85,7 +112,7 @@ namespace matrixalchemy
                     {
                         float position[3] = {};
                         cgltf_accessor_read_float(positions, index, position, 3);
-                        vertices.push_back({{position[0], position[1], position[2]}, color});
+                        vertices.push_back({{position[0], position[1], position[2]}, readVertexColor(colors, index, fallbackColor)});
                     }
                 }
 

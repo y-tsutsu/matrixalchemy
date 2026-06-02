@@ -27,7 +27,8 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0
+            "POSITION": 0,
+            "COLOR_0": 1
           },
           "mode": 4
         }
@@ -36,14 +37,20 @@
   ],
   "buffers": [
     {
-      "uri": "data:application/octet-stream;base64,AAAAvwAAAAAAAAAAAAAAPwAAAAAAAAAAAAAAAAAAgD8AAAAA",
-      "byteLength": 36
+      "uri": "data:application/octet-stream;base64,AAAAvwAAAAAAAAAAAAAAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAACAP83MTD7NzEw+zcxMPmZmZj+amZk+zcxMPs3MzD4AAIA/",
+      "byteLength": 72
     }
   ],
   "bufferViews": [
     {
       "buffer": 0,
       "byteOffset": 0,
+      "byteLength": 36,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 36,
       "byteLength": 36,
       "target": 34962
     }
@@ -57,6 +64,15 @@
       "type": "VEC3",
       "min": [-0.5, 0.0, 0.0],
       "max": [0.5, 1.0, 0.0]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3",
+      "min": [0.2, 0.2, 0.2],
+      "max": [1.0, 0.9, 1.0]
     }
   ]
 }
