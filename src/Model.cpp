@@ -3,7 +3,9 @@
 #include "matrixalchemy/Gl.hpp"
 
 #include <cgltf.h>
+#include <glm/gtc/type_ptr.hpp>
 
+#include <functional>
 #include <stdexcept>
 
 namespace
@@ -23,6 +25,13 @@ namespace
         return nullptr;
     }
 
+    glm::mat4 nodeWorldTransform(const cgltf_node &node)
+    {
+        glm::mat4 transform(1.0F);
+        cgltf_node_transform_world(&node, glm::value_ptr(transform));
+        return transform;
+    }
+
     void throwIfFailed(cgltf_result result, const char *message)
     {
         if (result != cgltf_result_success)
@@ -35,6 +44,58 @@ namespace
 
 namespace matrixalchemy
 {
+
+    namespace
+    {
+
+        std::vector<std::vector<ColoredVertex>> readMeshPrimitives(const cgltf_mesh &mesh, const glm::vec3 &color)
+        {
+            std::vector<std::vector<ColoredVertex>> primitives;
+
+            for (cgltf_size primitiveIndex = 0; primitiveIndex < mesh.primitives_count; ++primitiveIndex)
+            {
+                const cgltf_primitive &primitive = mesh.primitives[primitiveIndex];
+                if (primitive.type != cgltf_primitive_type_triangles)
+                {
+                    continue;
+                }
+
+                const cgltf_accessor *positions = findPositionAccessor(primitive);
+                if (positions == nullptr)
+                {
+                    continue;
+                }
+
+                std::vector<ColoredVertex> vertices;
+                if (primitive.indices != nullptr)
+                {
+                    vertices.reserve(static_cast<std::size_t>(primitive.indices->count));
+                    for (cgltf_size index = 0; index < primitive.indices->count; ++index)
+                    {
+                        const cgltf_size vertexIndex = cgltf_accessor_read_index(primitive.indices, index);
+                        float position[3] = {};
+                        cgltf_accessor_read_float(positions, vertexIndex, position, 3);
+                        vertices.push_back({{position[0], position[1], position[2]}, color});
+                    }
+                }
+                else
+                {
+                    vertices.reserve(static_cast<std::size_t>(positions->count));
+                    for (cgltf_size index = 0; index < positions->count; ++index)
+                    {
+                        float position[3] = {};
+                        cgltf_accessor_read_float(positions, index, position, 3);
+                        vertices.push_back({{position[0], position[1], position[2]}, color});
+                    }
+                }
+
+                primitives.push_back(std::move(vertices));
+            }
+
+            return primitives;
+        }
+
+    } // namespace
 
     void Model::load(const std::filesystem::path &path, const glm::vec3 &color)
     {
@@ -50,52 +111,60 @@ namespace matrixalchemy
             throwIfFailed(cgltf_load_buffers(&options, data, path.string().c_str()), "Failed to load glTF buffers.");
             throwIfFailed(cgltf_validate(data), "Failed to validate glTF file.");
 
+            std::vector<std::vector<std::size_t>> meshPrimitiveIndices(data->meshes_count);
             for (cgltf_size meshIndex = 0; meshIndex < data->meshes_count; ++meshIndex)
             {
-                const cgltf_mesh &mesh = data->meshes[meshIndex];
-                for (cgltf_size primitiveIndex = 0; primitiveIndex < mesh.primitives_count; ++primitiveIndex)
+                const std::vector<std::vector<ColoredVertex>> primitives = readMeshPrimitives(data->meshes[meshIndex], color);
+                for (const std::vector<ColoredVertex> &vertices : primitives)
                 {
-                    const cgltf_primitive &primitive = mesh.primitives[primitiveIndex];
-                    if (primitive.type != cgltf_primitive_type_triangles)
+                    if (vertices.empty())
                     {
                         continue;
                     }
 
-                    const cgltf_accessor *positions = findPositionAccessor(primitive);
-                    if (positions == nullptr)
+                    Mesh loadedMesh;
+                    loadedMesh.geometry.upload(vertices, GL_TRIANGLES);
+                    meshes_.push_back(std::move(loadedMesh));
+                    meshPrimitiveIndices[meshIndex].push_back(meshes_.size() - 1);
+                }
+            }
+
+            const cgltf_scene *scene = data->scene;
+            if (scene == nullptr && data->scenes_count > 0)
+            {
+                scene = &data->scenes[0];
+            }
+
+            if (scene != nullptr)
+            {
+                const std::function<void(const cgltf_node *)> addNodeInstances = [&](const cgltf_node *node)
+                {
+                    if (node == nullptr)
                     {
-                        continue;
+                        return;
                     }
 
-                    std::vector<ColoredVertex> vertices;
-                    if (primitive.indices != nullptr)
+                    if (node->mesh != nullptr)
                     {
-                        vertices.reserve(static_cast<std::size_t>(primitive.indices->count));
-                        for (cgltf_size index = 0; index < primitive.indices->count; ++index)
+                        const cgltf_size meshIndex = static_cast<cgltf_size>(node->mesh - data->meshes);
+                        if (meshIndex < meshPrimitiveIndices.size())
                         {
-                            const cgltf_size vertexIndex = cgltf_accessor_read_index(primitive.indices, index);
-                            float position[3] = {};
-                            cgltf_accessor_read_float(positions, vertexIndex, position, 3);
-                            vertices.push_back({{position[0], position[1], position[2]}, color});
-                        }
-                    }
-                    else
-                    {
-                        vertices.reserve(static_cast<std::size_t>(positions->count));
-                        for (cgltf_size index = 0; index < positions->count; ++index)
-                        {
-                            float position[3] = {};
-                            cgltf_accessor_read_float(positions, index, position, 3);
-                            vertices.push_back({{position[0], position[1], position[2]}, color});
+                            for (const std::size_t loadedMeshIndex : meshPrimitiveIndices[meshIndex])
+                            {
+                                instances_.push_back({loadedMeshIndex, nodeWorldTransform(*node)});
+                            }
                         }
                     }
 
-                    if (!vertices.empty())
+                    for (cgltf_size childIndex = 0; childIndex < node->children_count; ++childIndex)
                     {
-                        ColoredMesh loadedMesh;
-                        loadedMesh.upload(vertices, GL_TRIANGLES);
-                        meshes_.push_back(std::move(loadedMesh));
+                        addNodeInstances(node->children[childIndex]);
                     }
+                };
+
+                for (cgltf_size nodeIndex = 0; nodeIndex < scene->nodes_count; ++nodeIndex)
+                {
+                    addNodeInstances(scene->nodes[nodeIndex]);
                 }
             }
 
@@ -111,19 +180,25 @@ namespace matrixalchemy
 
     void Model::release()
     {
-        for (ColoredMesh &mesh : meshes_)
+        for (Mesh &mesh : meshes_)
         {
-            mesh.release();
+            mesh.geometry.release();
         }
         meshes_.clear();
+        instances_.clear();
     }
 
     void Model::draw(ShaderProgram &shader, const glm::mat4 &modelMatrix) const
     {
-        shader.setMat4("uModel", modelMatrix);
-        for (const ColoredMesh &mesh : meshes_)
+        for (const MeshInstance &instance : instances_)
         {
-            mesh.draw();
+            if (instance.meshIndex >= meshes_.size())
+            {
+                continue;
+            }
+
+            shader.setMat4("uModel", modelMatrix * instance.transform);
+            meshes_[instance.meshIndex].geometry.draw();
         }
     }
 

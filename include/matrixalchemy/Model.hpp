@@ -20,7 +20,19 @@ namespace matrixalchemy
         [[nodiscard]] bool empty() const { return meshes_.empty(); }
 
     private:
-        std::vector<ColoredMesh> meshes_;
+        struct Mesh
+        {
+            ColoredMesh geometry;
+        };
+
+        struct MeshInstance
+        {
+            std::size_t meshIndex = 0;
+            glm::mat4 transform = glm::mat4(1.0F);
+        };
+
+        std::vector<Mesh> meshes_;
+        std::vector<MeshInstance> instances_;
     };
 
 } // namespace matrixalchemy
