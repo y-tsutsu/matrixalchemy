@@ -46,6 +46,8 @@ Upcoming milestones:
 - GLAD, generated into `external/glad`
 - GLM
 - Dear ImGui
+- cgltf, vendored under `external/cgltf` for local builds and listed in
+  `vcpkg.json` for Windows/vcpkg builds
 - glTF model assets, loader to be selected in a later milestone
 
 ## Debian / WSLg Setup

@@ -42,7 +42,8 @@ add_executable(matrixalchemy
 
 target_include_directories(matrixalchemy
   PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/cgltf)
 
 target_compile_definitions(matrixalchemy PRIVATE GLFW_INCLUDE_NONE)
 target_compile_definitions(matrixalchemy PRIVATE MATRIXALCHEMY_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
