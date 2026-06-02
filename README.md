@@ -27,7 +27,8 @@ The current milestone provides a minimal OpenGL scene:
 - RGB XYZ axes
 - a rotating colored cube
 - a simple movable character placeholder
-- a minimal glTF sample loaded through cgltf with node transforms and vertex colors
+- a minimal glTF sample loaded through cgltf with an external buffer, node
+  transforms, and vertex colors
 - mouse-driven orbit camera controls
 - planar shadows projected onto the floor
 - optional Dear ImGui debug panel
