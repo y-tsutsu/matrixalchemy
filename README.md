@@ -27,13 +27,14 @@ The current milestone provides a minimal OpenGL scene:
 - RGB XYZ axes
 - a rotating colored cube
 - a simple movable character placeholder
+- a minimal glTF sample loaded through cgltf
 - mouse-driven orbit camera controls
 - planar shadows projected onto the floor
 - optional Dear ImGui debug panel
 
 Upcoming milestones:
 
-1. Add glTF model loading.
+1. Replace the placeholder with a free character glTF asset.
 2. Add lighting and material controls.
 3. Expand documentation as a beginner-friendly 3D graphics guide.
 
@@ -48,7 +49,7 @@ Upcoming milestones:
 - Dear ImGui
 - cgltf, vendored under `external/cgltf` for local builds and listed in
   `vcpkg.json` for Windows/vcpkg builds
-- glTF model assets, loader to be selected in a later milestone
+- glTF model assets
 
 ## Debian / WSLg Setup
 

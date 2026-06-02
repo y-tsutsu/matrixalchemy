@@ -31,10 +31,12 @@ add_executable(matrixalchemy
   src/App.cpp
   src/AxisGizmo.cpp
   src/Character.cpp
+  src/Cgltf.cpp
   src/ColoredMesh.cpp
   src/FileSystem.cpp
   src/GridFloor.cpp
   src/Main.cpp
+  src/Model.cpp
   src/OrbitCamera.cpp
   src/RotatingCube.cpp
   src/Shadow.cpp

@@ -3,6 +3,7 @@
 #include "matrixalchemy/AxisGizmo.hpp"
 #include "matrixalchemy/Character.hpp"
 #include "matrixalchemy/GridFloor.hpp"
+#include "matrixalchemy/Model.hpp"
 #include "matrixalchemy/OrbitCamera.hpp"
 #include "matrixalchemy/RotatingCube.hpp"
 #include "matrixalchemy/ShaderProgram.hpp"
@@ -58,6 +59,7 @@ namespace matrixalchemy
         AxisGizmo axisGizmo_;
         RotatingCube cube_;
         Character character_;
+        Model sampleModel_;
         OrbitCamera camera_;
         CharacterInput characterInput_;
     };

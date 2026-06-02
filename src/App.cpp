@@ -30,6 +30,7 @@ namespace matrixalchemy
         DebugUi::shutdown();
 #endif
         character_.release();
+        sampleModel_.release();
         cube_.release();
         axisGizmo_.release();
         gridFloor_.release();
@@ -189,6 +190,7 @@ namespace matrixalchemy
         axisGizmo_.create(5.0F);
         cube_.create(1.0F);
         character_.create();
+        sampleModel_.load(resolveAssetPath("assets/models/simple-triangle.gltf"), {0.90F, 0.45F, 0.10F});
     }
 
     void App::processInput()
@@ -243,6 +245,7 @@ namespace matrixalchemy
         axisGizmo_.draw(shader_);
         cube_.draw(shader_);
         character_.draw(shader_);
+        sampleModel_.draw(shader_, glm::translate(glm::mat4(1.0F), {2.0F, 0.0F, 1.5F}));
 
 #if MATRIXALCHEMY_HAS_IMGUI
         if (showDebugUi_)
