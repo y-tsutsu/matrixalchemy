@@ -1,12 +1,12 @@
 #pragma once
 
 #include "matrixalchemy/render/ColoredMesh.hpp"
-#include "matrixalchemy/scene/Drawable.hpp"
+#include "matrixalchemy/scene/IDrawable.hpp"
 
 namespace matrixalchemy::scene
 {
 
-    class GridFloor final : public Drawable
+    class GridFloor final : public IDrawable
     {
     public:
         void create(float halfSize, int tileCount);

@@ -7,10 +7,10 @@
 namespace matrixalchemy::scene
 {
 
-    class ShadowCaster
+    class IShadowCaster
     {
     public:
-        virtual ~ShadowCaster() = default;
+        virtual ~IShadowCaster() = default;
 
         virtual void drawShadow(render::ShaderProgram &shader, const glm::mat4 &shadowMatrix) const = 0;
     };

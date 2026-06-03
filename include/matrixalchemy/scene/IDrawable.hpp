@@ -5,10 +5,10 @@
 namespace matrixalchemy::scene
 {
 
-    class Drawable
+    class IDrawable
     {
     public:
-        virtual ~Drawable() = default;
+        virtual ~IDrawable() = default;
 
         virtual void draw(render::ShaderProgram &shader) const = 0;
     };

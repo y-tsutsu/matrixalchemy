@@ -1,8 +1,8 @@
 #pragma once
 
 #include "matrixalchemy/render/ColoredMesh.hpp"
-#include "matrixalchemy/scene/Drawable.hpp"
-#include "matrixalchemy/scene/ShadowCaster.hpp"
+#include "matrixalchemy/scene/IDrawable.hpp"
+#include "matrixalchemy/scene/IShadowCaster.hpp"
 
 #include <glm/glm.hpp>
 
@@ -17,7 +17,7 @@ namespace matrixalchemy::scene
         bool turnRight = false;
     };
 
-    class Character final : public Drawable, public ShadowCaster
+    class Character final : public IDrawable, public IShadowCaster
     {
     public:
         void create();

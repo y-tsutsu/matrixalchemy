@@ -1,13 +1,13 @@
 #pragma once
 
 #include "matrixalchemy/render/ColoredMesh.hpp"
-#include "matrixalchemy/scene/Drawable.hpp"
-#include "matrixalchemy/scene/ShadowCaster.hpp"
+#include "matrixalchemy/scene/IDrawable.hpp"
+#include "matrixalchemy/scene/IShadowCaster.hpp"
 
 namespace matrixalchemy::scene
 {
 
-    class RotatingCube final : public Drawable, public ShadowCaster
+    class RotatingCube final : public IDrawable, public IShadowCaster
     {
     public:
         void create(float size);
