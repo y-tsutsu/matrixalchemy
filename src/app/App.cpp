@@ -2,6 +2,7 @@
 
 #include "matrixalchemy/platform/FileSystem.hpp"
 #include "matrixalchemy/platform/Gl.hpp"
+#include "matrixalchemy/render/ShaderSources.hpp"
 #include "matrixalchemy/render/Shadow.hpp"
 
 #if MATRIXALCHEMY_HAS_IMGUI
@@ -13,6 +14,7 @@
 #include <algorithm>
 #include <chrono>
 #include <filesystem>
+#include <optional>
 #include <stdexcept>
 
 namespace matrixalchemy::app
@@ -183,19 +185,17 @@ namespace matrixalchemy::app
 
     void App::initializeScene()
     {
-        const std::string vertexShaderSource = platform::readTextFile(platform::resolveAssetPath("assets/shaders/color.vert"));
-        const std::string fragmentShaderSource = platform::readTextFile(platform::resolveAssetPath("assets/shaders/color.frag"));
-        shader_.create(vertexShaderSource, fragmentShaderSource);
+        shader_.create(render::shader_sources::colorVertex, render::shader_sources::colorFragment);
 
         gridFloor_.create(5.0F, 10);
         axisGizmo_.create(5.0F);
         cube_.create(1.0F);
         character_.create();
 
-        const std::filesystem::path saurusPath = std::filesystem::path(MATRIXALCHEMY_SOURCE_DIR) / "assets/models/saurus.vrm";
-        if (std::filesystem::exists(saurusPath))
+        const std::optional<std::filesystem::path> saurusPath = platform::findRuntimeAssetPath("saurus.vrm");
+        if (saurusPath.has_value())
         {
-            sampleModel_.load(saurusPath, {1.0F, 1.0F, 1.0F});
+            sampleModel_.load(*saurusPath, {1.0F, 1.0F, 1.0F});
             useCharacterModel_ = true;
         }
         else

@@ -22,7 +22,7 @@ The current milestone provides a minimal OpenGL scene:
 - GLFW window and input handling
 - GLAD OpenGL function loading
 - GLM-based `model`, `view`, and `projection` matrices
-- GLSL shader files loaded from `assets/shaders`
+- GLSL shader files embedded into the executable at build time
 - a checkerboard floor grid
 - RGB XYZ axes
 - a rotating colored cube
@@ -170,13 +170,15 @@ camera, a floor plane, XYZ axes, random cubes, a character model, and projected
 shadows. Matrix Alchemy intentionally keeps those ideas visible in the code so
 that the rendering pipeline can be learned by reading and changing the source.
 
-Shader sources live under `assets/shaders`. The executable looks for assets next
-to the binary, in the current working directory, and in the source tree, which
-keeps local development simple while leaving room for packaging later.
+Shader sources live under `assets/shaders` for editing. CMake converts them into
+a generated C++ header under the build directory, so the executable does not need
+to load shader files at runtime.
 
 The scene uses `assets/models/saurus.vrm` as the current keyboard-controlled VRM
-character when it is available. Otherwise, it falls back to the simple box
-character and the small `simple-triangle.gltf` sample.
+character. The build copies it next to the executable as `saurus.vrm`, and the
+runtime searches for that file next to the executable and in the current working
+directory. If the runtime model is not available, the app falls back to the
+simple box character and the small `simple-triangle.gltf` sample.
 
 The source tree is grouped by role. Headers mirror the implementation
 directories under `include/matrixalchemy`:

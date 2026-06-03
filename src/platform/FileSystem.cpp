@@ -36,6 +36,25 @@ namespace matrixalchemy::platform
 #endif
     }
 
+    std::optional<std::filesystem::path> findRuntimeAssetPath(const std::filesystem::path &relativePath)
+    {
+        const std::array<std::filesystem::path, 2> roots = {
+            executableDirectory(),
+            std::filesystem::current_path(),
+        };
+
+        for (const auto &root : roots)
+        {
+            const auto candidate = root / relativePath;
+            if (std::filesystem::exists(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        return std::nullopt;
+    }
+
     std::filesystem::path resolveAssetPath(const std::filesystem::path &relativePath)
     {
         const std::array<std::filesystem::path, 3> roots = {

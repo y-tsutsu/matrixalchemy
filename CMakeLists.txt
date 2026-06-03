@@ -22,6 +22,23 @@ endif()
 
 find_path(STB_INCLUDE_DIR stb_image.h PATH_SUFFIXES stb REQUIRED)
 
+set(MATRIXALCHEMY_GENERATED_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
+set(MATRIXALCHEMY_SHADER_SOURCES_HPP
+  ${MATRIXALCHEMY_GENERATED_INCLUDE_DIR}/matrixalchemy/render/ShaderSources.hpp)
+
+add_custom_command(
+  OUTPUT ${MATRIXALCHEMY_SHADER_SOURCES_HPP}
+  COMMAND ${CMAKE_COMMAND}
+    -DVERTEX_SHADER=${CMAKE_CURRENT_SOURCE_DIR}/assets/shaders/color.vert
+    -DFRAGMENT_SHADER=${CMAKE_CURRENT_SOURCE_DIR}/assets/shaders/color.frag
+    -DOUTPUT_FILE=${MATRIXALCHEMY_SHADER_SOURCES_HPP}
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateShaderSources.cmake
+  DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/shaders/color.vert
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/shaders/color.frag
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateShaderSources.cmake
+  VERBATIM)
+
 add_library(matrixalchemy_glad STATIC
   external/glad/src/gl.c)
 
@@ -44,16 +61,24 @@ add_executable(matrixalchemy
   src/scene/Character.cpp
   src/scene/GridFloor.cpp
   src/scene/OrbitCamera.cpp
-  src/scene/RotatingCube.cpp)
+  src/scene/RotatingCube.cpp
+  ${MATRIXALCHEMY_SHADER_SOURCES_HPP})
 
 target_include_directories(matrixalchemy
   PRIVATE
+    ${MATRIXALCHEMY_GENERATED_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/cgltf
     ${STB_INCLUDE_DIR})
 
 target_compile_definitions(matrixalchemy PRIVATE GLFW_INCLUDE_NONE)
 target_compile_definitions(matrixalchemy PRIVATE MATRIXALCHEMY_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+
+add_custom_command(TARGET matrixalchemy POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/models/saurus.vrm
+    $<TARGET_FILE_DIR:matrixalchemy>/saurus.vrm
+  VERBATIM)
 
 if(glm_FOUND)
   target_link_libraries(matrixalchemy PRIVATE glm::glm)
