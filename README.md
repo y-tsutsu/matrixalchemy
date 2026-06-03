@@ -178,6 +178,36 @@ The scene uses `assets/models/saurus.vrm` as the current keyboard-controlled VRM
 character when it is available. Otherwise, it falls back to the simple box
 character and the small `simple-triangle.gltf` sample.
 
+## VRM Support Scope
+
+The current VRM support is intentionally small and focused on rendering a
+beginner-friendly character sample in native OpenGL. It supports:
+
+- binary glTF/GLB-based `.vrm` files
+- scene node transforms
+- triangle meshes with indices
+- `POSITION`, `NORMAL`, `TEXCOORD_0`, and `COLOR_0`
+- base color factors and base color textures
+- embedded and external PNG/JPEG textures
+- glTF texture sampler state
+- alpha mask, alpha blend, and double-sided materials
+- `KHR_texture_transform`
+- keyboard-driven movement through the sample `Character` transform
+- projected floor shadows
+- a simple normal-expanded toon-style outline
+
+The loader does not yet implement the full VRM feature set. These are currently
+out of scope:
+
+- skeletal skinning
+- animation playback
+- humanoid retargeting
+- blend shapes and facial expressions
+- spring bones
+- first-person settings
+- full MToon material reproduction
+- VRM 1.0 extension-specific runtime behavior
+
 ## Asset Credits
 
 - `assets/models/saurus.vrm`: "Cute Saurus", distributed through Open Source
