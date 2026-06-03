@@ -8,7 +8,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-namespace matrixalchemy
+namespace matrixalchemy::asset
 {
 
     class Model
@@ -16,15 +16,15 @@ namespace matrixalchemy
     public:
         void load(const std::filesystem::path &path, const glm::vec3 &color);
         void release();
-        void draw(ShaderProgram &shader, const glm::mat4 &modelMatrix, bool useMaterialState = true) const;
-        void drawOutline(ShaderProgram &shader, const glm::mat4 &modelMatrix, float width) const;
+        void draw(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, bool useMaterialState = true) const;
+        void drawOutline(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, float width) const;
 
         [[nodiscard]] bool empty() const { return meshes_.empty(); }
 
     private:
         struct Mesh
         {
-            ModelMesh geometry;
+            render::ModelMesh geometry;
             std::size_t textureIndex = 0;
             float alphaCutoff = 0.5F;
             bool hasTexture = false;
@@ -41,7 +41,7 @@ namespace matrixalchemy
 
         std::vector<Mesh> meshes_;
         std::vector<MeshInstance> instances_;
-        std::vector<Texture2D> textures_;
+        std::vector<render::Texture2D> textures_;
     };
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::asset

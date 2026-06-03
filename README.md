@@ -178,6 +178,16 @@ The scene uses `assets/models/saurus.vrm` as the current keyboard-controlled VRM
 character when it is available. Otherwise, it falls back to the simple box
 character and the small `simple-triangle.gltf` sample.
 
+The source tree is grouped by role. Headers mirror the implementation
+directories under `include/matrixalchemy`:
+
+- `app`: application lifetime, input, and render ordering
+- `platform`: filesystem and platform/OpenGL include boundaries
+- `render`: OpenGL rendering primitives, shaders, textures, and shadow helpers
+- `asset`: glTF/VRM loading and conversion
+- `scene`: scene objects, camera, and drawable/shadow-casting interfaces
+- `ui`: Dear ImGui debug UI
+
 ## VRM Support Scope
 
 The current VRM support is intentionally small and focused on rendering a

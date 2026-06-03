@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace matrixalchemy
+namespace matrixalchemy::render
 {
 
     ModelMesh::~ModelMesh()
@@ -86,4 +86,4 @@ namespace matrixalchemy
         glBindVertexArray(0);
     }
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::render

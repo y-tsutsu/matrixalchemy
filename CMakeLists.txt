@@ -33,7 +33,7 @@ add_executable(matrixalchemy
   src/app/App.cpp
   src/asset/Cgltf.cpp
   src/asset/Model.cpp
-  src/Main.cpp
+  src/main.cpp
   src/platform/FileSystem.cpp
   src/render/ColoredMesh.cpp
   src/render/ModelMesh.cpp

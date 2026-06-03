@@ -4,7 +4,7 @@
 
 #include <string_view>
 
-namespace matrixalchemy
+namespace matrixalchemy::render
 {
 
     class ShaderProgram
@@ -34,4 +34,4 @@ namespace matrixalchemy
         unsigned int id_ = 0;
     };
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::render

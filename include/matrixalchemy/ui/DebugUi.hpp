@@ -2,19 +2,22 @@
 
 struct GLFWwindow;
 
-namespace matrixalchemy
+namespace matrixalchemy::app
 {
-
     class App;
+}
+
+namespace matrixalchemy::ui
+{
 
     class DebugUi
     {
     public:
         static void initialize(GLFWwindow *window);
         static void beginFrame();
-        static void draw(App &app);
+        static void draw(app::App &app);
         static void render();
         static void shutdown();
     };
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::ui

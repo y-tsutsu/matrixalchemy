@@ -16,7 +16,7 @@ namespace
         return degrees * 3.14159265358979323846F / 180.0F;
     }
 
-    void addBox(std::vector<matrixalchemy::ColoredVertex> &vertices, const glm::vec3 &center, const glm::vec3 &halfSize, const glm::vec3 &color)
+    void addBox(std::vector<matrixalchemy::render::ColoredVertex> &vertices, const glm::vec3 &center, const glm::vec3 &halfSize, const glm::vec3 &color)
     {
         const float left = center.x - halfSize.x;
         const float right = center.x + halfSize.x;
@@ -75,7 +75,7 @@ namespace
 
 } // namespace
 
-namespace matrixalchemy
+namespace matrixalchemy::scene
 {
 
     void Character::create()
@@ -85,7 +85,7 @@ namespace matrixalchemy
         constexpr glm::vec3 eyeColor = {0.06F, 0.05F, 0.04F};
         constexpr glm::vec3 footColor = {0.85F, 0.16F, 0.16F};
 
-        std::vector<ColoredVertex> vertices;
+        std::vector<render::ColoredVertex> vertices;
         vertices.reserve(36 * 7);
 
         addBox(vertices, {0.0F, 0.65F, 0.0F}, {0.35F, 0.45F, 0.25F}, bodyColor);
@@ -134,13 +134,13 @@ namespace matrixalchemy
         }
     }
 
-    void Character::draw(ShaderProgram &shader) const
+    void Character::draw(render::ShaderProgram &shader) const
     {
         shader.setMat4("uModel", transformMatrix());
         mesh_.draw();
     }
 
-    void Character::drawShadow(ShaderProgram &shader, const glm::mat4 &shadowMatrix) const
+    void Character::drawShadow(render::ShaderProgram &shader, const glm::mat4 &shadowMatrix) const
     {
         const glm::mat4 floorLift = glm::translate(glm::mat4(1.0F), {0.0F, 0.015F, 0.0F});
         shader.setMat4("uModel", floorLift * shadowMatrix * transformMatrix());
@@ -153,4 +153,4 @@ namespace matrixalchemy
         return glm::translate(glm::mat4(1.0F), {position_.x, bounce, position_.z}) * glm::rotate(glm::mat4(1.0F), radians(rotationDegrees_), {0.0F, 1.0F, 0.0F});
     }
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::scene

@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-namespace matrixalchemy
+namespace matrixalchemy::scene
 {
 
     class OrbitCamera
@@ -29,4 +29,4 @@ namespace matrixalchemy
         bool dragging_ = false;
     };
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::scene

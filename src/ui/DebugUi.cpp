@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 #include <imgui.h>
 
-namespace matrixalchemy
+namespace matrixalchemy::ui
 {
 
     void DebugUi::initialize(GLFWwindow *window)
@@ -28,7 +28,7 @@ namespace matrixalchemy
         ImGui::NewFrame();
     }
 
-    void DebugUi::draw(App &app)
+    void DebugUi::draw(app::App &app)
     {
         ImGui::Begin("Matrix Alchemy");
         ImGui::Text("F1: toggle this panel");
@@ -63,4 +63,4 @@ namespace matrixalchemy
         ImGui::DestroyContext();
     }
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::ui

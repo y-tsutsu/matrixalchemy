@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-namespace matrixalchemy
+namespace matrixalchemy::render
 {
 
     glm::mat4 planarShadowMatrix(const glm::vec4 &plane, const glm::vec4 &light)
@@ -32,4 +32,4 @@ namespace matrixalchemy
             dot - light.w * plane.w);
     }
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::render

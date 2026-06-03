@@ -6,7 +6,7 @@
 
 #include <array>
 
-namespace matrixalchemy
+namespace matrixalchemy::scene
 {
 
     void AxisGizmo::create(float length)
@@ -15,13 +15,13 @@ namespace matrixalchemy
         constexpr glm::vec3 green = {0.10F, 0.75F, 0.20F};
         constexpr glm::vec3 blue = {0.20F, 0.35F, 1.00F};
 
-        const std::array<ColoredVertex, 6> vertices = {
-            ColoredVertex{{0.0F, 0.02F, 0.0F}, red},
-            ColoredVertex{{length, 0.02F, 0.0F}, red},
-            ColoredVertex{{0.0F, 0.02F, 0.0F}, green},
-            ColoredVertex{{0.0F, length, 0.0F}, green},
-            ColoredVertex{{0.0F, 0.02F, 0.0F}, blue},
-            ColoredVertex{{0.0F, 0.02F, length}, blue},
+        const std::array<render::ColoredVertex, 6> vertices = {
+            render::ColoredVertex{{0.0F, 0.02F, 0.0F}, red},
+            render::ColoredVertex{{length, 0.02F, 0.0F}, red},
+            render::ColoredVertex{{0.0F, 0.02F, 0.0F}, green},
+            render::ColoredVertex{{0.0F, length, 0.0F}, green},
+            render::ColoredVertex{{0.0F, 0.02F, 0.0F}, blue},
+            render::ColoredVertex{{0.0F, 0.02F, length}, blue},
         };
 
         mesh_.upload(vertices, GL_LINES);
@@ -32,7 +32,7 @@ namespace matrixalchemy
         mesh_.release();
     }
 
-    void AxisGizmo::draw(ShaderProgram &shader) const
+    void AxisGizmo::draw(render::ShaderProgram &shader) const
     {
         shader.setMat4("uModel", glm::mat4(1.0F));
         glLineWidth(2.0F);
@@ -40,4 +40,4 @@ namespace matrixalchemy
         glLineWidth(1.0F);
     }
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::scene

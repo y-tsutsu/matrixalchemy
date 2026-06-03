@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <utility>
 
-namespace matrixalchemy
+namespace matrixalchemy::render
 {
 
     Texture2D::~Texture2D()
@@ -85,4 +85,4 @@ namespace matrixalchemy
         glBindTexture(GL_TEXTURE_2D, id_);
     }
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::render

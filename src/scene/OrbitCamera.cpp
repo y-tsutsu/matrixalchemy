@@ -15,7 +15,7 @@ namespace
 
 } // namespace
 
-namespace matrixalchemy
+namespace matrixalchemy::scene
 {
 
     glm::mat4 OrbitCamera::viewMatrix() const
@@ -64,4 +64,4 @@ namespace matrixalchemy
         radius_ = std::clamp(radius_, 3.0F, 18.0F);
     }
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::scene

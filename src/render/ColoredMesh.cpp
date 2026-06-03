@@ -4,7 +4,7 @@
 
 #include <utility>
 
-namespace matrixalchemy
+namespace matrixalchemy::render
 {
 
     ColoredMesh::~ColoredMesh()
@@ -81,4 +81,4 @@ namespace matrixalchemy
         glBindVertexArray(0);
     }
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::render

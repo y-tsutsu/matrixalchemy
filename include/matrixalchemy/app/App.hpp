@@ -1,17 +1,17 @@
 #pragma once
 
+#include "matrixalchemy/asset/Model.hpp"
+#include "matrixalchemy/render/ShaderProgram.hpp"
 #include "matrixalchemy/scene/AxisGizmo.hpp"
 #include "matrixalchemy/scene/Character.hpp"
 #include "matrixalchemy/scene/GridFloor.hpp"
-#include "matrixalchemy/asset/Model.hpp"
 #include "matrixalchemy/scene/OrbitCamera.hpp"
 #include "matrixalchemy/scene/RotatingCube.hpp"
-#include "matrixalchemy/render/ShaderProgram.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-namespace matrixalchemy
+namespace matrixalchemy::app
 {
 
     class App
@@ -54,15 +54,15 @@ namespace matrixalchemy
         int height_ = 720;
         bool showDebugUi_ = true;
 
-        ShaderProgram shader_;
-        GridFloor gridFloor_;
-        AxisGizmo axisGizmo_;
-        RotatingCube cube_;
-        Character character_;
-        Model sampleModel_;
+        render::ShaderProgram shader_;
+        scene::GridFloor gridFloor_;
+        scene::AxisGizmo axisGizmo_;
+        scene::RotatingCube cube_;
+        scene::Character character_;
+        asset::Model sampleModel_;
         bool useCharacterModel_ = false;
-        OrbitCamera camera_;
-        CharacterInput characterInput_;
+        scene::OrbitCamera camera_;
+        scene::CharacterInput characterInput_;
     };
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::app

@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-namespace matrixalchemy
+namespace matrixalchemy::render
 {
 
     ShaderProgram::~ShaderProgram()
@@ -134,4 +134,4 @@ namespace matrixalchemy
         return shader;
     }
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::render

@@ -2,7 +2,7 @@
 
 #include <span>
 
-namespace matrixalchemy
+namespace matrixalchemy::render
 {
 
     struct TextureSampling
@@ -35,4 +35,4 @@ namespace matrixalchemy
         unsigned int id_ = 0;
     };
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::render

@@ -173,7 +173,7 @@ namespace
         return GL_REPEAT;
     }
 
-    matrixalchemy::TextureSampling textureSampling(const cgltf_texture &texture)
+    matrixalchemy::render::TextureSampling textureSampling(const cgltf_texture &texture)
     {
         if (texture.sampler == nullptr)
         {
@@ -211,7 +211,7 @@ namespace
 
 } // namespace
 
-namespace matrixalchemy
+namespace matrixalchemy::asset
 {
 
     namespace
@@ -219,7 +219,7 @@ namespace matrixalchemy
 
         struct LoadedPrimitive
         {
-            std::vector<ModelVertex> vertices;
+            std::vector<render::ModelVertex> vertices;
             std::size_t textureIndex = 0;
             float alphaCutoff = 0.5F;
             bool hasTexture = false;
@@ -232,7 +232,7 @@ namespace matrixalchemy
                                                const cgltf_data &data,
                                                const std::filesystem::path &modelPath,
                                                std::vector<std::size_t> &textureIndices,
-                                               std::vector<Texture2D> &textures)
+                                               std::vector<render::Texture2D> &textures)
         {
             const cgltf_size cgltfTextureIndex = static_cast<cgltf_size>(&texture - data.textures);
             if (cgltfTextureIndex >= textureIndices.size())
@@ -252,8 +252,8 @@ namespace matrixalchemy
                 return std::nullopt;
             }
 
-            Texture2D loadedTexture;
-            const TextureSampling sampling = textureSampling(texture);
+            render::Texture2D loadedTexture;
+            const render::TextureSampling sampling = textureSampling(texture);
             if (image->buffer_view != nullptr)
             {
                 const unsigned char *imageData = cgltf_buffer_view_data(image->buffer_view);
@@ -285,7 +285,7 @@ namespace matrixalchemy
                                                         const std::filesystem::path &modelPath,
                                                         const glm::vec3 &fallbackColor,
                                                         std::vector<std::size_t> &textureIndices,
-                                                        std::vector<Texture2D> &textures)
+                                                        std::vector<render::Texture2D> &textures)
         {
             std::vector<LoadedPrimitive> primitives;
 
@@ -454,7 +454,7 @@ namespace matrixalchemy
         textures_.clear();
     }
 
-    void Model::draw(ShaderProgram &shader, const glm::mat4 &modelMatrix, bool useMaterialState) const
+    void Model::draw(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, bool useMaterialState) const
     {
         const bool previousCullFace = glIsEnabled(GL_CULL_FACE) == GL_TRUE;
         const bool previousBlend = glIsEnabled(GL_BLEND) == GL_TRUE;
@@ -527,7 +527,7 @@ namespace matrixalchemy
         glDepthMask(previousDepthMask);
     }
 
-    void Model::drawOutline(ShaderProgram &shader, const glm::mat4 &modelMatrix, float width) const
+    void Model::drawOutline(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, float width) const
     {
         const bool previousCullFace = glIsEnabled(GL_CULL_FACE) == GL_TRUE;
         const bool previousBlend = glIsEnabled(GL_BLEND) == GL_TRUE;
@@ -576,4 +576,4 @@ namespace matrixalchemy
         }
     }
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::asset

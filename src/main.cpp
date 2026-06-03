@@ -8,7 +8,7 @@ int main()
 {
     try
     {
-        matrixalchemy::App app;
+        matrixalchemy::app::App app;
         return app.run();
     }
     catch (const std::exception &error)

@@ -15,7 +15,7 @@
 #include <filesystem>
 #include <stdexcept>
 
-namespace matrixalchemy
+namespace matrixalchemy::app
 {
 
     App::App()
@@ -28,7 +28,7 @@ namespace matrixalchemy
     App::~App()
     {
 #if MATRIXALCHEMY_HAS_IMGUI
-        DebugUi::shutdown();
+        ui::DebugUi::shutdown();
 #endif
         character_.release();
         sampleModel_.release();
@@ -177,14 +177,14 @@ namespace matrixalchemy
         glClearColor(0.62F, 0.70F, 0.80F, 1.0F);
 
 #if MATRIXALCHEMY_HAS_IMGUI
-        DebugUi::initialize(window_);
+        ui::DebugUi::initialize(window_);
 #endif
     }
 
     void App::initializeScene()
     {
-        const std::string vertexShaderSource = readTextFile(resolveAssetPath("assets/shaders/color.vert"));
-        const std::string fragmentShaderSource = readTextFile(resolveAssetPath("assets/shaders/color.frag"));
+        const std::string vertexShaderSource = platform::readTextFile(platform::resolveAssetPath("assets/shaders/color.vert"));
+        const std::string fragmentShaderSource = platform::readTextFile(platform::resolveAssetPath("assets/shaders/color.frag"));
         shader_.create(vertexShaderSource, fragmentShaderSource);
 
         gridFloor_.create(5.0F, 10);
@@ -200,7 +200,7 @@ namespace matrixalchemy
         }
         else
         {
-            sampleModel_.load(resolveAssetPath("assets/models/simple-triangle.gltf"), {0.90F, 0.45F, 0.10F});
+            sampleModel_.load(platform::resolveAssetPath("assets/models/simple-triangle.gltf"), {0.90F, 0.45F, 0.10F});
             useCharacterModel_ = false;
         }
     }
@@ -244,7 +244,7 @@ namespace matrixalchemy
         gridFloor_.draw(shader_);
         glStencilMask(0x00);
 
-        const glm::mat4 shadowMatrix = planarShadowMatrix({0.0F, 1.0F, 0.0F, 0.0F}, {-3.0F, 6.0F, -4.0F, 1.0F});
+        const glm::mat4 shadowMatrix = render::planarShadowMatrix({0.0F, 1.0F, 0.0F, 0.0F}, {-3.0F, 6.0F, -4.0F, 1.0F});
         glStencilFunc(GL_EQUAL, 1, 0xFF);
         glStencilMask(0xFF);
         glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
@@ -286,9 +286,9 @@ namespace matrixalchemy
 #if MATRIXALCHEMY_HAS_IMGUI
         if (showDebugUi_)
         {
-            DebugUi::beginFrame();
-            DebugUi::draw(*this);
-            DebugUi::render();
+            ui::DebugUi::beginFrame();
+            ui::DebugUi::draw(*this);
+            ui::DebugUi::render();
         }
 #endif
     }
@@ -305,4 +305,4 @@ namespace matrixalchemy
         glfwSetWindowShouldClose(window_, GLFW_TRUE);
     }
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::app

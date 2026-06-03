@@ -11,7 +11,7 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace matrixalchemy
+namespace matrixalchemy::platform
 {
 
     std::filesystem::path executableDirectory()
@@ -69,4 +69,4 @@ namespace matrixalchemy
         return stream.str();
     }
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::platform

@@ -4,7 +4,7 @@
 
 #include <span>
 
-namespace matrixalchemy
+namespace matrixalchemy::render
 {
 
     struct ModelVertex
@@ -38,4 +38,4 @@ namespace matrixalchemy
         int vertexCount_ = 0;
     };
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::render

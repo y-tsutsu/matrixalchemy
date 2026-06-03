@@ -5,7 +5,7 @@
 #include <span>
 #include <vector>
 
-namespace matrixalchemy
+namespace matrixalchemy::render
 {
 
     struct ColoredVertex
@@ -37,4 +37,4 @@ namespace matrixalchemy
         int vertexCount_ = 0;
     };
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::render

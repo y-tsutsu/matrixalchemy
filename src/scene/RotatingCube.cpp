@@ -16,7 +16,7 @@ namespace
 
 } // namespace
 
-namespace matrixalchemy
+namespace matrixalchemy::scene
 {
 
     void RotatingCube::create(float size)
@@ -29,48 +29,48 @@ namespace matrixalchemy
         const glm::vec3 purple = {0.65F, 0.35F, 0.85F};
         const glm::vec3 cyan = {0.15F, 0.75F, 0.80F};
 
-        const std::array<ColoredVertex, 36> vertices = {
-            ColoredVertex{{-half, -half, -half}, red},
-            ColoredVertex{{half, -half, -half}, red},
-            ColoredVertex{{half, half, -half}, red},
-            ColoredVertex{{half, half, -half}, red},
-            ColoredVertex{{-half, half, -half}, red},
-            ColoredVertex{{-half, -half, -half}, red},
+        const std::array<render::ColoredVertex, 36> vertices = {
+            render::ColoredVertex{{-half, -half, -half}, red},
+            render::ColoredVertex{{half, -half, -half}, red},
+            render::ColoredVertex{{half, half, -half}, red},
+            render::ColoredVertex{{half, half, -half}, red},
+            render::ColoredVertex{{-half, half, -half}, red},
+            render::ColoredVertex{{-half, -half, -half}, red},
 
-            ColoredVertex{{-half, -half, half}, blue},
-            ColoredVertex{{half, -half, half}, blue},
-            ColoredVertex{{half, half, half}, blue},
-            ColoredVertex{{half, half, half}, blue},
-            ColoredVertex{{-half, half, half}, blue},
-            ColoredVertex{{-half, -half, half}, blue},
+            render::ColoredVertex{{-half, -half, half}, blue},
+            render::ColoredVertex{{half, -half, half}, blue},
+            render::ColoredVertex{{half, half, half}, blue},
+            render::ColoredVertex{{half, half, half}, blue},
+            render::ColoredVertex{{-half, half, half}, blue},
+            render::ColoredVertex{{-half, -half, half}, blue},
 
-            ColoredVertex{{-half, half, half}, green},
-            ColoredVertex{{-half, half, -half}, green},
-            ColoredVertex{{-half, -half, -half}, green},
-            ColoredVertex{{-half, -half, -half}, green},
-            ColoredVertex{{-half, -half, half}, green},
-            ColoredVertex{{-half, half, half}, green},
+            render::ColoredVertex{{-half, half, half}, green},
+            render::ColoredVertex{{-half, half, -half}, green},
+            render::ColoredVertex{{-half, -half, -half}, green},
+            render::ColoredVertex{{-half, -half, -half}, green},
+            render::ColoredVertex{{-half, -half, half}, green},
+            render::ColoredVertex{{-half, half, half}, green},
 
-            ColoredVertex{{half, half, half}, yellow},
-            ColoredVertex{{half, half, -half}, yellow},
-            ColoredVertex{{half, -half, -half}, yellow},
-            ColoredVertex{{half, -half, -half}, yellow},
-            ColoredVertex{{half, -half, half}, yellow},
-            ColoredVertex{{half, half, half}, yellow},
+            render::ColoredVertex{{half, half, half}, yellow},
+            render::ColoredVertex{{half, half, -half}, yellow},
+            render::ColoredVertex{{half, -half, -half}, yellow},
+            render::ColoredVertex{{half, -half, -half}, yellow},
+            render::ColoredVertex{{half, -half, half}, yellow},
+            render::ColoredVertex{{half, half, half}, yellow},
 
-            ColoredVertex{{-half, -half, -half}, purple},
-            ColoredVertex{{half, -half, -half}, purple},
-            ColoredVertex{{half, -half, half}, purple},
-            ColoredVertex{{half, -half, half}, purple},
-            ColoredVertex{{-half, -half, half}, purple},
-            ColoredVertex{{-half, -half, -half}, purple},
+            render::ColoredVertex{{-half, -half, -half}, purple},
+            render::ColoredVertex{{half, -half, -half}, purple},
+            render::ColoredVertex{{half, -half, half}, purple},
+            render::ColoredVertex{{half, -half, half}, purple},
+            render::ColoredVertex{{-half, -half, half}, purple},
+            render::ColoredVertex{{-half, -half, -half}, purple},
 
-            ColoredVertex{{-half, half, -half}, cyan},
-            ColoredVertex{{half, half, -half}, cyan},
-            ColoredVertex{{half, half, half}, cyan},
-            ColoredVertex{{half, half, half}, cyan},
-            ColoredVertex{{-half, half, half}, cyan},
-            ColoredVertex{{-half, half, -half}, cyan},
+            render::ColoredVertex{{-half, half, -half}, cyan},
+            render::ColoredVertex{{half, half, -half}, cyan},
+            render::ColoredVertex{{half, half, half}, cyan},
+            render::ColoredVertex{{half, half, half}, cyan},
+            render::ColoredVertex{{-half, half, half}, cyan},
+            render::ColoredVertex{{-half, half, -half}, cyan},
         };
 
         mesh_.upload(vertices, GL_TRIANGLES);
@@ -90,13 +90,13 @@ namespace matrixalchemy
         }
     }
 
-    void RotatingCube::draw(ShaderProgram &shader) const
+    void RotatingCube::draw(render::ShaderProgram &shader) const
     {
         shader.setMat4("uModel", modelMatrix());
         mesh_.draw();
     }
 
-    void RotatingCube::drawShadow(ShaderProgram &shader, const glm::mat4 &shadowMatrix) const
+    void RotatingCube::drawShadow(render::ShaderProgram &shader, const glm::mat4 &shadowMatrix) const
     {
         const glm::mat4 floorLift = glm::translate(glm::mat4(1.0F), {0.0F, 0.015F, 0.0F});
         shader.setMat4("uModel", floorLift * shadowMatrix * modelMatrix());
@@ -108,4 +108,4 @@ namespace matrixalchemy
         return glm::translate(glm::mat4(1.0F), {-2.0F, 0.5F, -2.0F}) * glm::rotate(glm::mat4(1.0F), radians(rotationDegrees_), {0.0F, 1.0F, 0.0F});
     }
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::scene

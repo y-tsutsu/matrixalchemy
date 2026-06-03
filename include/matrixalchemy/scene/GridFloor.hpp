@@ -1,20 +1,20 @@
 #pragma once
 
 #include "matrixalchemy/render/ColoredMesh.hpp"
-#include "matrixalchemy/render/ShaderProgram.hpp"
+#include "matrixalchemy/scene/Drawable.hpp"
 
-namespace matrixalchemy
+namespace matrixalchemy::scene
 {
 
-    class GridFloor
+    class GridFloor final : public Drawable
     {
     public:
         void create(float halfSize, int tileCount);
         void release();
-        void draw(ShaderProgram &shader) const;
+        void draw(render::ShaderProgram &shader) const override;
 
     private:
-        ColoredMesh mesh_;
+        render::ColoredMesh mesh_;
     };
 
-} // namespace matrixalchemy
+} // namespace matrixalchemy::scene
