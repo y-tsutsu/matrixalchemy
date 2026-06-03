@@ -246,6 +246,8 @@ namespace matrixalchemy
 
         const glm::mat4 shadowMatrix = planarShadowMatrix({0.0F, 1.0F, 0.0F, 0.0F}, {-3.0F, 6.0F, -4.0F, 1.0F});
         glStencilFunc(GL_EQUAL, 1, 0xFF);
+        glStencilMask(0xFF);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glDepthMask(GL_FALSE);
