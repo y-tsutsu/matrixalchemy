@@ -83,6 +83,20 @@ namespace matrixalchemy
         glUniform1i(location, value ? 1 : 0);
     }
 
+    void ShaderProgram::setFloat(std::string_view name, float value) const
+    {
+        const std::string uniformName(name);
+        const int location = glGetUniformLocation(id_, uniformName.c_str());
+        glUniform1f(location, value);
+    }
+
+    void ShaderProgram::setInt(std::string_view name, int value) const
+    {
+        const std::string uniformName(name);
+        const int location = glGetUniformLocation(id_, uniformName.c_str());
+        glUniform1i(location, value);
+    }
+
     void ShaderProgram::setMat4(std::string_view name, const glm::mat4 &value) const
     {
         const std::string uniformName(name);

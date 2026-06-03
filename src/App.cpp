@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <filesystem>
 #include <stdexcept>
 
 namespace matrixalchemy
@@ -190,7 +191,16 @@ namespace matrixalchemy
         axisGizmo_.create(5.0F);
         cube_.create(1.0F);
         character_.create();
-        sampleModel_.load(resolveAssetPath("assets/models/simple-triangle.gltf"), {0.90F, 0.45F, 0.10F});
+
+        const std::filesystem::path saurusPath = std::filesystem::path(MATRIXALCHEMY_SOURCE_DIR) / "assets/models/saurus.vrm";
+        if (std::filesystem::exists(saurusPath))
+        {
+            sampleModel_.load(saurusPath, {0.90F, 0.45F, 0.10F});
+        }
+        else
+        {
+            sampleModel_.load(resolveAssetPath("assets/models/simple-triangle.gltf"), {0.90F, 0.45F, 0.10F});
+        }
     }
 
     void App::processInput()
@@ -214,11 +224,14 @@ namespace matrixalchemy
         const float aspect = static_cast<float>(width_) / static_cast<float>(height_);
         const glm::mat4 projection = glm::perspective(glm::radians(60.0F), aspect, 0.1F, 100.0F);
         const glm::mat4 view = camera_.viewMatrix();
+        const glm::mat4 sampleModelMatrix = glm::translate(glm::mat4(1.0F), {2.0F, 0.0F, 1.5F});
 
         shader_.use();
         shader_.setMat4("uProjection", projection);
         shader_.setMat4("uView", view);
         shader_.setBool("uUseColorOverride", false);
+        shader_.setBool("uUseTexture", false);
+        shader_.setBool("uUseAlphaMask", false);
 
         glEnable(GL_STENCIL_TEST);
         glStencilMask(0xFF);
@@ -236,6 +249,7 @@ namespace matrixalchemy
         shader_.setVec4("uColorOverride", {0.0F, 0.0F, 0.0F, 0.35F});
         cube_.drawShadow(shader_, shadowMatrix);
         character_.drawShadow(shader_, shadowMatrix);
+        sampleModel_.draw(shader_, shadowMatrix * sampleModelMatrix, false);
         shader_.setBool("uUseColorOverride", false);
         glDepthMask(GL_TRUE);
         glDisable(GL_BLEND);
@@ -245,7 +259,7 @@ namespace matrixalchemy
         axisGizmo_.draw(shader_);
         cube_.draw(shader_);
         character_.draw(shader_);
-        sampleModel_.draw(shader_, glm::translate(glm::mat4(1.0F), {2.0F, 0.0F, 1.5F}));
+        sampleModel_.draw(shader_, sampleModelMatrix);
 
 #if MATRIXALCHEMY_HAS_IMGUI
         if (showDebugUi_)

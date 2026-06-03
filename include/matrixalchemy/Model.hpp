@@ -1,7 +1,8 @@
 #pragma once
 
-#include "matrixalchemy/ColoredMesh.hpp"
+#include "matrixalchemy/ModelMesh.hpp"
 #include "matrixalchemy/ShaderProgram.hpp"
+#include "matrixalchemy/Texture2D.hpp"
 
 #include <filesystem>
 #include <glm/glm.hpp>
@@ -15,14 +16,20 @@ namespace matrixalchemy
     public:
         void load(const std::filesystem::path &path, const glm::vec3 &color);
         void release();
-        void draw(ShaderProgram &shader, const glm::mat4 &modelMatrix) const;
+        void draw(ShaderProgram &shader, const glm::mat4 &modelMatrix, bool useMaterialState = true) const;
 
         [[nodiscard]] bool empty() const { return meshes_.empty(); }
 
     private:
         struct Mesh
         {
-            ColoredMesh geometry;
+            ModelMesh geometry;
+            std::size_t textureIndex = 0;
+            float alphaCutoff = 0.5F;
+            bool hasTexture = false;
+            bool alphaMask = false;
+            bool alphaBlend = false;
+            bool doubleSided = false;
         };
 
         struct MeshInstance
@@ -33,6 +40,7 @@ namespace matrixalchemy
 
         std::vector<Mesh> meshes_;
         std::vector<MeshInstance> instances_;
+        std::vector<Texture2D> textures_;
     };
 
 } // namespace matrixalchemy

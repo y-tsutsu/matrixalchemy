@@ -27,8 +27,9 @@ The current milestone provides a minimal OpenGL scene:
 - RGB XYZ axes
 - a rotating colored cube
 - a simple movable character placeholder
-- a minimal glTF sample loaded through cgltf with an external buffer, node
-  transforms, and vertex colors
+- a VRM preview model loaded through cgltf with node transforms, vertex colors,
+  base color factors, base color textures, alpha modes, double-sided materials,
+  and texture sampler state
 - mouse-driven orbit camera controls
 - planar shadows projected onto the floor
 - optional Dear ImGui debug panel
@@ -50,6 +51,7 @@ Upcoming milestones:
 - Dear ImGui
 - cgltf, vendored under `external/cgltf` for local builds and listed in
   `vcpkg.json` for Windows/vcpkg builds
+- stb_image for PNG/JPEG texture decoding
 - glTF model assets
 
 ## Debian / WSLg Setup
@@ -66,6 +68,7 @@ sudo apt install \
   python3-glad \
   libglfw3-dev \
   libglm-dev \
+  libstb-dev \
   libgl-dev \
   libimgui-dev \
   libx11-dev \
@@ -170,3 +173,13 @@ that the rendering pipeline can be learned by reading and changing the source.
 Shader sources live under `assets/shaders`. The executable looks for assets next
 to the binary, in the current working directory, and in the source tree, which
 keeps local development simple while leaving room for packaging later.
+
+The scene uses `assets/models/saurus.vrm` as the current VRM preview model when
+it is available. Otherwise, it falls back to the small `simple-triangle.gltf`
+sample.
+
+## Asset Credits
+
+- `assets/models/saurus.vrm`: "Cute Saurus", distributed through Open Source
+  Avatars. License: CC0 1.0 Universal.
+  Source: <https://www.opensourceavatars.com/>

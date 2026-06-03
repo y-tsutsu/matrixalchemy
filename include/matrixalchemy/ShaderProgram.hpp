@@ -23,6 +23,8 @@ namespace matrixalchemy
         void release();
         void use() const;
         void setBool(std::string_view name, bool value) const;
+        void setFloat(std::string_view name, float value) const;
+        void setInt(std::string_view name, int value) const;
         void setMat4(std::string_view name, const glm::mat4 &value) const;
         void setVec4(std::string_view name, const glm::vec4 &value) const;
 

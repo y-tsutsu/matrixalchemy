@@ -5,8 +5,13 @@
 #include <cgltf.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <fstream>
 #include <functional>
+#include <iterator>
+#include <limits>
+#include <optional>
 #include <stdexcept>
+#include <vector>
 
 namespace
 {
@@ -39,16 +44,128 @@ namespace
         return nullptr;
     }
 
-    glm::vec3 readVertexColor(const cgltf_accessor *colors, cgltf_size index, const glm::vec3 &fallbackColor)
+    const cgltf_accessor *findTexCoordAccessor(const cgltf_primitive &primitive)
+    {
+        for (cgltf_size index = 0; index < primitive.attributes_count; ++index)
+        {
+            const cgltf_attribute &attribute = primitive.attributes[index];
+            if (attribute.type == cgltf_attribute_type_texcoord && attribute.index == 0)
+            {
+                return attribute.data;
+            }
+        }
+
+        return nullptr;
+    }
+
+    glm::vec4 readVertexColor(const cgltf_accessor *colors, cgltf_size index, const glm::vec4 &fallbackColor)
     {
         if (colors == nullptr)
         {
             return fallbackColor;
         }
 
-        float color[4] = {fallbackColor.r, fallbackColor.g, fallbackColor.b, 1.0F};
+        float color[4] = {fallbackColor.r, fallbackColor.g, fallbackColor.b, fallbackColor.a};
         cgltf_accessor_read_float(colors, index, color, 4);
-        return {color[0], color[1], color[2]};
+        return {color[0], color[1], color[2], color[3]};
+    }
+
+    glm::vec2 readTexCoord(const cgltf_accessor *texCoords, cgltf_size index)
+    {
+        if (texCoords == nullptr)
+        {
+            return {0.0F, 0.0F};
+        }
+
+        float texCoord[2] = {};
+        cgltf_accessor_read_float(texCoords, index, texCoord, 2);
+        return {texCoord[0], texCoord[1]};
+    }
+
+    glm::vec2 applyTextureTransform(const glm::vec2 &texCoord, const cgltf_texture_view &textureView)
+    {
+        if (!textureView.has_transform)
+        {
+            return texCoord;
+        }
+
+        const glm::vec2 scale(textureView.transform.scale[0], textureView.transform.scale[1]);
+        const glm::vec2 offset(textureView.transform.offset[0], textureView.transform.offset[1]);
+        return texCoord * scale + offset;
+    }
+
+    glm::vec4 materialBaseColor(const cgltf_material *material)
+    {
+        if (material == nullptr || !material->has_pbr_metallic_roughness)
+        {
+            return {1.0F, 1.0F, 1.0F, 1.0F};
+        }
+
+        const cgltf_pbr_metallic_roughness &pbr = material->pbr_metallic_roughness;
+        return {pbr.base_color_factor[0], pbr.base_color_factor[1], pbr.base_color_factor[2], pbr.base_color_factor[3]};
+    }
+
+    const cgltf_texture_view *baseColorTextureView(const cgltf_material *material)
+    {
+        if (material == nullptr || !material->has_pbr_metallic_roughness)
+        {
+            return nullptr;
+        }
+
+        const cgltf_texture_view &textureView = material->pbr_metallic_roughness.base_color_texture;
+        return textureView.texture == nullptr ? nullptr : &textureView;
+    }
+
+    unsigned int textureMinFilter(cgltf_filter_type filter)
+    {
+        if (filter == cgltf_filter_type_nearest || filter == cgltf_filter_type_linear || filter == cgltf_filter_type_nearest_mipmap_nearest || filter == cgltf_filter_type_linear_mipmap_nearest ||
+            filter == cgltf_filter_type_nearest_mipmap_linear || filter == cgltf_filter_type_linear_mipmap_linear)
+        {
+            return static_cast<unsigned int>(filter);
+        }
+
+        return GL_LINEAR_MIPMAP_LINEAR;
+    }
+
+    unsigned int textureMagFilter(cgltf_filter_type filter)
+    {
+        if (filter == cgltf_filter_type_nearest || filter == cgltf_filter_type_linear)
+        {
+            return static_cast<unsigned int>(filter);
+        }
+
+        return GL_LINEAR;
+    }
+
+    unsigned int textureWrap(cgltf_wrap_mode wrap)
+    {
+        if (wrap == cgltf_wrap_mode_clamp_to_edge || wrap == cgltf_wrap_mode_mirrored_repeat || wrap == cgltf_wrap_mode_repeat)
+        {
+            return static_cast<unsigned int>(wrap);
+        }
+
+        return GL_REPEAT;
+    }
+
+    matrixalchemy::TextureSampling textureSampling(const cgltf_texture &texture)
+    {
+        if (texture.sampler == nullptr)
+        {
+            return {GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT};
+        }
+
+        return {textureMinFilter(texture.sampler->min_filter), textureMagFilter(texture.sampler->mag_filter), textureWrap(texture.sampler->wrap_s), textureWrap(texture.sampler->wrap_t)};
+    }
+
+    std::vector<unsigned char> readBinaryFile(const std::filesystem::path &path)
+    {
+        std::ifstream file(path, std::ios::binary);
+        if (!file)
+        {
+            throw std::runtime_error("Failed to open texture image file.");
+        }
+
+        return {std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
     }
 
     glm::mat4 nodeWorldTransform(const cgltf_node &node)
@@ -74,9 +191,77 @@ namespace matrixalchemy
     namespace
     {
 
-        std::vector<std::vector<ColoredVertex>> readMeshPrimitives(const cgltf_mesh &mesh, const glm::vec3 &fallbackColor)
+        struct LoadedPrimitive
         {
-            std::vector<std::vector<ColoredVertex>> primitives;
+            std::vector<ModelVertex> vertices;
+            std::size_t textureIndex = 0;
+            float alphaCutoff = 0.5F;
+            bool hasTexture = false;
+            bool alphaMask = false;
+            bool alphaBlend = false;
+            bool doubleSided = false;
+        };
+
+        std::optional<std::size_t> loadTexture(const cgltf_texture &texture,
+                                               const cgltf_data &data,
+                                               const std::filesystem::path &modelPath,
+                                               std::vector<std::size_t> &textureIndices,
+                                               std::vector<Texture2D> &textures)
+        {
+            const cgltf_size cgltfTextureIndex = static_cast<cgltf_size>(&texture - data.textures);
+            if (cgltfTextureIndex >= textureIndices.size())
+            {
+                return std::nullopt;
+            }
+
+            const std::size_t unloaded = std::numeric_limits<std::size_t>::max();
+            if (textureIndices[cgltfTextureIndex] != unloaded)
+            {
+                return textureIndices[cgltfTextureIndex];
+            }
+
+            const cgltf_image *image = texture.image;
+            if (image == nullptr)
+            {
+                return std::nullopt;
+            }
+
+            Texture2D loadedTexture;
+            const TextureSampling sampling = textureSampling(texture);
+            if (image->buffer_view != nullptr)
+            {
+                const unsigned char *imageData = cgltf_buffer_view_data(image->buffer_view);
+                loadedTexture.loadFromMemory({imageData, image->buffer_view->size}, sampling);
+            }
+            else if (image->uri != nullptr)
+            {
+                const std::string uri(image->uri);
+                if (uri.starts_with("data:"))
+                {
+                    return std::nullopt;
+                }
+
+                const std::vector<unsigned char> imageData = readBinaryFile(modelPath.parent_path() / uri);
+                loadedTexture.loadFromMemory(imageData, sampling);
+            }
+            else
+            {
+                return std::nullopt;
+            }
+
+            textures.push_back(std::move(loadedTexture));
+            textureIndices[cgltfTextureIndex] = textures.size() - 1;
+            return textureIndices[cgltfTextureIndex];
+        }
+
+        std::vector<LoadedPrimitive> readMeshPrimitives(const cgltf_mesh &mesh,
+                                                        const cgltf_data &data,
+                                                        const std::filesystem::path &modelPath,
+                                                        const glm::vec3 &fallbackColor,
+                                                        std::vector<std::size_t> &textureIndices,
+                                                        std::vector<Texture2D> &textures)
+        {
+            std::vector<LoadedPrimitive> primitives;
 
             for (cgltf_size primitiveIndex = 0; primitiveIndex < mesh.primitives_count; ++primitiveIndex)
             {
@@ -92,31 +277,48 @@ namespace matrixalchemy
                     continue;
                 }
                 const cgltf_accessor *colors = findColorAccessor(primitive);
+                const cgltf_accessor *texCoords = findTexCoordAccessor(primitive);
+                const glm::vec4 fallbackVertexColor(fallbackColor, 1.0F);
+                const glm::vec4 baseColor = materialBaseColor(primitive.material);
+                const cgltf_texture_view *textureView = baseColorTextureView(primitive.material);
+                const std::optional<std::size_t> textureIndex =
+                    textureView != nullptr && texCoords != nullptr ? loadTexture(*textureView->texture, data, modelPath, textureIndices, textures) : std::nullopt;
 
-                std::vector<ColoredVertex> vertices;
+                LoadedPrimitive loadedPrimitive;
+                loadedPrimitive.textureIndex = textureIndex.value_or(0);
+                loadedPrimitive.hasTexture = textureIndex.has_value();
+                loadedPrimitive.alphaCutoff = primitive.material == nullptr ? 0.5F : primitive.material->alpha_cutoff;
+                loadedPrimitive.alphaMask = primitive.material != nullptr && primitive.material->alpha_mode == cgltf_alpha_mode_mask;
+                loadedPrimitive.alphaBlend = primitive.material != nullptr && primitive.material->alpha_mode == cgltf_alpha_mode_blend;
+                loadedPrimitive.doubleSided = primitive.material != nullptr && primitive.material->double_sided;
+
                 if (primitive.indices != nullptr)
                 {
-                    vertices.reserve(static_cast<std::size_t>(primitive.indices->count));
+                    loadedPrimitive.vertices.reserve(static_cast<std::size_t>(primitive.indices->count));
                     for (cgltf_size index = 0; index < primitive.indices->count; ++index)
                     {
                         const cgltf_size vertexIndex = cgltf_accessor_read_index(primitive.indices, index);
                         float position[3] = {};
                         cgltf_accessor_read_float(positions, vertexIndex, position, 3);
-                        vertices.push_back({{position[0], position[1], position[2]}, readVertexColor(colors, vertexIndex, fallbackColor)});
+                        loadedPrimitive.vertices.push_back({{position[0], position[1], position[2]},
+                                                            readVertexColor(colors, vertexIndex, fallbackVertexColor) * baseColor,
+                                                            textureView == nullptr ? readTexCoord(texCoords, vertexIndex) : applyTextureTransform(readTexCoord(texCoords, vertexIndex), *textureView)});
                     }
                 }
                 else
                 {
-                    vertices.reserve(static_cast<std::size_t>(positions->count));
+                    loadedPrimitive.vertices.reserve(static_cast<std::size_t>(positions->count));
                     for (cgltf_size index = 0; index < positions->count; ++index)
                     {
                         float position[3] = {};
                         cgltf_accessor_read_float(positions, index, position, 3);
-                        vertices.push_back({{position[0], position[1], position[2]}, readVertexColor(colors, index, fallbackColor)});
+                        loadedPrimitive.vertices.push_back({{position[0], position[1], position[2]},
+                                                            readVertexColor(colors, index, fallbackVertexColor) * baseColor,
+                                                            textureView == nullptr ? readTexCoord(texCoords, index) : applyTextureTransform(readTexCoord(texCoords, index), *textureView)});
                     }
                 }
 
-                primitives.push_back(std::move(vertices));
+                primitives.push_back(std::move(loadedPrimitive));
             }
 
             return primitives;
@@ -138,19 +340,26 @@ namespace matrixalchemy
             throwIfFailed(cgltf_load_buffers(&options, data, path.string().c_str()), "Failed to load glTF buffers.");
             throwIfFailed(cgltf_validate(data), "Failed to validate glTF file.");
 
+            std::vector<std::size_t> textureIndices(data->textures_count, std::numeric_limits<std::size_t>::max());
             std::vector<std::vector<std::size_t>> meshPrimitiveIndices(data->meshes_count);
             for (cgltf_size meshIndex = 0; meshIndex < data->meshes_count; ++meshIndex)
             {
-                const std::vector<std::vector<ColoredVertex>> primitives = readMeshPrimitives(data->meshes[meshIndex], color);
-                for (const std::vector<ColoredVertex> &vertices : primitives)
+                std::vector<LoadedPrimitive> primitives = readMeshPrimitives(data->meshes[meshIndex], *data, path, color, textureIndices, textures_);
+                for (LoadedPrimitive &primitive : primitives)
                 {
-                    if (vertices.empty())
+                    if (primitive.vertices.empty())
                     {
                         continue;
                     }
 
                     Mesh loadedMesh;
-                    loadedMesh.geometry.upload(vertices, GL_TRIANGLES);
+                    loadedMesh.geometry.upload(primitive.vertices, GL_TRIANGLES);
+                    loadedMesh.textureIndex = primitive.textureIndex;
+                    loadedMesh.alphaCutoff = primitive.alphaCutoff;
+                    loadedMesh.hasTexture = primitive.hasTexture;
+                    loadedMesh.alphaMask = primitive.alphaMask;
+                    loadedMesh.alphaBlend = primitive.alphaBlend;
+                    loadedMesh.doubleSided = primitive.doubleSided;
                     meshes_.push_back(std::move(loadedMesh));
                     meshPrimitiveIndices[meshIndex].push_back(meshes_.size() - 1);
                 }
@@ -213,10 +422,16 @@ namespace matrixalchemy
         }
         meshes_.clear();
         instances_.clear();
+        textures_.clear();
     }
 
-    void Model::draw(ShaderProgram &shader, const glm::mat4 &modelMatrix) const
+    void Model::draw(ShaderProgram &shader, const glm::mat4 &modelMatrix, bool useMaterialState) const
     {
+        const bool previousCullFace = glIsEnabled(GL_CULL_FACE) == GL_TRUE;
+        const bool previousBlend = glIsEnabled(GL_BLEND) == GL_TRUE;
+        GLboolean previousDepthMask = GL_TRUE;
+        glGetBooleanv(GL_DEPTH_WRITEMASK, &previousDepthMask);
+
         for (const MeshInstance &instance : instances_)
         {
             if (instance.meshIndex >= meshes_.size())
@@ -225,8 +440,62 @@ namespace matrixalchemy
             }
 
             shader.setMat4("uModel", modelMatrix * instance.transform);
+            const Mesh &mesh = meshes_[instance.meshIndex];
+
+            if (useMaterialState && mesh.doubleSided)
+            {
+                glDisable(GL_CULL_FACE);
+            }
+            else if (useMaterialState)
+            {
+                glEnable(GL_CULL_FACE);
+                glCullFace(GL_BACK);
+            }
+
+            if (useMaterialState && mesh.alphaBlend)
+            {
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                glDepthMask(GL_FALSE);
+            }
+            else if (useMaterialState)
+            {
+                glDisable(GL_BLEND);
+                glDepthMask(previousDepthMask);
+            }
+
+            const bool useTexture = useMaterialState && mesh.hasTexture && mesh.textureIndex < textures_.size() && textures_[mesh.textureIndex].valid();
+            shader.setBool("uUseTexture", useTexture);
+            shader.setBool("uUseAlphaMask", useMaterialState && mesh.alphaMask);
+            shader.setFloat("uAlphaCutoff", mesh.alphaCutoff);
+            if (useTexture)
+            {
+                textures_[mesh.textureIndex].bind(0);
+                shader.setInt("uBaseColorTexture", 0);
+            }
             meshes_[instance.meshIndex].geometry.draw();
         }
+        shader.setBool("uUseTexture", false);
+        shader.setBool("uUseAlphaMask", false);
+
+        if (previousCullFace)
+        {
+            glEnable(GL_CULL_FACE);
+        }
+        else
+        {
+            glDisable(GL_CULL_FACE);
+        }
+
+        if (previousBlend)
+        {
+            glEnable(GL_BLEND);
+        }
+        else
+        {
+            glDisable(GL_BLEND);
+        }
+        glDepthMask(previousDepthMask);
     }
 
 } // namespace matrixalchemy

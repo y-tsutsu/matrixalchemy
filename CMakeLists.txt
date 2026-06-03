@@ -20,6 +20,8 @@ if(NOT glm_FOUND)
   find_path(GLM_INCLUDE_DIR glm/glm.hpp REQUIRED)
 endif()
 
+find_path(STB_INCLUDE_DIR stb_image.h PATH_SUFFIXES stb REQUIRED)
+
 add_library(matrixalchemy_glad STATIC
   external/glad/src/gl.c)
 
@@ -37,15 +39,18 @@ add_executable(matrixalchemy
   src/GridFloor.cpp
   src/Main.cpp
   src/Model.cpp
+  src/ModelMesh.cpp
   src/OrbitCamera.cpp
   src/RotatingCube.cpp
   src/Shadow.cpp
-  src/ShaderProgram.cpp)
+  src/ShaderProgram.cpp
+  src/Texture2D.cpp)
 
 target_include_directories(matrixalchemy
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/cgltf)
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/cgltf
+    ${STB_INCLUDE_DIR})
 
 target_compile_definitions(matrixalchemy PRIVATE GLFW_INCLUDE_NONE)
 target_compile_definitions(matrixalchemy PRIVATE MATRIXALCHEMY_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
