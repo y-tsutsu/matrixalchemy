@@ -1,12 +1,12 @@
 #pragma once
 
-#include "matrixalchemy/asset/Model.hpp"
 #include "matrixalchemy/render/ShaderProgram.hpp"
 #include "matrixalchemy/scene/AxisGizmo.hpp"
 #include "matrixalchemy/scene/Character.hpp"
 #include "matrixalchemy/scene/GridFloor.hpp"
 #include "matrixalchemy/scene/OrbitCamera.hpp"
 #include "matrixalchemy/scene/RotatingCube.hpp"
+#include "matrixalchemy/scene/VrmCharacter.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -29,8 +29,8 @@ namespace matrixalchemy::app
         [[nodiscard]] float cameraRadius() const { return camera_.radius(); }
         [[nodiscard]] float cameraThetaDegrees() const { return camera_.thetaDegrees(); }
         [[nodiscard]] float cameraPhiDegrees() const { return camera_.phiDegrees(); }
-        [[nodiscard]] glm::vec3 characterPosition() const { return character_.position(); }
-        [[nodiscard]] float characterRotationDegrees() const { return character_.rotationDegrees(); }
+        [[nodiscard]] glm::vec3 characterPosition() const;
+        [[nodiscard]] float characterRotationDegrees() const;
         [[nodiscard]] bool debugUiVisible() const { return showDebugUi_; }
 
     private:
@@ -58,9 +58,9 @@ namespace matrixalchemy::app
         scene::GridFloor gridFloor_;
         scene::AxisGizmo axisGizmo_;
         scene::RotatingCube cube_;
-        scene::Character character_;
-        asset::Model sampleModel_;
-        bool useCharacterModel_ = false;
+        scene::Character fallbackCharacter_;
+        scene::VrmCharacter vrmCharacter_;
+        bool useVrmCharacter_ = false;
         scene::OrbitCamera camera_;
         scene::CharacterInput characterInput_;
     };

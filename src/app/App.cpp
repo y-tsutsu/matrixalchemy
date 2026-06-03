@@ -32,8 +32,8 @@ namespace matrixalchemy::app
 #if MATRIXALCHEMY_HAS_IMGUI
         ui::DebugUi::shutdown();
 #endif
-        character_.release();
-        sampleModel_.release();
+        fallbackCharacter_.release();
+        vrmCharacter_.release();
         cube_.release();
         axisGizmo_.release();
         gridFloor_.release();
@@ -64,6 +64,16 @@ namespace matrixalchemy::app
         }
 
         return 0;
+    }
+
+    glm::vec3 App::characterPosition() const
+    {
+        return useVrmCharacter_ ? vrmCharacter_.position() : fallbackCharacter_.position();
+    }
+
+    float App::characterRotationDegrees() const
+    {
+        return useVrmCharacter_ ? vrmCharacter_.rotationDegrees() : fallbackCharacter_.rotationDegrees();
     }
 
     void App::framebufferSizeCallback(GLFWwindow *window, int width, int height)
@@ -190,18 +200,17 @@ namespace matrixalchemy::app
         gridFloor_.create(5.0F, 10);
         axisGizmo_.create(5.0F);
         cube_.create(1.0F);
-        character_.create();
+        fallbackCharacter_.create();
 
         const std::optional<std::filesystem::path> saurusPath = platform::findRuntimeAssetPath("saurus.vrm");
         if (saurusPath.has_value())
         {
-            sampleModel_.load(*saurusPath, {1.0F, 1.0F, 1.0F});
-            useCharacterModel_ = true;
+            vrmCharacter_.load(*saurusPath);
+            useVrmCharacter_ = true;
         }
         else
         {
-            sampleModel_.load(platform::resolveAssetPath("assets/models/simple-triangle.gltf"), {0.90F, 0.45F, 0.10F});
-            useCharacterModel_ = false;
+            useVrmCharacter_ = false;
         }
     }
 
@@ -216,7 +225,14 @@ namespace matrixalchemy::app
     void App::update(float deltaSeconds)
     {
         cube_.update(deltaSeconds);
-        character_.update(deltaSeconds, characterInput_);
+        if (useVrmCharacter_)
+        {
+            vrmCharacter_.update(deltaSeconds, characterInput_);
+        }
+        else
+        {
+            fallbackCharacter_.update(deltaSeconds, characterInput_);
+        }
     }
 
     void App::render()
@@ -226,8 +242,6 @@ namespace matrixalchemy::app
         const float aspect = static_cast<float>(width_) / static_cast<float>(height_);
         const glm::mat4 projection = glm::perspective(glm::radians(60.0F), aspect, 0.1F, 100.0F);
         const glm::mat4 view = camera_.viewMatrix();
-        const glm::mat4 sampleModelMatrix = glm::translate(glm::mat4(1.0F), {2.0F, 0.0F, 1.5F});
-        const glm::mat4 characterModelMatrix = character_.transformMatrix();
 
         shader_.use();
         shader_.setMat4("uProjection", projection);
@@ -254,15 +268,13 @@ namespace matrixalchemy::app
         shader_.setBool("uUseColorOverride", true);
         shader_.setVec4("uColorOverride", {0.0F, 0.0F, 0.0F, 0.35F});
         cube_.drawShadow(shader_, shadowMatrix);
-        if (useCharacterModel_)
+        if (useVrmCharacter_)
         {
-            const glm::mat4 floorLift = glm::translate(glm::mat4(1.0F), {0.0F, 0.015F, 0.0F});
-            sampleModel_.draw(shader_, floorLift * shadowMatrix * characterModelMatrix, false);
+            vrmCharacter_.drawShadow(shader_, shadowMatrix);
         }
         else
         {
-            character_.drawShadow(shader_, shadowMatrix);
-            sampleModel_.draw(shader_, shadowMatrix * sampleModelMatrix, false);
+            fallbackCharacter_.drawShadow(shader_, shadowMatrix);
         }
         shader_.setBool("uUseColorOverride", false);
         glDepthMask(GL_TRUE);
@@ -272,15 +284,13 @@ namespace matrixalchemy::app
 
         axisGizmo_.draw(shader_);
         cube_.draw(shader_);
-        if (useCharacterModel_)
+        if (useVrmCharacter_)
         {
-            sampleModel_.drawOutline(shader_, characterModelMatrix, 0.012F);
-            sampleModel_.draw(shader_, characterModelMatrix);
+            vrmCharacter_.draw(shader_);
         }
         else
         {
-            character_.draw(shader_);
-            sampleModel_.draw(shader_, sampleModelMatrix);
+            fallbackCharacter_.draw(shader_);
         }
 
 #if MATRIXALCHEMY_HAS_IMGUI

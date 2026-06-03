@@ -59,9 +59,11 @@ add_executable(matrixalchemy
   src/render/Texture2D.cpp
   src/scene/AxisGizmo.cpp
   src/scene/Character.cpp
+  src/scene/CharacterController.cpp
   src/scene/GridFloor.cpp
   src/scene/OrbitCamera.cpp
   src/scene/RotatingCube.cpp
+  src/scene/VrmCharacter.cpp
   ${MATRIXALCHEMY_SHADER_SOURCES_HPP})
 
 target_include_directories(matrixalchemy

@@ -1,19 +1,20 @@
 #pragma once
 
-#include "matrixalchemy/render/ColoredMesh.hpp"
+#include "matrixalchemy/asset/Model.hpp"
 #include "matrixalchemy/scene/CharacterController.hpp"
 #include "matrixalchemy/scene/IDrawable.hpp"
 #include "matrixalchemy/scene/IShadowCaster.hpp"
 
+#include <filesystem>
 #include <glm/glm.hpp>
 
 namespace matrixalchemy::scene
 {
 
-    class Character final : public IDrawable, public IShadowCaster
+    class VrmCharacter final : public IDrawable, public IShadowCaster
     {
     public:
-        void create();
+        void load(const std::filesystem::path &path);
         void release();
         void update(float deltaSeconds, const CharacterInput &input);
         void draw(render::ShaderProgram &shader) const override;
@@ -22,10 +23,12 @@ namespace matrixalchemy::scene
         [[nodiscard]] glm::vec3 position() const { return controller_.position(); }
         [[nodiscard]] float rotationDegrees() const { return controller_.rotationDegrees(); }
         [[nodiscard]] glm::mat4 transformMatrix() const { return controller_.transformMatrix(); }
+        [[nodiscard]] bool loaded() const { return !model_.empty(); }
 
     private:
-        render::ColoredMesh mesh_;
+        asset::Model model_;
         CharacterController controller_;
+        float outlineWidth_ = 0.012F;
     };
 
 } // namespace matrixalchemy::scene
