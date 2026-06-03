@@ -1,11 +1,11 @@
-#include "matrixalchemy/App.hpp"
+#include "matrixalchemy/app/App.hpp"
 
-#include "matrixalchemy/FileSystem.hpp"
-#include "matrixalchemy/Gl.hpp"
-#include "matrixalchemy/Shadow.hpp"
+#include "matrixalchemy/platform/FileSystem.hpp"
+#include "matrixalchemy/platform/Gl.hpp"
+#include "matrixalchemy/render/Shadow.hpp"
 
 #if MATRIXALCHEMY_HAS_IMGUI
-#include "matrixalchemy/DebugUi.hpp"
+#include "matrixalchemy/ui/DebugUi.hpp"
 #endif
 
 #include <glm/gtc/matrix_transform.hpp>

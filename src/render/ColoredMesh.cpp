@@ -1,6 +1,6 @@
-#include "matrixalchemy/ColoredMesh.hpp"
+#include "matrixalchemy/render/ColoredMesh.hpp"
 
-#include "matrixalchemy/Gl.hpp"
+#include "matrixalchemy/platform/Gl.hpp"
 
 #include <utility>
 

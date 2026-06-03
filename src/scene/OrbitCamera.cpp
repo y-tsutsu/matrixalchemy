@@ -1,4 +1,4 @@
-#include "matrixalchemy/OrbitCamera.hpp"
+#include "matrixalchemy/scene/OrbitCamera.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 

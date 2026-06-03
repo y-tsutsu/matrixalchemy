@@ -30,21 +30,21 @@ target_include_directories(matrixalchemy_glad
     ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include)
 
 add_executable(matrixalchemy
-  src/App.cpp
-  src/AxisGizmo.cpp
-  src/Character.cpp
-  src/Cgltf.cpp
-  src/ColoredMesh.cpp
-  src/FileSystem.cpp
-  src/GridFloor.cpp
+  src/app/App.cpp
+  src/asset/Cgltf.cpp
+  src/asset/Model.cpp
   src/Main.cpp
-  src/Model.cpp
-  src/ModelMesh.cpp
-  src/OrbitCamera.cpp
-  src/RotatingCube.cpp
-  src/Shadow.cpp
-  src/ShaderProgram.cpp
-  src/Texture2D.cpp)
+  src/platform/FileSystem.cpp
+  src/render/ColoredMesh.cpp
+  src/render/ModelMesh.cpp
+  src/render/ShaderProgram.cpp
+  src/render/Shadow.cpp
+  src/render/Texture2D.cpp
+  src/scene/AxisGizmo.cpp
+  src/scene/Character.cpp
+  src/scene/GridFloor.cpp
+  src/scene/OrbitCamera.cpp
+  src/scene/RotatingCube.cpp)
 
 target_include_directories(matrixalchemy
   PRIVATE
@@ -72,7 +72,7 @@ if(MATRIXALCHEMY_ENABLE_IMGUI)
   if(TARGET imgui::imgui)
     target_sources(matrixalchemy
       PRIVATE
-        src/DebugUi.cpp)
+        src/ui/DebugUi.cpp)
     target_link_libraries(matrixalchemy PRIVATE imgui::imgui)
     target_compile_definitions(matrixalchemy PRIVATE MATRIXALCHEMY_HAS_IMGUI=1)
   else()
@@ -82,7 +82,7 @@ if(MATRIXALCHEMY_ENABLE_IMGUI)
     if(TARGET PkgConfig::IMGUI)
       target_sources(matrixalchemy
         PRIVATE
-          src/DebugUi.cpp)
+          src/ui/DebugUi.cpp)
       target_link_libraries(matrixalchemy PRIVATE PkgConfig::IMGUI)
       target_compile_definitions(matrixalchemy PRIVATE MATRIXALCHEMY_HAS_IMGUI=1)
     else()

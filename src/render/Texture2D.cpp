@@ -1,6 +1,6 @@
-#include "matrixalchemy/Texture2D.hpp"
+#include "matrixalchemy/render/Texture2D.hpp"
 
-#include "matrixalchemy/Gl.hpp"
+#include "matrixalchemy/platform/Gl.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>

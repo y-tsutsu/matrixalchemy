@@ -1,6 +1,6 @@
-#include "matrixalchemy/RotatingCube.hpp"
+#include "matrixalchemy/scene/RotatingCube.hpp"
 
-#include "matrixalchemy/Gl.hpp"
+#include "matrixalchemy/platform/Gl.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 

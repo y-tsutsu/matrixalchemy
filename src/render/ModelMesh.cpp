@@ -1,6 +1,6 @@
-#include "matrixalchemy/ModelMesh.hpp"
+#include "matrixalchemy/render/ModelMesh.hpp"
 
-#include "matrixalchemy/Gl.hpp"
+#include "matrixalchemy/platform/Gl.hpp"
 
 #include <cstddef>
 #include <utility>

@@ -1,6 +1,6 @@
-#include "matrixalchemy/ShaderProgram.hpp"
+#include "matrixalchemy/render/ShaderProgram.hpp"
 
-#include "matrixalchemy/Gl.hpp"
+#include "matrixalchemy/platform/Gl.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 

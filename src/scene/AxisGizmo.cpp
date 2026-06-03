@@ -1,6 +1,6 @@
-#include "matrixalchemy/AxisGizmo.hpp"
+#include "matrixalchemy/scene/AxisGizmo.hpp"
 
-#include "matrixalchemy/Gl.hpp"
+#include "matrixalchemy/platform/Gl.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 

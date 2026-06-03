@@ -1,4 +1,4 @@
-#include "matrixalchemy/App.hpp"
+#include "matrixalchemy/app/App.hpp"
 
 #include <cstdlib>
 #include <exception>

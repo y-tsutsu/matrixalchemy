@@ -1,7 +1,7 @@
 #pragma once
 
-#include "matrixalchemy/ColoredMesh.hpp"
-#include "matrixalchemy/ShaderProgram.hpp"
+#include "matrixalchemy/render/ColoredMesh.hpp"
+#include "matrixalchemy/render/ShaderProgram.hpp"
 
 #include <glm/glm.hpp>
 

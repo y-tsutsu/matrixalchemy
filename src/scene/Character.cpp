@@ -1,6 +1,6 @@
-#include "matrixalchemy/Character.hpp"
+#include "matrixalchemy/scene/Character.hpp"
 
-#include "matrixalchemy/Gl.hpp"
+#include "matrixalchemy/platform/Gl.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 

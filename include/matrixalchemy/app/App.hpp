@@ -1,12 +1,12 @@
 #pragma once
 
-#include "matrixalchemy/AxisGizmo.hpp"
-#include "matrixalchemy/Character.hpp"
-#include "matrixalchemy/GridFloor.hpp"
-#include "matrixalchemy/Model.hpp"
-#include "matrixalchemy/OrbitCamera.hpp"
-#include "matrixalchemy/RotatingCube.hpp"
-#include "matrixalchemy/ShaderProgram.hpp"
+#include "matrixalchemy/scene/AxisGizmo.hpp"
+#include "matrixalchemy/scene/Character.hpp"
+#include "matrixalchemy/scene/GridFloor.hpp"
+#include "matrixalchemy/asset/Model.hpp"
+#include "matrixalchemy/scene/OrbitCamera.hpp"
+#include "matrixalchemy/scene/RotatingCube.hpp"
+#include "matrixalchemy/render/ShaderProgram.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>

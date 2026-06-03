@@ -1,8 +1,8 @@
 #pragma once
 
-#include "matrixalchemy/ModelMesh.hpp"
-#include "matrixalchemy/ShaderProgram.hpp"
-#include "matrixalchemy/Texture2D.hpp"
+#include "matrixalchemy/render/ModelMesh.hpp"
+#include "matrixalchemy/render/ShaderProgram.hpp"
+#include "matrixalchemy/render/Texture2D.hpp"
 
 #include <filesystem>
 #include <glm/glm.hpp>

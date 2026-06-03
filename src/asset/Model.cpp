@@ -1,6 +1,6 @@
-#include "matrixalchemy/Model.hpp"
+#include "matrixalchemy/asset/Model.hpp"
 
-#include "matrixalchemy/Gl.hpp"
+#include "matrixalchemy/platform/Gl.hpp"
 
 #include <cgltf.h>
 #include <glm/gtc/type_ptr.hpp>

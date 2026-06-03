@@ -1,7 +1,7 @@
-#include "matrixalchemy/DebugUi.hpp"
+#include "matrixalchemy/ui/DebugUi.hpp"
 
-#include "matrixalchemy/App.hpp"
-#include "matrixalchemy/Gl.hpp"
+#include "matrixalchemy/app/App.hpp"
+#include "matrixalchemy/platform/Gl.hpp"
 
 #include <GLFW/glfw3.h>
 #include <backends/imgui_impl_glfw.h>

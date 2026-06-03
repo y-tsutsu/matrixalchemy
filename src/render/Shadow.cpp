@@ -1,4 +1,4 @@
-#include "matrixalchemy/Shadow.hpp"
+#include "matrixalchemy/render/Shadow.hpp"
 
 #include <stdexcept>
 
