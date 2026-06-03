@@ -26,7 +26,7 @@ The current milestone provides a minimal OpenGL scene:
 - a checkerboard floor grid
 - RGB XYZ axes
 - a rotating colored cube
-- a simple movable character placeholder
+- a keyboard-controlled VRM character preview
 - a VRM preview model loaded through cgltf with node transforms, vertex colors,
   base color factors, base color textures, alpha modes, double-sided materials,
   and texture sampler state
@@ -36,7 +36,7 @@ The current milestone provides a minimal OpenGL scene:
 
 Upcoming milestones:
 
-1. Replace the placeholder with a free character glTF asset.
+1. Improve the VRM character preview with toon-style presentation controls.
 2. Add lighting and material controls.
 3. Expand documentation as a beginner-friendly 3D graphics guide.
 
@@ -174,9 +174,9 @@ Shader sources live under `assets/shaders`. The executable looks for assets next
 to the binary, in the current working directory, and in the source tree, which
 keeps local development simple while leaving room for packaging later.
 
-The scene uses `assets/models/saurus.vrm` as the current VRM preview model when
-it is available. Otherwise, it falls back to the small `simple-triangle.gltf`
-sample.
+The scene uses `assets/models/saurus.vrm` as the current keyboard-controlled VRM
+character when it is available. Otherwise, it falls back to the simple box
+character and the small `simple-triangle.gltf` sample.
 
 ## Asset Credits
 

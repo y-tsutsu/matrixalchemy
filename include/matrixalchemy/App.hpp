@@ -60,6 +60,7 @@ namespace matrixalchemy
         RotatingCube cube_;
         Character character_;
         Model sampleModel_;
+        bool useCharacterModel_ = false;
         OrbitCamera camera_;
         CharacterInput characterInput_;
     };

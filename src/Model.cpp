@@ -58,6 +58,20 @@ namespace
         return nullptr;
     }
 
+    const cgltf_accessor *findNormalAccessor(const cgltf_primitive &primitive)
+    {
+        for (cgltf_size index = 0; index < primitive.attributes_count; ++index)
+        {
+            const cgltf_attribute &attribute = primitive.attributes[index];
+            if (attribute.type == cgltf_attribute_type_normal)
+            {
+                return attribute.data;
+            }
+        }
+
+        return nullptr;
+    }
+
     glm::vec4 readVertexColor(const cgltf_accessor *colors, cgltf_size index, const glm::vec4 &fallbackColor)
     {
         if (colors == nullptr)
@@ -80,6 +94,18 @@ namespace
         float texCoord[2] = {};
         cgltf_accessor_read_float(texCoords, index, texCoord, 2);
         return {texCoord[0], texCoord[1]};
+    }
+
+    glm::vec3 readNormal(const cgltf_accessor *normals, cgltf_size index)
+    {
+        if (normals == nullptr)
+        {
+            return {0.0F, 1.0F, 0.0F};
+        }
+
+        float normal[3] = {0.0F, 1.0F, 0.0F};
+        cgltf_accessor_read_float(normals, index, normal, 3);
+        return glm::normalize(glm::vec3(normal[0], normal[1], normal[2]));
     }
 
     glm::vec2 applyTextureTransform(const glm::vec2 &texCoord, const cgltf_texture_view &textureView)
@@ -278,11 +304,12 @@ namespace matrixalchemy
                 }
                 const cgltf_accessor *colors = findColorAccessor(primitive);
                 const cgltf_accessor *texCoords = findTexCoordAccessor(primitive);
-                const glm::vec4 fallbackVertexColor(fallbackColor, 1.0F);
+                const cgltf_accessor *normals = findNormalAccessor(primitive);
                 const glm::vec4 baseColor = materialBaseColor(primitive.material);
                 const cgltf_texture_view *textureView = baseColorTextureView(primitive.material);
                 const std::optional<std::size_t> textureIndex =
                     textureView != nullptr && texCoords != nullptr ? loadTexture(*textureView->texture, data, modelPath, textureIndices, textures) : std::nullopt;
+                const glm::vec4 fallbackVertexColor = textureIndex.has_value() ? glm::vec4(1.0F) : glm::vec4(fallbackColor, 1.0F);
 
                 LoadedPrimitive loadedPrimitive;
                 loadedPrimitive.textureIndex = textureIndex.value_or(0);
@@ -302,7 +329,8 @@ namespace matrixalchemy
                         cgltf_accessor_read_float(positions, vertexIndex, position, 3);
                         loadedPrimitive.vertices.push_back({{position[0], position[1], position[2]},
                                                             readVertexColor(colors, vertexIndex, fallbackVertexColor) * baseColor,
-                                                            textureView == nullptr ? readTexCoord(texCoords, vertexIndex) : applyTextureTransform(readTexCoord(texCoords, vertexIndex), *textureView)});
+                                                            textureView == nullptr ? readTexCoord(texCoords, vertexIndex) : applyTextureTransform(readTexCoord(texCoords, vertexIndex), *textureView),
+                                                            readNormal(normals, vertexIndex)});
                     }
                 }
                 else
@@ -314,7 +342,8 @@ namespace matrixalchemy
                         cgltf_accessor_read_float(positions, index, position, 3);
                         loadedPrimitive.vertices.push_back({{position[0], position[1], position[2]},
                                                             readVertexColor(colors, index, fallbackVertexColor) * baseColor,
-                                                            textureView == nullptr ? readTexCoord(texCoords, index) : applyTextureTransform(readTexCoord(texCoords, index), *textureView)});
+                                                            textureView == nullptr ? readTexCoord(texCoords, index) : applyTextureTransform(readTexCoord(texCoords, index), *textureView),
+                                                            readNormal(normals, index)});
                     }
                 }
 
@@ -496,6 +525,55 @@ namespace matrixalchemy
             glDisable(GL_BLEND);
         }
         glDepthMask(previousDepthMask);
+    }
+
+    void Model::drawOutline(ShaderProgram &shader, const glm::mat4 &modelMatrix, float width) const
+    {
+        const bool previousCullFace = glIsEnabled(GL_CULL_FACE) == GL_TRUE;
+        const bool previousBlend = glIsEnabled(GL_BLEND) == GL_TRUE;
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
+        glDisable(GL_BLEND);
+
+        shader.setBool("uUseColorOverride", true);
+        shader.setVec4("uColorOverride", {0.10F, 0.08F, 0.06F, 1.0F});
+        shader.setBool("uUseTexture", false);
+        shader.setBool("uUseAlphaMask", false);
+        shader.setFloat("uOutlineWidth", width);
+
+        for (const MeshInstance &instance : instances_)
+        {
+            if (instance.meshIndex >= meshes_.size())
+            {
+                continue;
+            }
+
+            shader.setMat4("uModel", modelMatrix * instance.transform);
+            meshes_[instance.meshIndex].geometry.draw();
+        }
+
+        shader.setFloat("uOutlineWidth", 0.0F);
+        shader.setBool("uUseColorOverride", false);
+
+        glCullFace(GL_BACK);
+        if (previousCullFace)
+        {
+            glEnable(GL_CULL_FACE);
+        }
+        else
+        {
+            glDisable(GL_CULL_FACE);
+        }
+
+        if (previousBlend)
+        {
+            glEnable(GL_BLEND);
+        }
+        else
+        {
+            glDisable(GL_BLEND);
+        }
     }
 
 } // namespace matrixalchemy

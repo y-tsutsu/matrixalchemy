@@ -195,11 +195,13 @@ namespace matrixalchemy
         const std::filesystem::path saurusPath = std::filesystem::path(MATRIXALCHEMY_SOURCE_DIR) / "assets/models/saurus.vrm";
         if (std::filesystem::exists(saurusPath))
         {
-            sampleModel_.load(saurusPath, {0.90F, 0.45F, 0.10F});
+            sampleModel_.load(saurusPath, {1.0F, 1.0F, 1.0F});
+            useCharacterModel_ = true;
         }
         else
         {
             sampleModel_.load(resolveAssetPath("assets/models/simple-triangle.gltf"), {0.90F, 0.45F, 0.10F});
+            useCharacterModel_ = false;
         }
     }
 
@@ -225,6 +227,7 @@ namespace matrixalchemy
         const glm::mat4 projection = glm::perspective(glm::radians(60.0F), aspect, 0.1F, 100.0F);
         const glm::mat4 view = camera_.viewMatrix();
         const glm::mat4 sampleModelMatrix = glm::translate(glm::mat4(1.0F), {2.0F, 0.0F, 1.5F});
+        const glm::mat4 characterModelMatrix = character_.transformMatrix() * glm::rotate(glm::mat4(1.0F), glm::radians(180.0F), {0.0F, 1.0F, 0.0F});
 
         shader_.use();
         shader_.setMat4("uProjection", projection);
@@ -232,6 +235,7 @@ namespace matrixalchemy
         shader_.setBool("uUseColorOverride", false);
         shader_.setBool("uUseTexture", false);
         shader_.setBool("uUseAlphaMask", false);
+        shader_.setFloat("uOutlineWidth", 0.0F);
 
         glEnable(GL_STENCIL_TEST);
         glStencilMask(0xFF);
@@ -248,8 +252,16 @@ namespace matrixalchemy
         shader_.setBool("uUseColorOverride", true);
         shader_.setVec4("uColorOverride", {0.0F, 0.0F, 0.0F, 0.35F});
         cube_.drawShadow(shader_, shadowMatrix);
-        character_.drawShadow(shader_, shadowMatrix);
-        sampleModel_.draw(shader_, shadowMatrix * sampleModelMatrix, false);
+        if (useCharacterModel_)
+        {
+            const glm::mat4 floorLift = glm::translate(glm::mat4(1.0F), {0.0F, 0.015F, 0.0F});
+            sampleModel_.draw(shader_, floorLift * shadowMatrix * characterModelMatrix, false);
+        }
+        else
+        {
+            character_.drawShadow(shader_, shadowMatrix);
+            sampleModel_.draw(shader_, shadowMatrix * sampleModelMatrix, false);
+        }
         shader_.setBool("uUseColorOverride", false);
         glDepthMask(GL_TRUE);
         glDisable(GL_BLEND);
@@ -258,8 +270,16 @@ namespace matrixalchemy
 
         axisGizmo_.draw(shader_);
         cube_.draw(shader_);
-        character_.draw(shader_);
-        sampleModel_.draw(shader_, sampleModelMatrix);
+        if (useCharacterModel_)
+        {
+            sampleModel_.drawOutline(shader_, characterModelMatrix, 0.012F);
+            sampleModel_.draw(shader_, characterModelMatrix);
+        }
+        else
+        {
+            character_.draw(shader_);
+            sampleModel_.draw(shader_, sampleModelMatrix);
+        }
 
 #if MATRIXALCHEMY_HAS_IMGUI
         if (showDebugUi_)

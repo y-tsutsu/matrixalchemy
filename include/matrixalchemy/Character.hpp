@@ -27,10 +27,9 @@ namespace matrixalchemy
 
         [[nodiscard]] glm::vec3 position() const { return position_; }
         [[nodiscard]] float rotationDegrees() const { return rotationDegrees_; }
+        [[nodiscard]] glm::mat4 transformMatrix() const;
 
     private:
-        [[nodiscard]] glm::mat4 modelMatrix() const;
-
         ColoredMesh mesh_;
         glm::vec3 position_ = {0.0F, 0.0F, 0.0F};
         float rotationDegrees_ = 0.0F;

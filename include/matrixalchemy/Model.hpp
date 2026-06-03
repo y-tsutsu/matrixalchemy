@@ -17,6 +17,7 @@ namespace matrixalchemy
         void load(const std::filesystem::path &path, const glm::vec3 &color);
         void release();
         void draw(ShaderProgram &shader, const glm::mat4 &modelMatrix, bool useMaterialState = true) const;
+        void drawOutline(ShaderProgram &shader, const glm::mat4 &modelMatrix, float width) const;
 
         [[nodiscard]] bool empty() const { return meshes_.empty(); }
 
