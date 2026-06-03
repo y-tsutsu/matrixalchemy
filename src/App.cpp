@@ -227,7 +227,7 @@ namespace matrixalchemy
         const glm::mat4 projection = glm::perspective(glm::radians(60.0F), aspect, 0.1F, 100.0F);
         const glm::mat4 view = camera_.viewMatrix();
         const glm::mat4 sampleModelMatrix = glm::translate(glm::mat4(1.0F), {2.0F, 0.0F, 1.5F});
-        const glm::mat4 characterModelMatrix = character_.transformMatrix() * glm::rotate(glm::mat4(1.0F), glm::radians(180.0F), {0.0F, 1.0F, 0.0F});
+        const glm::mat4 characterModelMatrix = character_.transformMatrix();
 
         shader_.use();
         shader_.setMat4("uProjection", projection);

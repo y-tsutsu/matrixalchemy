@@ -110,11 +110,11 @@ namespace matrixalchemy
 
         if (input.turnLeft)
         {
-            rotationDegrees_ -= turnSpeed * deltaSeconds;
+            rotationDegrees_ += turnSpeed * deltaSeconds;
         }
         if (input.turnRight)
         {
-            rotationDegrees_ += turnSpeed * deltaSeconds;
+            rotationDegrees_ -= turnSpeed * deltaSeconds;
         }
 
         const float direction = (input.moveForward ? 1.0F : 0.0F) - (input.moveBackward ? 1.0F : 0.0F);
