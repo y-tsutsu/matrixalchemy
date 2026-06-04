@@ -26,7 +26,9 @@ namespace matrixalchemy::scene
     {
         const glm::mat4 transform = transformMatrix() * glm::scale(glm::mat4(1.0F), glm::vec3(modelScale_));
         model_.drawOutline(shader, transform, outlineWidth_);
+        shader.setBool("uUseToonLighting", true);
         model_.draw(shader, transform);
+        shader.setBool("uUseToonLighting", false);
     }
 
     void VrmCharacter::drawShadow(render::ShaderProgram &shader, const glm::mat4 &shadowMatrix) const

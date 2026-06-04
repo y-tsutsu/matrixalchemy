@@ -116,6 +116,13 @@ namespace matrixalchemy::render
         glUniformMatrix4fv(location, static_cast<int>(values.size()), GL_FALSE, glm::value_ptr(values.front()));
     }
 
+    void ShaderProgram::setVec3(std::string_view name, const glm::vec3 &value) const
+    {
+        const std::string uniformName(name);
+        const int location = glGetUniformLocation(id_, uniformName.c_str());
+        glUniform3fv(location, 1, glm::value_ptr(value));
+    }
+
     void ShaderProgram::setVec4(std::string_view name, const glm::vec4 &value) const
     {
         const std::string uniformName(name);

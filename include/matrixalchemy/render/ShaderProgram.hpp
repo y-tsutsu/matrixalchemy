@@ -28,6 +28,7 @@ namespace matrixalchemy::render
         void setInt(std::string_view name, int value) const;
         void setMat4(std::string_view name, const glm::mat4 &value) const;
         void setMat4Array(std::string_view name, std::span<const glm::mat4> values) const;
+        void setVec3(std::string_view name, const glm::vec3 &value) const;
         void setVec4(std::string_view name, const glm::vec4 &value) const;
 
     private:

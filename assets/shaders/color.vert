@@ -16,6 +16,8 @@ uniform mat4 uJointMatrices[128];
 
 out vec4 vColor;
 out vec2 vTexCoord;
+out vec3 vWorldPosition;
+out vec3 vWorldNormal;
 
 void main()
 {
@@ -40,5 +42,9 @@ void main()
         position += normalize(normal) * uOutlineWidth;
     }
 
-    gl_Position = uProjection * uView * uModel * vec4(position, 1.0);
+    vec4 worldPosition = uModel * vec4(position, 1.0);
+    vWorldPosition = worldPosition.xyz;
+    vWorldNormal = normalize(mat3(transpose(inverse(uModel))) * normal);
+
+    gl_Position = uProjection * uView * worldPosition;
 }
