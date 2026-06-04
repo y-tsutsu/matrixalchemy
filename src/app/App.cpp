@@ -19,6 +19,18 @@
 
 namespace matrixalchemy::app
 {
+    namespace
+    {
+
+        constexpr float floorHalfSize = 5.0F;
+        constexpr int floorTileCount = 10;
+        constexpr float axisLength = 6.5F;
+        constexpr float lightMarkerRadius = 0.085F;
+        constexpr int lightMarkerSlices = 16;
+        constexpr int lightMarkerStacks = 8;
+        constexpr glm::vec3 initialLightPosition = {-4.33F, 5.6F, -3.04F};
+
+    } // namespace
 
     App::App()
     {
@@ -34,7 +46,7 @@ namespace matrixalchemy::app
 #endif
         fallbackCharacter_.release();
         vrmCharacter_.release();
-        cube_.release();
+        floatingCubes_.release();
         lightMarker_.release();
         axisGizmo_.release();
         gridFloor_.release();
@@ -198,11 +210,11 @@ namespace matrixalchemy::app
     {
         shader_.create(render::shader_sources::colorVertex, render::shader_sources::colorFragment);
 
-        gridFloor_.create(5.0F, 10);
-        axisGizmo_.create(6.5F);
-        lightMarker_.create(0.085F, 16, 8);
-        lightMarker_.setPosition({-4.33F, 5.6F, -3.04F});
-        cube_.create(1.0F);
+        gridFloor_.create(floorHalfSize, floorTileCount);
+        axisGizmo_.create(axisLength);
+        lightMarker_.create(lightMarkerRadius, lightMarkerSlices, lightMarkerStacks);
+        lightMarker_.setPosition(initialLightPosition);
+        floatingCubes_.create(1.0F);
         fallbackCharacter_.create();
 
         const std::optional<std::filesystem::path> saurusPath = platform::findRuntimeAssetPath("saurus.vrm");
@@ -227,7 +239,7 @@ namespace matrixalchemy::app
 
     void App::update(float deltaSeconds)
     {
-        cube_.update(deltaSeconds);
+        floatingCubes_.update(deltaSeconds);
         lightMarker_.update(deltaSeconds);
         if (useVrmCharacter_)
         {
@@ -272,7 +284,7 @@ namespace matrixalchemy::app
         glDepthMask(GL_FALSE);
         shader_.setBool("uUseColorOverride", true);
         shader_.setVec4("uColorOverride", {0.0F, 0.0F, 0.0F, 0.35F});
-        cube_.drawShadow(shader_, shadowMatrix);
+        floatingCubes_.drawShadow(shader_, shadowMatrix);
         if (useVrmCharacter_)
         {
             vrmCharacter_.drawShadow(shader_, shadowMatrix);
@@ -292,7 +304,7 @@ namespace matrixalchemy::app
             axisGizmo_.draw(shader_);
         }
         lightMarker_.draw(shader_);
-        cube_.draw(shader_);
+        floatingCubes_.draw(shader_);
         if (useVrmCharacter_)
         {
             vrmCharacter_.draw(shader_);

@@ -12,6 +12,9 @@ namespace
 {
 
     constexpr float pi = 3.14159265358979323846F;
+    constexpr float orbitSpeed = 35.0F;
+    constexpr float orbitRadius = 5.3F;
+    constexpr float orbitHeight = 5.6F;
 
     float radians(float degrees)
     {
@@ -77,13 +80,9 @@ namespace matrixalchemy::scene
 
     void LightMarker::update(float deltaSeconds)
     {
-        constexpr float orbitSpeed = 35.0F;
-        constexpr float orbitRadius = 5.3F;
-        constexpr float height = 5.6F;
-
         orbitDegrees_ += orbitSpeed * deltaSeconds;
         const float angle = radians(orbitDegrees_);
-        position_ = {std::cos(angle) * orbitRadius, height, std::sin(angle) * orbitRadius};
+        position_ = {std::cos(angle) * orbitRadius, orbitHeight, std::sin(angle) * orbitRadius};
     }
 
     void LightMarker::draw(render::ShaderProgram &shader) const

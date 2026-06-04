@@ -9,7 +9,7 @@
 namespace matrixalchemy::scene
 {
 
-    class RotatingCube final : public IDrawable, public IShadowCaster
+    class FloatingCubes final : public IDrawable, public IShadowCaster
     {
     public:
         void create(float size);

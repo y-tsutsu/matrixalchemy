@@ -33,7 +33,7 @@ namespace matrixalchemy::ui
         ImGui::Begin("Matrix Alchemy");
         ImGui::Text("F1: toggle this panel");
         ImGui::Separator();
-        ImGui::Text("Cube rotation: %.2f deg", app.cubeRotationDegrees());
+        ImGui::Text("Floating cubes rotation: %.2f deg", app.floatingCubesRotationDegrees());
         ImGui::Separator();
         ImGui::Text("Camera radius: %.2f", app.cameraRadius());
         ImGui::Text("Camera theta: %.2f deg", app.cameraThetaDegrees());

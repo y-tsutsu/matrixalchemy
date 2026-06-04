@@ -3,10 +3,10 @@
 #include "matrixalchemy/render/ShaderProgram.hpp"
 #include "matrixalchemy/scene/AxisGizmo.hpp"
 #include "matrixalchemy/scene/Character.hpp"
+#include "matrixalchemy/scene/FloatingCubes.hpp"
 #include "matrixalchemy/scene/GridFloor.hpp"
 #include "matrixalchemy/scene/LightMarker.hpp"
 #include "matrixalchemy/scene/OrbitCamera.hpp"
-#include "matrixalchemy/scene/RotatingCube.hpp"
 #include "matrixalchemy/scene/VrmCharacter.hpp"
 
 #include <GLFW/glfw3.h>
@@ -26,7 +26,7 @@ namespace matrixalchemy::app
 
         int run();
 
-        [[nodiscard]] float cubeRotationDegrees() const { return cube_.rotationDegrees(); }
+        [[nodiscard]] float floatingCubesRotationDegrees() const { return floatingCubes_.rotationDegrees(); }
         [[nodiscard]] float cameraRadius() const { return camera_.radius(); }
         [[nodiscard]] float cameraThetaDegrees() const { return camera_.thetaDegrees(); }
         [[nodiscard]] float cameraPhiDegrees() const { return camera_.phiDegrees(); }
@@ -59,7 +59,7 @@ namespace matrixalchemy::app
         scene::GridFloor gridFloor_;
         scene::AxisGizmo axisGizmo_;
         scene::LightMarker lightMarker_;
-        scene::RotatingCube cube_;
+        scene::FloatingCubes floatingCubes_;
         scene::Character fallbackCharacter_;
         scene::VrmCharacter vrmCharacter_;
         bool useVrmCharacter_ = false;

@@ -1,4 +1,4 @@
-#include "matrixalchemy/scene/RotatingCube.hpp"
+#include "matrixalchemy/scene/FloatingCubes.hpp"
 
 #include "matrixalchemy/platform/Gl.hpp"
 
@@ -11,6 +11,23 @@
 
 namespace
 {
+
+    constexpr int cubeCount = 20;
+    constexpr float minCubeSize = 0.34F;
+    constexpr float maxCubeSize = 0.52F;
+    constexpr float floorClearance = 0.06F;
+    constexpr float floorRange = 4.2F;
+    constexpr float minBaseLift = 0.25F;
+    constexpr float maxBaseHeight = 3.45F;
+    constexpr float minOrbitRadius = 0.45F;
+    constexpr float maxOrbitRadius = 0.90F;
+    constexpr float minOrbitSpeed = 0.70F;
+    constexpr float maxOrbitSpeed = 1.50F;
+    constexpr float minBobHeight = 0.25F;
+    constexpr float maxBobHeight = 0.55F;
+    constexpr float minBobSpeed = 1.60F;
+    constexpr float maxBobSpeed = 2.85F;
+    constexpr float twoPi = 6.28318530718F;
 
     float radians(float degrees)
     {
@@ -47,12 +64,17 @@ namespace
         return palette[std::uniform_int_distribution<std::size_t>(0, palette.size() - 1)(random)];
     }
 
+    float cubeFloorHeight(float size)
+    {
+        return std::sqrt(3.0F) * size * 0.5F + floorClearance;
+    }
+
 } // namespace
 
 namespace matrixalchemy::scene
 {
 
-    void RotatingCube::create(float size)
+    void FloatingCubes::create(float size)
     {
         const float half = size / 2.0F;
         const glm::vec3 red = {0.90F, 0.20F, 0.25F};
@@ -111,17 +133,16 @@ namespace matrixalchemy::scene
         std::random_device seed;
         std::mt19937 random(seed());
         cubes_.clear();
-        cubes_.reserve(20);
+        cubes_.reserve(cubeCount);
 
-        for (int index = 0; index < 20; ++index)
+        for (int index = 0; index < cubeCount; ++index)
         {
-            const float cubeSize = randomFloat(random, 0.34F, 0.52F);
-            const float minimumHeight = std::sqrt(3.0F) * cubeSize * 0.5F + 0.06F;
-            const float x = randomFloat(random, -4.2F, 4.2F);
-            const float z = randomFloat(random, -4.2F, 4.2F);
+            const float cubeSize = randomFloat(random, minCubeSize, maxCubeSize);
+            const float x = randomFloat(random, -floorRange, floorRange);
+            const float z = randomFloat(random, -floorRange, floorRange);
 
             CubeInstance cube;
-            cube.basePosition = {x, randomFloat(random, minimumHeight + 0.25F, 3.45F), z};
+            cube.basePosition = {x, randomFloat(random, cubeFloorHeight(cubeSize) + minBaseLift, maxBaseHeight), z};
             cube.colorScale = randomColor(random);
             cube.rotationAxis = glm::normalize(glm::vec3{
                 randomFloat(random, 0.15F, 1.0F),
@@ -129,33 +150,33 @@ namespace matrixalchemy::scene
                 randomFloat(random, 0.15F, 1.0F),
             });
             cube.size = cubeSize;
-            cube.orbitRadius = randomFloat(random, 0.45F, 0.90F);
-            cube.orbitSpeed = randomFloat(random, 0.70F, 1.50F) * (index % 2 == 0 ? 1.0F : -1.0F);
-            cube.bobHeight = randomFloat(random, 0.25F, 0.55F);
-            cube.bobSpeed = randomFloat(random, 1.60F, 2.85F);
-            cube.phase = randomFloat(random, 0.0F, 6.28318530718F);
+            cube.orbitRadius = randomFloat(random, minOrbitRadius, maxOrbitRadius);
+            cube.orbitSpeed = randomFloat(random, minOrbitSpeed, maxOrbitSpeed) * (index % 2 == 0 ? 1.0F : -1.0F);
+            cube.bobHeight = randomFloat(random, minBobHeight, maxBobHeight);
+            cube.bobSpeed = randomFloat(random, minBobSpeed, maxBobSpeed);
+            cube.phase = randomFloat(random, 0.0F, twoPi);
             cubes_.push_back(cube);
         }
     }
 
-    void RotatingCube::release()
+    void FloatingCubes::release()
     {
         cubes_.clear();
         mesh_.release();
     }
 
-    void RotatingCube::update(float deltaSeconds)
+    void FloatingCubes::update(float deltaSeconds)
     {
         elapsedSeconds_ += deltaSeconds;
         rotationDegrees_ += 45.0F * deltaSeconds;
     }
 
-    float RotatingCube::rotationDegrees() const
+    float FloatingCubes::rotationDegrees() const
     {
         return wrapDegrees(rotationDegrees_);
     }
 
-    void RotatingCube::draw(render::ShaderProgram &shader) const
+    void FloatingCubes::draw(render::ShaderProgram &shader) const
     {
         for (const CubeInstance &cube : cubes_)
         {
@@ -167,7 +188,7 @@ namespace matrixalchemy::scene
         shader.setBool("uUseColorOverride", false);
     }
 
-    void RotatingCube::drawShadow(render::ShaderProgram &shader, const glm::mat4 &shadowMatrix) const
+    void FloatingCubes::drawShadow(render::ShaderProgram &shader, const glm::mat4 &shadowMatrix) const
     {
         const glm::mat4 floorLift = glm::translate(glm::mat4(1.0F), {0.0F, 0.015F, 0.0F});
         for (const CubeInstance &cube : cubes_)
@@ -177,7 +198,7 @@ namespace matrixalchemy::scene
         }
     }
 
-    glm::mat4 RotatingCube::modelMatrix(const CubeInstance &cube) const
+    glm::mat4 FloatingCubes::modelMatrix(const CubeInstance &cube) const
     {
         const float orbitAngle = elapsedSeconds_ * cube.orbitSpeed + cube.phase;
         glm::vec3 position = cube.basePosition + glm::vec3{
@@ -185,7 +206,7 @@ namespace matrixalchemy::scene
                                                      std::sin(elapsedSeconds_ * cube.bobSpeed + cube.phase) * cube.bobHeight,
                                                      std::sin(orbitAngle) * cube.orbitRadius,
                                                  };
-        position.y = std::max(position.y, std::sqrt(3.0F) * cube.size * 0.5F + 0.06F);
+        position.y = std::max(position.y, cubeFloorHeight(cube.size));
         const float rotation = radians(rotationDegrees_ * (1.0F + cube.orbitRadius) + cube.phase * 60.0F);
 
         return glm::translate(glm::mat4(1.0F), position) *

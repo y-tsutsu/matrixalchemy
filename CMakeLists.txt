@@ -49,6 +49,7 @@ target_include_directories(matrixalchemy_glad
 add_executable(matrixalchemy
   src/app/App.cpp
   src/asset/Cgltf.cpp
+  src/asset/GltfModelLoader.cpp
   src/asset/Model.cpp
   src/main.cpp
   src/platform/FileSystem.cpp
@@ -63,7 +64,7 @@ add_executable(matrixalchemy
   src/scene/GridFloor.cpp
   src/scene/LightMarker.cpp
   src/scene/OrbitCamera.cpp
-  src/scene/RotatingCube.cpp
+  src/scene/FloatingCubes.cpp
   src/scene/VrmCharacter.cpp
   ${MATRIXALCHEMY_SHADER_SOURCES_HPP})
 
