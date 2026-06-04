@@ -16,7 +16,7 @@ namespace matrixalchemy::scene
     public:
         void load(const std::filesystem::path &path);
         void release();
-        void update(float deltaSeconds, const CharacterInput &input);
+        void update(float deltaSeconds, const CharacterInput &input, const asset::PoseAnimationSettings &poseSettings);
         void draw(render::ShaderProgram &shader) const override;
         void drawShadow(render::ShaderProgram &shader, const glm::mat4 &shadowMatrix) const override;
 

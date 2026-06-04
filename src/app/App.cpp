@@ -248,7 +248,7 @@ namespace matrixalchemy::app
         lightMarker_.update(deltaSeconds);
         if (useVrmCharacter_)
         {
-            vrmCharacter_.update(deltaSeconds, characterInput_);
+            vrmCharacter_.update(deltaSeconds, characterInput_, poseAnimationSettings_);
         }
         else
         {

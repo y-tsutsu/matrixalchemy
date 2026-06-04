@@ -15,11 +15,11 @@ namespace matrixalchemy::scene
         model_.release();
     }
 
-    void VrmCharacter::update(float deltaSeconds, const CharacterInput &input)
+    void VrmCharacter::update(float deltaSeconds, const CharacterInput &input, const asset::PoseAnimationSettings &poseSettings)
     {
         controller_.update(deltaSeconds, input);
         poseSeconds_ += deltaSeconds;
-        model_.applyDemoPose(poseSeconds_);
+        model_.applyDemoPose(poseSeconds_, poseSettings);
     }
 
     void VrmCharacter::draw(render::ShaderProgram &shader) const

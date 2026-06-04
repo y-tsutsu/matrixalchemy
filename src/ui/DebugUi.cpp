@@ -56,6 +56,12 @@ namespace matrixalchemy::ui
         ImGui::Text("Character position: %.2f, %.2f, %.2f", position.x, position.y, position.z);
         ImGui::Text("Character render height: %.2f", app.characterRenderHeight());
         ImGui::Text("Character rotation: %.2f deg", wrapDegrees(app.characterRotationDegrees()));
+        ImGui::Separator();
+        auto &poseSettings = app.poseAnimationSettings();
+        ImGui::Checkbox("Arm animation", &poseSettings.enabled);
+        ImGui::SliderFloat("Arm speed", &poseSettings.speed, 0.1F, 4.0F, "%.2f");
+        ImGui::SliderFloat("Arm base", &poseSettings.baseArmAngleDegrees, 0.0F, 90.0F, "%.1f deg");
+        ImGui::SliderFloat("Arm spread", &poseSettings.spreadAngleDegrees, 0.0F, 70.0F, "%.1f deg");
         ImGui::End();
     }
 

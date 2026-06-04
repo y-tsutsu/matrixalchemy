@@ -40,11 +40,11 @@ namespace matrixalchemy::asset
         hasRightArm_ = rightArmIndex_ < nodes.size();
     }
 
-    void ModelPoseAnimator::apply(float elapsedSeconds, std::vector<ModelNode> &nodes) const
+    void ModelPoseAnimator::apply(float elapsedSeconds, const PoseAnimationSettings &settings, std::vector<ModelNode> &nodes) const
     {
-        const float baseArmAngle = 58.0F;
-        const float spreadAngle = (std::sin(elapsedSeconds * 1.4F) * 0.5F + 0.5F) * 34.0F;
-        const float armAngle = radians(baseArmAngle - spreadAngle);
+        const float spreadRatio = settings.enabled ? std::sin(elapsedSeconds * settings.speed) * 0.5F + 0.5F : 0.0F;
+        const float spreadAngle = spreadRatio * settings.spreadAngleDegrees;
+        const float armAngle = radians(settings.baseArmAngleDegrees - spreadAngle);
 
         if (hasLeftArm_ && leftArmIndex_ < nodes.size())
         {

@@ -33,6 +33,8 @@ namespace matrixalchemy::app
         [[nodiscard]] glm::vec3 characterPosition() const;
         [[nodiscard]] float characterRotationDegrees() const;
         [[nodiscard]] float characterRenderHeight() const;
+        [[nodiscard]] const asset::PoseAnimationSettings &poseAnimationSettings() const { return poseAnimationSettings_; }
+        [[nodiscard]] asset::PoseAnimationSettings &poseAnimationSettings() { return poseAnimationSettings_; }
         [[nodiscard]] bool debugUiVisible() const { return showDebugUi_; }
 
     private:
@@ -66,6 +68,7 @@ namespace matrixalchemy::app
         bool useVrmCharacter_ = false;
         scene::OrbitCamera camera_;
         scene::CharacterInput characterInput_;
+        asset::PoseAnimationSettings poseAnimationSettings_;
     };
 
 } // namespace matrixalchemy::app

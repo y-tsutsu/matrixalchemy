@@ -54,10 +54,10 @@ namespace matrixalchemy::asset
         }
     }
 
-    void Model::applyDemoPose(float elapsedSeconds)
+    void Model::applyDemoPose(float elapsedSeconds, const PoseAnimationSettings &settings)
     {
         resetNodeLocalTransforms();
-        poseAnimator_.apply(elapsedSeconds, nodes_);
+        poseAnimator_.apply(elapsedSeconds, settings, nodes_);
         updateWorldTransforms();
     }
 
