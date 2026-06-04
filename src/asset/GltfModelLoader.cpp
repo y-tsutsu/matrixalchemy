@@ -258,6 +258,13 @@ namespace
         return transform;
     }
 
+    glm::mat4 nodeLocalTransform(const cgltf_node &node)
+    {
+        glm::mat4 transform(1.0F);
+        cgltf_node_transform_local(&node, glm::value_ptr(transform));
+        return transform;
+    }
+
     glm::mat4 readMatrix(const cgltf_accessor *accessor, cgltf_size index)
     {
         glm::mat4 matrix(1.0F);
@@ -451,6 +458,28 @@ namespace matrixalchemy::asset
             return skins;
         }
 
+        std::vector<ModelNode> readNodes(const cgltf_data &data)
+        {
+            std::vector<ModelNode> nodes;
+            nodes.reserve(static_cast<std::size_t>(data.nodes_count));
+
+            for (cgltf_size nodeIndex = 0; nodeIndex < data.nodes_count; ++nodeIndex)
+            {
+                const cgltf_node &node = data.nodes[nodeIndex];
+                ModelNode modelNode;
+                modelNode.localTransform = nodeLocalTransform(node);
+                modelNode.worldTransform = nodeWorldTransform(node);
+                if (node.parent != nullptr)
+                {
+                    modelNode.parentIndex = static_cast<std::size_t>(node.parent - data.nodes);
+                    modelNode.hasParent = true;
+                }
+                nodes.push_back(modelNode);
+            }
+
+            return nodes;
+        }
+
     } // namespace
 
     ModelData loadGltfModel(const std::filesystem::path &path, const glm::vec3 &fallbackColor)
@@ -466,6 +495,7 @@ namespace matrixalchemy::asset
             throwIfFailed(cgltf_validate(data), "Failed to validate glTF file.");
 
             ModelData modelData;
+            modelData.nodes = readNodes(*data);
             modelData.skins = readSkins(*data);
             std::vector<std::size_t> textureIndices(data->textures_count, std::numeric_limits<std::size_t>::max());
             std::vector<std::vector<std::size_t>> meshPrimitiveIndices(data->meshes_count);
@@ -502,13 +532,14 @@ namespace matrixalchemy::asset
                     if (node->mesh != nullptr)
                     {
                         const cgltf_size meshIndex = static_cast<cgltf_size>(node->mesh - data->meshes);
+                        const std::size_t nodeIndex = static_cast<std::size_t>(node - data->nodes);
                         if (meshIndex < meshPrimitiveIndices.size())
                         {
                             const bool hasSkin = node->skin != nullptr;
                             const std::size_t skinIndex = hasSkin ? static_cast<std::size_t>(node->skin - data->skins) : 0;
                             for (const std::size_t primitiveIndex : meshPrimitiveIndices[meshIndex])
                             {
-                                modelData.instances.push_back({primitiveIndex, skinIndex, nodeWorldTransform(*node), hasSkin});
+                                modelData.instances.push_back({primitiveIndex, nodeIndex, skinIndex, nodeWorldTransform(*node), hasSkin});
                             }
                         }
                     }

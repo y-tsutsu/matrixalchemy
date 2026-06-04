@@ -15,6 +15,8 @@ namespace matrixalchemy::asset
         try
         {
             ModelData modelData = loadGltfModel(path, color);
+            nodes_ = std::move(modelData.nodes);
+            skins_ = std::move(modelData.skins);
             textures_ = std::move(modelData.textures);
 
             for (ModelPrimitive &primitive : modelData.primitives)
@@ -33,7 +35,7 @@ namespace matrixalchemy::asset
             instances_.reserve(modelData.instances.size());
             for (const ModelInstance &instance : modelData.instances)
             {
-                instances_.push_back({instance.primitiveIndex, instance.skinIndex, instance.transform, instance.hasSkin});
+                instances_.push_back({instance.primitiveIndex, instance.nodeIndex, instance.skinIndex, instance.transform, instance.hasSkin});
             }
         }
         catch (...)
@@ -51,6 +53,8 @@ namespace matrixalchemy::asset
         }
         meshes_.clear();
         instances_.clear();
+        nodes_.clear();
+        skins_.clear();
         textures_.clear();
     }
 

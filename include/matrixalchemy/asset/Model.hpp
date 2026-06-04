@@ -1,5 +1,6 @@
 #pragma once
 
+#include "matrixalchemy/asset/ModelData.hpp"
 #include "matrixalchemy/render/ModelMesh.hpp"
 #include "matrixalchemy/render/ShaderProgram.hpp"
 #include "matrixalchemy/render/Texture2D.hpp"
@@ -36,6 +37,7 @@ namespace matrixalchemy::asset
         struct MeshInstance
         {
             std::size_t meshIndex = 0;
+            std::size_t nodeIndex = 0;
             std::size_t skinIndex = 0;
             glm::mat4 transform = glm::mat4(1.0F);
             bool hasSkin = false;
@@ -43,6 +45,8 @@ namespace matrixalchemy::asset
 
         std::vector<Mesh> meshes_;
         std::vector<MeshInstance> instances_;
+        std::vector<ModelNode> nodes_;
+        std::vector<ModelSkin> skins_;
         std::vector<render::Texture2D> textures_;
     };
 

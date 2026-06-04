@@ -25,9 +25,18 @@ namespace matrixalchemy::asset
     struct ModelInstance
     {
         std::size_t primitiveIndex = 0;
+        std::size_t nodeIndex = 0;
         std::size_t skinIndex = 0;
         glm::mat4 transform = glm::mat4(1.0F);
         bool hasSkin = false;
+    };
+
+    struct ModelNode
+    {
+        std::size_t parentIndex = 0;
+        glm::mat4 localTransform = glm::mat4(1.0F);
+        glm::mat4 worldTransform = glm::mat4(1.0F);
+        bool hasParent = false;
     };
 
     struct ModelSkin
@@ -40,6 +49,7 @@ namespace matrixalchemy::asset
     {
         std::vector<ModelPrimitive> primitives;
         std::vector<ModelInstance> instances;
+        std::vector<ModelNode> nodes;
         std::vector<ModelSkin> skins;
         std::vector<render::Texture2D> textures;
     };
