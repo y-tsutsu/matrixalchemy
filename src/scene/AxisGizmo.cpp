@@ -16,12 +16,12 @@ namespace matrixalchemy::scene
         constexpr glm::vec3 blue = {0.20F, 0.35F, 1.00F};
 
         const std::array<render::ColoredVertex, 6> vertices = {
-            render::ColoredVertex{{0.0F, 0.02F, 0.0F}, red},
-            render::ColoredVertex{{length, 0.02F, 0.0F}, red},
-            render::ColoredVertex{{0.0F, 0.02F, 0.0F}, green},
+            render::ColoredVertex{{0.0F, 0.0F, 0.0F}, red},
+            render::ColoredVertex{{length, 0.0F, 0.0F}, red},
+            render::ColoredVertex{{0.0F, 0.0F, 0.0F}, green},
             render::ColoredVertex{{0.0F, length, 0.0F}, green},
-            render::ColoredVertex{{0.0F, 0.02F, 0.0F}, blue},
-            render::ColoredVertex{{0.0F, 0.02F, length}, blue},
+            render::ColoredVertex{{0.0F, 0.0F, 0.0F}, blue},
+            render::ColoredVertex{{0.0F, 0.0F, length}, blue},
         };
 
         mesh_.upload(vertices, GL_LINES);
