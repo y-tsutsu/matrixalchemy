@@ -376,6 +376,7 @@ namespace
         const std::string_view vrmJson(vrmExtension->data);
         modelData.leftUpperArmNodeIndex = readVrmHumanoidBoneNode(vrmJson, "leftUpperArm");
         modelData.rightUpperArmNodeIndex = readVrmHumanoidBoneNode(vrmJson, "rightUpperArm");
+        modelData.headNodeIndex = readVrmHumanoidBoneNode(vrmJson, "head");
     }
 
 } // namespace

@@ -58,6 +58,7 @@ namespace matrixalchemy::asset
         std::vector<render::Texture2D> textures;
         std::optional<std::size_t> leftUpperArmNodeIndex;
         std::optional<std::size_t> rightUpperArmNodeIndex;
+        std::optional<std::size_t> headNodeIndex;
     };
 
 } // namespace matrixalchemy::asset

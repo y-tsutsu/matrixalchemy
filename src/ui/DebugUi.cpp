@@ -62,6 +62,10 @@ namespace matrixalchemy::ui
         ImGui::SliderFloat("Arm speed", &poseSettings.speed, 0.1F, 4.0F, "%.2f");
         ImGui::SliderFloat("Arm base", &poseSettings.baseArmAngleDegrees, 0.0F, 90.0F, "%.1f deg");
         ImGui::SliderFloat("Arm spread", &poseSettings.spreadAngleDegrees, 0.0F, 70.0F, "%.1f deg");
+        ImGui::Checkbox("Head animation", &poseSettings.headEnabled);
+        ImGui::SliderFloat("Head yaw", &poseSettings.headYawDegrees, 0.0F, 25.0F, "%.1f deg");
+        ImGui::Checkbox("Tail animation", &poseSettings.tailEnabled);
+        ImGui::SliderFloat("Tail swing", &poseSettings.tailSwingDegrees, 0.0F, 35.0F, "%.1f deg");
         ImGui::End();
     }
 

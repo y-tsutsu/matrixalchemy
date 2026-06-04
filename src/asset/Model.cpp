@@ -31,6 +31,10 @@ namespace matrixalchemy::asset
             {
                 poseAnimator_.setHumanoidArmNodes(*modelData.leftUpperArmNodeIndex, *modelData.rightUpperArmNodeIndex);
             }
+            if (modelData.headNodeIndex.has_value())
+            {
+                poseAnimator_.setHumanoidHeadNode(*modelData.headNodeIndex);
+            }
 
             for (ModelPrimitive &primitive : modelData.primitives)
             {
