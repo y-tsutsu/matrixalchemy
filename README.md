@@ -93,6 +93,9 @@ $ ./build/matrixalchemy
 Use MSYS2 for the MinGW compiler tools and Clink/cmd.exe for the project build
 commands. C++ libraries are managed by vcpkg.
 
+This path has been verified on Windows with Clink, MSYS2 UCRT64, Ninja, and
+vcpkg's `x64-mingw-dynamic` triplet.
+
 In the **UCRT64** shell, install the development tools:
 
 ```console
