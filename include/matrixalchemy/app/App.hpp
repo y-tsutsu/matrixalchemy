@@ -4,6 +4,7 @@
 #include "matrixalchemy/scene/AxisGizmo.hpp"
 #include "matrixalchemy/scene/Character.hpp"
 #include "matrixalchemy/scene/GridFloor.hpp"
+#include "matrixalchemy/scene/LightMarker.hpp"
 #include "matrixalchemy/scene/OrbitCamera.hpp"
 #include "matrixalchemy/scene/RotatingCube.hpp"
 #include "matrixalchemy/scene/VrmCharacter.hpp"
@@ -57,6 +58,7 @@ namespace matrixalchemy::app
         render::ShaderProgram shader_;
         scene::GridFloor gridFloor_;
         scene::AxisGizmo axisGizmo_;
+        scene::LightMarker lightMarker_;
         scene::RotatingCube cube_;
         scene::Character fallbackCharacter_;
         scene::VrmCharacter vrmCharacter_;

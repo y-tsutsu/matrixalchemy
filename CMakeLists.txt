@@ -61,6 +61,7 @@ add_executable(matrixalchemy
   src/scene/Character.cpp
   src/scene/CharacterController.cpp
   src/scene/GridFloor.cpp
+  src/scene/LightMarker.cpp
   src/scene/OrbitCamera.cpp
   src/scene/RotatingCube.cpp
   src/scene/VrmCharacter.cpp

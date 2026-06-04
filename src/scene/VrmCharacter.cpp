@@ -22,7 +22,7 @@ namespace matrixalchemy::scene
 
     void VrmCharacter::draw(render::ShaderProgram &shader) const
     {
-        const glm::mat4 transform = transformMatrix();
+        const glm::mat4 transform = transformMatrix() * glm::scale(glm::mat4(1.0F), glm::vec3(modelScale_));
         model_.drawOutline(shader, transform, outlineWidth_);
         model_.draw(shader, transform);
     }
@@ -30,7 +30,8 @@ namespace matrixalchemy::scene
     void VrmCharacter::drawShadow(render::ShaderProgram &shader, const glm::mat4 &shadowMatrix) const
     {
         const glm::mat4 floorLift = glm::translate(glm::mat4(1.0F), {0.0F, 0.015F, 0.0F});
-        model_.draw(shader, floorLift * shadowMatrix * transformMatrix(), false);
+        const glm::mat4 transform = transformMatrix() * glm::scale(glm::mat4(1.0F), glm::vec3(modelScale_));
+        model_.draw(shader, floorLift * shadowMatrix * transform, false);
     }
 
 } // namespace matrixalchemy::scene

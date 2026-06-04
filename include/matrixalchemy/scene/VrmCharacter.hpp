@@ -28,6 +28,7 @@ namespace matrixalchemy::scene
     private:
         asset::Model model_;
         CharacterController controller_;
+        float modelScale_ = 1.18F;
         float outlineWidth_ = 0.012F;
     };
 

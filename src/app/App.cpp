@@ -35,6 +35,7 @@ namespace matrixalchemy::app
         fallbackCharacter_.release();
         vrmCharacter_.release();
         cube_.release();
+        lightMarker_.release();
         axisGizmo_.release();
         gridFloor_.release();
         shader_.release();
@@ -198,7 +199,9 @@ namespace matrixalchemy::app
         shader_.create(render::shader_sources::colorVertex, render::shader_sources::colorFragment);
 
         gridFloor_.create(5.0F, 10);
-        axisGizmo_.create(5.0F);
+        axisGizmo_.create(6.5F);
+        lightMarker_.create(0.085F, 16, 8);
+        lightMarker_.setPosition({-4.33F, 5.6F, -3.04F});
         cube_.create(1.0F);
         fallbackCharacter_.create();
 
@@ -225,6 +228,7 @@ namespace matrixalchemy::app
     void App::update(float deltaSeconds)
     {
         cube_.update(deltaSeconds);
+        lightMarker_.update(deltaSeconds);
         if (useVrmCharacter_)
         {
             vrmCharacter_.update(deltaSeconds, characterInput_);
@@ -258,7 +262,8 @@ namespace matrixalchemy::app
         gridFloor_.draw(shader_);
         glStencilMask(0x00);
 
-        const glm::mat4 shadowMatrix = render::planarShadowMatrix({0.0F, 1.0F, 0.0F, 0.0F}, {-3.0F, 6.0F, -4.0F, 1.0F});
+        const glm::vec4 lightPosition = {lightMarker_.position(), 1.0F};
+        const glm::mat4 shadowMatrix = render::planarShadowMatrix({0.0F, 1.0F, 0.0F, 0.0F}, lightPosition);
         glStencilFunc(GL_EQUAL, 1, 0xFF);
         glStencilMask(0xFF);
         glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
@@ -282,7 +287,11 @@ namespace matrixalchemy::app
         glStencilMask(0xFF);
         glDisable(GL_STENCIL_TEST);
 
-        axisGizmo_.draw(shader_);
+        if (showDebugUi_)
+        {
+            axisGizmo_.draw(shader_);
+        }
+        lightMarker_.draw(shader_);
         cube_.draw(shader_);
         if (useVrmCharacter_)
         {

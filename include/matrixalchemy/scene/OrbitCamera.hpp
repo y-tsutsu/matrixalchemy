@@ -21,8 +21,8 @@ namespace matrixalchemy::scene
 
     private:
         glm::vec3 target_ = {0.0F, 0.5F, 0.0F};
-        float radius_ = 8.0F;
-        float thetaDegrees_ = 45.0F;
+        float radius_ = 10.0F;
+        float thetaDegrees_ = -35.0F;
         float phiDegrees_ = 25.0F;
         double previousMouseX_ = 0.0;
         double previousMouseY_ = 0.0;

@@ -51,7 +51,9 @@ namespace matrixalchemy::scene
 
     glm::mat4 CharacterController::transformMatrix() const
     {
-        const float bounce = std::sin(radians(bounceDegrees_)) * 0.08F;
+        constexpr float baseLift = 0.13F;
+        constexpr float bounceHeight = 0.12F;
+        const float bounce = baseLift + std::sin(radians(bounceDegrees_)) * bounceHeight;
         return glm::translate(glm::mat4(1.0F), {position_.x, bounce, position_.z}) * glm::rotate(glm::mat4(1.0F), radians(rotationDegrees_), {0.0F, 1.0F, 0.0F});
     }
 
