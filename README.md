@@ -52,8 +52,7 @@ Upcoming milestones:
 - GLAD, generated into `external/glad`
 - GLM
 - Dear ImGui
-- cgltf, vendored under `external/cgltf` for local builds and listed in
-  `vcpkg.json` for Windows/vcpkg builds
+- cgltf, vendored under `external/cgltf`
 - stb_image for PNG/JPEG texture decoding
 - glTF model assets
 
@@ -61,31 +60,16 @@ Upcoming milestones:
 
 Install the build tools and runtime dependencies:
 
-```bash
-sudo apt update
-sudo apt install \
-  build-essential \
-  cmake \
-  ninja-build \
-  pkg-config \
-  python3-glad \
-  libglfw3-dev \
-  libglm-dev \
-  libstb-dev \
-  libgl-dev \
-  libimgui-dev \
-  libx11-dev \
-  libxrandr-dev \
-  libxinerama-dev \
-  libxcursor-dev \
-  libxi-dev
+```console
+$ sudo apt update
+$ sudo apt install -y build-essential cmake ninja-build pkg-config python3-glad libglfw3-dev libglm-dev libstb-dev libgl-dev libimgui-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
 ```
 
 The repository contains generated GLAD sources under `external/glad`. They can
 be regenerated with:
 
-```bash
-glad --reproducible --api gl:core=3.3 --out-path external/glad c
+```console
+$ glad --reproducible --api gl:core=3.3 --out-path external/glad c
 ```
 
 Dear ImGui is optional at configure time. When `libimgui-dev` is available, the
@@ -93,73 +77,66 @@ debug panel is enabled automatically through `pkg-config`.
 
 Configure and build:
 
-```bash
-cmake -S . -B build -G Ninja
-cmake --build build
+```console
+$ cmake --preset debug
+$ cmake --build --preset debug --parallel
 ```
 
 Run:
 
-```bash
-./build/matrixalchemy
+```console
+$ ./build/matrixalchemy
 ```
 
-## Windows / MSYS2 + vcpkg Setup
+## Windows / Clink + MSYS2 + vcpkg Setup
 
-Use MSYS2 mainly for the shell and build tools. C++ libraries are managed by
-vcpkg so that the same dependencies can also be used from Visual Studio later.
+Use MSYS2 for the MinGW compiler tools and Clink/cmd.exe for the project build
+commands. C++ libraries are managed by vcpkg.
 
 In the **UCRT64** shell, install the development tools:
 
-```bash
-pacman -Syu
-pacman -S \
-  mingw-w64-ucrt-x86_64-toolchain \
-  mingw-w64-ucrt-x86_64-cmake \
-  mingw-w64-ucrt-x86_64-ninja \
-  git
+```console
+$ pacman -Syu
+$ pacman -S mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-ninja
 ```
 
-Install vcpkg separately, then install this project's dependencies through the
-manifest:
+Install vcpkg under the ignored `build/` directory. The CMake configure step can
+install this project's manifest dependencies automatically, but running
+`vcpkg install` first is useful when you want to check the dependency setup
+separately:
 
-```bash
-git clone https://github.com/microsoft/vcpkg.git /c/dev/vcpkg
-/c/dev/vcpkg/bootstrap-vcpkg.sh
-/c/dev/vcpkg/vcpkg install --triplet x64-mingw-dynamic
+```console
+$ git clone https://github.com/microsoft/vcpkg.git build\vcpkg
+$ build\vcpkg\bootstrap-vcpkg.bat
+$ build\vcpkg\vcpkg.exe install --triplet x64-mingw-dynamic
 ```
 
-The project also works with UCRT triplets when your MSYS2 environment is UCRT64.
-Use the matching triplet consistently during configure and install, for example
-`x64-mingw-dynamic` or `x64-mingw-static`.
+Use the same triplet consistently during install and configure. For the UCRT64
+shell, `x64-mingw-dynamic` is the first triplet to try. If you prefer a binary
+with fewer runtime DLL concerns, `x64-mingw-static` is also a reasonable option.
+The `windows-mingw` preset expects vcpkg at `build\vcpkg`. If you delete
+`build\`, reinstall vcpkg before configuring again.
 
 Configure and build:
 
-```bash
-cmake -S . -B build -G Ninja \
-  -DCMAKE_TOOLCHAIN_FILE=/c/dev/vcpkg/scripts/buildsystems/vcpkg.cmake \
-  -DVCPKG_TARGET_TRIPLET=x64-mingw-dynamic
-cmake --build build
+```console
+$ cmake --preset windows-mingw
+$ cmake --build --preset windows-mingw --parallel
 ```
+
+`CMAKE_TOOLCHAIN_FILE` is read when a build directory is configured for the first
+time. If `build\` was already configured without vcpkg, delete that
+directory and configure again.
 
 Run:
 
-```bash
-./build/matrixalchemy.exe
+```console
+$ .\build\matrixalchemy.exe
 ```
 
-## Windows / Visual Studio + vcpkg Setup
-
-Install vcpkg and use the same `vcpkg.json` manifest. A typical configure step
-from PowerShell is:
-
-```powershell
-cmake -S . -B build -G Ninja `
-  -DCMAKE_TOOLCHAIN_FILE=C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake `
-  -DVCPKG_TARGET_TRIPLET=x64-windows
-
-cmake --build build
-```
+With the dynamic triplet, vcpkg normally copies required runtime DLLs next to the
+executable during the build. If Windows reports a missing DLL, rebuild from a
+clean build directory or try the static triplet.
 
 ## Controls
 

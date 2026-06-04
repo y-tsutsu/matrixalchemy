@@ -2,7 +2,6 @@
   "name": "matrixalchemy",
   "version-string": "0.1.0",
   "dependencies": [
-    "cgltf",
     "glfw3",
     "glm",
     "stb",
