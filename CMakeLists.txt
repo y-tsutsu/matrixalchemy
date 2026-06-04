@@ -52,7 +52,10 @@ target_include_directories(matrixalchemy_glad
 add_executable(matrixalchemy
   src/app/App.cpp
   src/asset/Cgltf.cpp
+  src/asset/GltfMeshReader.cpp
   src/asset/GltfModelLoader.cpp
+  src/asset/GltfSceneReader.cpp
+  src/asset/GltfVrmReader.cpp
   src/asset/Model.cpp
   src/asset/ModelPoseAnimator.cpp
   src/main.cpp
