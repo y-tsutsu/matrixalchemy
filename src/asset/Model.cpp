@@ -27,6 +27,10 @@ namespace matrixalchemy::asset
             skins_ = std::move(modelData.skins);
             textures_ = std::move(modelData.textures);
             poseAnimator_.initialize(nodes_);
+            if (modelData.leftUpperArmNodeIndex.has_value() && modelData.rightUpperArmNodeIndex.has_value())
+            {
+                poseAnimator_.setHumanoidArmNodes(*modelData.leftUpperArmNodeIndex, *modelData.rightUpperArmNodeIndex);
+            }
 
             for (ModelPrimitive &primitive : modelData.primitives)
             {

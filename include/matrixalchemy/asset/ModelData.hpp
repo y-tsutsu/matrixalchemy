@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include <cstddef>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -55,6 +56,8 @@ namespace matrixalchemy::asset
         std::vector<ModelNode> nodes;
         std::vector<ModelSkin> skins;
         std::vector<render::Texture2D> textures;
+        std::optional<std::size_t> leftUpperArmNodeIndex;
+        std::optional<std::size_t> rightUpperArmNodeIndex;
     };
 
 } // namespace matrixalchemy::asset

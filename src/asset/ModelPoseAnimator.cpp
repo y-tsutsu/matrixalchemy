@@ -40,6 +40,14 @@ namespace matrixalchemy::asset
         hasRightArm_ = rightArmIndex_ < nodes.size();
     }
 
+    void ModelPoseAnimator::setHumanoidArmNodes(std::size_t leftUpperArmNodeIndex, std::size_t rightUpperArmNodeIndex)
+    {
+        leftArmIndex_ = leftUpperArmNodeIndex;
+        rightArmIndex_ = rightUpperArmNodeIndex;
+        hasLeftArm_ = true;
+        hasRightArm_ = true;
+    }
+
     void ModelPoseAnimator::apply(float elapsedSeconds, const PoseAnimationSettings &settings, std::vector<ModelNode> &nodes) const
     {
         const float spreadRatio = settings.enabled ? std::sin(elapsedSeconds * settings.speed) * 0.5F + 0.5F : 0.0F;

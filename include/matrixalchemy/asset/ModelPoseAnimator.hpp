@@ -20,6 +20,7 @@ namespace matrixalchemy::asset
     {
     public:
         void initialize(const std::vector<ModelNode> &nodes);
+        void setHumanoidArmNodes(std::size_t leftUpperArmNodeIndex, std::size_t rightUpperArmNodeIndex);
         void apply(float elapsedSeconds, const PoseAnimationSettings &settings, std::vector<ModelNode> &nodes) const;
 
     private:
