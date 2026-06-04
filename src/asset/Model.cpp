@@ -224,6 +224,8 @@ namespace matrixalchemy::asset
         std::vector<glm::mat4> matrices;
         matrices.reserve(jointCount);
 
+        // glTFのjointはモデル全体のノード空間で評価されるので、メッシュインスタンスの
+        // ローカル空間へ戻してからinverse bind matrixを掛ける。
         const glm::mat4 inverseMeshTransform = glm::inverse(instance.transform);
         for (std::size_t jointIndex = 0; jointIndex < jointCount; ++jointIndex)
         {

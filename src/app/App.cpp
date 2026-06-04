@@ -273,6 +273,7 @@ namespace matrixalchemy::app
         shader_.setBool("uUseSkinning", false);
         shader_.setFloat("uOutlineWidth", 0.0F);
 
+        // 床だけに影を出したいので、まず床を描きながらステンシルに床領域を記録する。
         glEnable(GL_STENCIL_TEST);
         glStencilMask(0xFF);
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -280,8 +281,10 @@ namespace matrixalchemy::app
         gridFloor_.draw(shader_);
         glStencilMask(0x00);
 
+        // 影の形はライト位置から床平面へ頂点を投影する行列で作る。
         const glm::vec4 lightPosition = {lightMarker_.position(), 1.0F};
         const glm::mat4 shadowMatrix = render::planarShadowMatrix({0.0F, 1.0F, 0.0F, 0.0F}, lightPosition);
+        // ステンシルで床領域だけを通し、影は半透明で重ねる。深度は書かない。
         glStencilFunc(GL_EQUAL, 1, 0xFF);
         glStencilMask(0xFF);
         glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);

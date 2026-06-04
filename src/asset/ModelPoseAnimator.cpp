@@ -74,6 +74,7 @@ namespace matrixalchemy::asset
 
     void ModelPoseAnimator::apply(float elapsedSeconds, const PoseAnimationSettings &settings, std::vector<ModelNode> &nodes) const
     {
+        // クリップ再生ではなく、ノードのローカル変換を直接少しだけ変えてスキニングの効果を見る。
         const float spreadRatio = settings.enabled ? std::sin(elapsedSeconds * settings.speed) * 0.5F + 0.5F : 0.0F;
         const float spreadAngle = spreadRatio * settings.spreadAngleDegrees;
         const float armAngle = radians(settings.baseArmAngleDegrees - spreadAngle);
@@ -104,6 +105,7 @@ namespace matrixalchemy::asset
                     continue;
                 }
 
+                // 先端へ行くほど位相と振れ幅を変えて、硬い一本の棒に見えないようにする。
                 const float phase = static_cast<float>(index) * 0.55F;
                 const float swingScale = 1.0F - static_cast<float>(index) * 0.14F;
                 const float yaw = radians(std::sin(elapsedSeconds * settings.speed * 1.25F + phase) * settings.tailSwingDegrees * std::max(swingScale, 0.35F));
