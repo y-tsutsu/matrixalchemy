@@ -21,6 +21,7 @@ namespace matrixalchemy::scene
 
         [[nodiscard]] glm::vec3 position() const { return controller_.position(); }
         [[nodiscard]] float rotationDegrees() const { return controller_.rotationDegrees(); }
+        [[nodiscard]] float renderHeight() const { return controller_.renderHeight(); }
         [[nodiscard]] glm::mat4 transformMatrix() const { return controller_.transformMatrix(); }
 
     private:

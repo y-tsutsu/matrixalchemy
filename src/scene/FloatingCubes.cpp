@@ -18,7 +18,12 @@ namespace
     constexpr float floorClearance = 0.06F;
     constexpr float floorRange = 4.2F;
     constexpr float minBaseLift = 0.25F;
-    constexpr float maxBaseHeight = 3.45F;
+    constexpr float maxBaseHeight = 5.2F;
+    constexpr float targetReachDistance = 0.12F;
+    constexpr float minDriftSpeed = 0.28F;
+    constexpr float maxDriftSpeed = 0.58F;
+    constexpr float minColorChannel = 0.14F;
+    constexpr float maxColorChannel = 1.0F;
     constexpr float minOrbitRadius = 0.45F;
     constexpr float maxOrbitRadius = 0.90F;
     constexpr float minOrbitSpeed = 0.70F;
@@ -47,21 +52,11 @@ namespace
 
     glm::vec3 randomColor(std::mt19937 &random)
     {
-        constexpr std::array<glm::vec3, 12> palette = {
-            glm::vec3{0.90F, 0.12F, 0.22F},
-            glm::vec3{0.95F, 0.78F, 0.24F},
-            glm::vec3{0.20F, 0.72F, 0.85F},
-            glm::vec3{0.12F, 0.84F, 0.34F},
-            glm::vec3{0.70F, 0.16F, 0.82F},
-            glm::vec3{0.22F, 0.40F, 0.92F},
-            glm::vec3{0.58F, 0.38F, 0.14F},
-            glm::vec3{0.52F, 0.54F, 0.44F},
-            glm::vec3{0.32F, 0.90F, 0.78F},
-            glm::vec3{0.88F, 0.24F, 0.52F},
-            glm::vec3{0.10F, 0.24F, 0.55F},
-            glm::vec3{0.50F, 0.78F, 1.00F},
+        return {
+            randomFloat(random, minColorChannel, maxColorChannel),
+            randomFloat(random, minColorChannel, maxColorChannel),
+            randomFloat(random, minColorChannel, maxColorChannel),
         };
-        return palette[std::uniform_int_distribution<std::size_t>(0, palette.size() - 1)(random)];
     }
 
     float cubeFloorHeight(float size)
@@ -131,30 +126,30 @@ namespace matrixalchemy::scene
         mesh_.upload(vertices, GL_TRIANGLES);
 
         std::random_device seed;
-        std::mt19937 random(seed());
+        random_.seed(seed());
         cubes_.clear();
         cubes_.reserve(cubeCount);
 
         for (int index = 0; index < cubeCount; ++index)
         {
-            const float cubeSize = randomFloat(random, minCubeSize, maxCubeSize);
-            const float x = randomFloat(random, -floorRange, floorRange);
-            const float z = randomFloat(random, -floorRange, floorRange);
+            const float cubeSize = randomFloat(random_, minCubeSize, maxCubeSize);
 
             CubeInstance cube;
-            cube.basePosition = {x, randomFloat(random, cubeFloorHeight(cubeSize) + minBaseLift, maxBaseHeight), z};
-            cube.colorScale = randomColor(random);
+            cube.basePosition = randomTargetPosition(cubeSize);
+            cube.targetPosition = randomTargetPosition(cubeSize);
+            cube.colorScale = randomColor(random_);
             cube.rotationAxis = glm::normalize(glm::vec3{
-                randomFloat(random, 0.15F, 1.0F),
-                randomFloat(random, 0.25F, 1.0F),
-                randomFloat(random, 0.15F, 1.0F),
+                randomFloat(random_, 0.15F, 1.0F),
+                randomFloat(random_, 0.25F, 1.0F),
+                randomFloat(random_, 0.15F, 1.0F),
             });
             cube.size = cubeSize;
-            cube.orbitRadius = randomFloat(random, minOrbitRadius, maxOrbitRadius);
-            cube.orbitSpeed = randomFloat(random, minOrbitSpeed, maxOrbitSpeed) * (index % 2 == 0 ? 1.0F : -1.0F);
-            cube.bobHeight = randomFloat(random, minBobHeight, maxBobHeight);
-            cube.bobSpeed = randomFloat(random, minBobSpeed, maxBobSpeed);
-            cube.phase = randomFloat(random, 0.0F, twoPi);
+            cube.driftSpeed = randomFloat(random_, minDriftSpeed, maxDriftSpeed);
+            cube.orbitRadius = randomFloat(random_, minOrbitRadius, maxOrbitRadius);
+            cube.orbitSpeed = randomFloat(random_, minOrbitSpeed, maxOrbitSpeed) * (index % 2 == 0 ? 1.0F : -1.0F);
+            cube.bobHeight = randomFloat(random_, minBobHeight, maxBobHeight);
+            cube.bobSpeed = randomFloat(random_, minBobSpeed, maxBobSpeed);
+            cube.phase = randomFloat(random_, 0.0F, twoPi);
             cubes_.push_back(cube);
         }
     }
@@ -169,6 +164,21 @@ namespace matrixalchemy::scene
     {
         elapsedSeconds_ += deltaSeconds;
         rotationDegrees_ += 45.0F * deltaSeconds;
+
+        for (CubeInstance &cube : cubes_)
+        {
+            const glm::vec3 toTarget = cube.targetPosition - cube.basePosition;
+            const float distance = glm::length(toTarget);
+            if (distance <= targetReachDistance)
+            {
+                cube.targetPosition = randomTargetPosition(cube.size);
+                cube.driftSpeed = randomFloat(random_, minDriftSpeed, maxDriftSpeed);
+                continue;
+            }
+
+            const float step = std::min(distance, cube.driftSpeed * deltaSeconds);
+            cube.basePosition += glm::normalize(toTarget) * step;
+        }
     }
 
     float FloatingCubes::rotationDegrees() const
@@ -196,6 +206,15 @@ namespace matrixalchemy::scene
             shader.setMat4("uModel", floorLift * shadowMatrix * modelMatrix(cube));
             mesh_.draw();
         }
+    }
+
+    glm::vec3 FloatingCubes::randomTargetPosition(float cubeSize)
+    {
+        return {
+            randomFloat(random_, -floorRange, floorRange),
+            randomFloat(random_, cubeFloorHeight(cubeSize) + minBaseLift, maxBaseHeight),
+            randomFloat(random_, -floorRange, floorRange),
+        };
     }
 
     glm::mat4 FloatingCubes::modelMatrix(const CubeInstance &cube) const

@@ -89,6 +89,11 @@ namespace matrixalchemy::app
         return useVrmCharacter_ ? vrmCharacter_.rotationDegrees() : fallbackCharacter_.rotationDegrees();
     }
 
+    float App::characterRenderHeight() const
+    {
+        return useVrmCharacter_ ? vrmCharacter_.renderHeight() : fallbackCharacter_.renderHeight();
+    }
+
     void App::framebufferSizeCallback(GLFWwindow *window, int width, int height)
     {
         auto *app = static_cast<App *>(glfwGetWindowUserPointer(window));

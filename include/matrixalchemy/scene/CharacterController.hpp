@@ -20,6 +20,7 @@ namespace matrixalchemy::scene
 
         [[nodiscard]] glm::vec3 position() const { return position_; }
         [[nodiscard]] float rotationDegrees() const { return rotationDegrees_; }
+        [[nodiscard]] float renderHeight() const;
         [[nodiscard]] glm::mat4 transformMatrix() const;
 
     private:

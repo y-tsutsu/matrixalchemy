@@ -9,6 +9,19 @@
 #include <glm/glm.hpp>
 #include <imgui.h>
 
+#include <cmath>
+
+namespace
+{
+
+    float wrapDegrees(float degrees)
+    {
+        const float wrapped = std::fmod(degrees, 360.0F);
+        return wrapped < 0.0F ? wrapped + 360.0F : wrapped;
+    }
+
+} // namespace
+
 namespace matrixalchemy::ui
 {
 
@@ -36,12 +49,13 @@ namespace matrixalchemy::ui
         ImGui::Text("Floating cubes rotation: %.2f deg", app.floatingCubesRotationDegrees());
         ImGui::Separator();
         ImGui::Text("Camera radius: %.2f", app.cameraRadius());
-        ImGui::Text("Camera theta: %.2f deg", app.cameraThetaDegrees());
+        ImGui::Text("Camera theta: %.2f deg", wrapDegrees(app.cameraThetaDegrees()));
         ImGui::Text("Camera phi: %.2f deg", app.cameraPhiDegrees());
         ImGui::Separator();
         const glm::vec3 position = app.characterPosition();
         ImGui::Text("Character position: %.2f, %.2f, %.2f", position.x, position.y, position.z);
-        ImGui::Text("Character rotation: %.2f deg", app.characterRotationDegrees());
+        ImGui::Text("Character render height: %.2f", app.characterRenderHeight());
+        ImGui::Text("Character rotation: %.2f deg", wrapDegrees(app.characterRotationDegrees()));
         ImGui::End();
     }
 

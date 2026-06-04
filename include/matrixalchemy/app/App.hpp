@@ -32,6 +32,7 @@ namespace matrixalchemy::app
         [[nodiscard]] float cameraPhiDegrees() const { return camera_.phiDegrees(); }
         [[nodiscard]] glm::vec3 characterPosition() const;
         [[nodiscard]] float characterRotationDegrees() const;
+        [[nodiscard]] float characterRenderHeight() const;
         [[nodiscard]] bool debugUiVisible() const { return showDebugUi_; }
 
     private:

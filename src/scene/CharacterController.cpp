@@ -8,6 +8,9 @@
 namespace
 {
 
+    constexpr float baseLift = 0.13F;
+    constexpr float bounceHeight = 0.12F;
+
     float radians(float degrees)
     {
         return degrees * 3.14159265358979323846F / 180.0F;
@@ -49,12 +52,14 @@ namespace matrixalchemy::scene
         }
     }
 
+    float CharacterController::renderHeight() const
+    {
+        return baseLift + std::sin(radians(bounceDegrees_)) * bounceHeight;
+    }
+
     glm::mat4 CharacterController::transformMatrix() const
     {
-        constexpr float baseLift = 0.13F;
-        constexpr float bounceHeight = 0.12F;
-        const float bounce = baseLift + std::sin(radians(bounceDegrees_)) * bounceHeight;
-        return glm::translate(glm::mat4(1.0F), {position_.x, bounce, position_.z}) * glm::rotate(glm::mat4(1.0F), radians(rotationDegrees_), {0.0F, 1.0F, 0.0F});
+        return glm::translate(glm::mat4(1.0F), {position_.x, renderHeight(), position_.z}) * glm::rotate(glm::mat4(1.0F), radians(rotationDegrees_), {0.0F, 1.0F, 0.0F});
     }
 
 } // namespace matrixalchemy::scene
