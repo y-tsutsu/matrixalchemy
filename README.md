@@ -17,28 +17,30 @@ kind of experience with a modern, portable native stack.
 
 ## Current Milestone
 
-The current milestone provides a minimal OpenGL scene:
+The current milestone provides a small animated OpenGL scene:
 
 - GLFW window and input handling
 - GLAD OpenGL function loading
 - GLM-based `model`, `view`, and `projection` matrices
 - GLSL shader files embedded into the executable at build time
 - a checkerboard floor grid
-- RGB XYZ axes
-- a rotating colored cube
+- RGB XYZ axes, toggled with the debug UI
+- floating colored cubes with randomized colors and motion
 - a keyboard-controlled VRM character preview
 - a VRM preview model loaded through cgltf with node transforms, vertex colors,
   base color factors, base color textures, alpha modes, double-sided materials,
-  and texture sampler state
+  texture sampler state, and skeletal skinning data
+- simple VRM humanoid-based pose animation for the character
 - mouse-driven orbit camera controls
+- an animated visible light marker
 - planar shadows projected onto the floor
 - optional Dear ImGui debug panel
 
 Upcoming milestones:
 
-1. Improve the VRM character preview with toon-style presentation controls.
-2. Add lighting and material controls.
-3. Expand documentation as a beginner-friendly 3D graphics guide.
+1. Expand documentation as a beginner-friendly 3D graphics guide.
+2. Add more material and lighting controls.
+3. Test and refine the Windows/vcpkg build path on a real Windows machine.
 
 ## Tech Stack
 
@@ -126,6 +128,10 @@ git clone https://github.com/microsoft/vcpkg.git /c/dev/vcpkg
 /c/dev/vcpkg/vcpkg install --triplet x64-mingw-dynamic
 ```
 
+The project also works with UCRT triplets when your MSYS2 environment is UCRT64.
+Use the matching triplet consistently during configure and install, for example
+`x64-mingw-dynamic` or `x64-mingw-static`.
+
 Configure and build:
 
 ```bash
@@ -160,8 +166,18 @@ cmake --build build
 - `Up` / `Down`: move the character forward/backward
 - Left mouse drag: orbit the camera
 - Mouse wheel: zoom the camera
-- `F1`: toggle the debug panel
+- `F1`: toggle the debug panel and XYZ axes
 - `Esc`: quit
+
+The debug panel exposes camera values, character transform values, and the
+sample pose animation controls:
+
+- arm animation on/off
+- arm speed
+- base arm angle
+- arm spread angle
+- head animation on/off and yaw amount
+- tail animation on/off and swing amount
 
 ## Development Notes
 
@@ -182,7 +198,9 @@ simple box character.
 
 Character movement is handled by `scene::CharacterController`. The VRM-specific
 scene object is `scene::VrmCharacter`, which wraps `asset::Model` and implements
-the drawable and shadow-casting scene interfaces.
+the drawable and shadow-casting scene interfaces. Pose animation is intentionally
+separated into `asset::ModelPoseAnimator`; it is a small sample animation layer,
+not a full VRM animation system.
 
 The source tree is grouped by role. Headers mirror the implementation
 directories under `include/matrixalchemy`:
@@ -194,6 +212,28 @@ directories under `include/matrixalchemy`:
 - `scene`: scene objects, camera, and drawable/shadow-casting interfaces
 - `ui`: Dear ImGui debug UI
 
+## Graphics Concepts Covered
+
+The project currently demonstrates these 3D graphics concepts in code:
+
+- object-space to world-space transforms with model matrices
+- orbit camera view matrices
+- perspective projection matrices
+- vertex attributes and shader inputs
+- embedded shader source generation through CMake
+- textured and vertex-colored glTF primitives
+- planar projected shadows
+- normal-expanded outline rendering
+- skeletal skinning with `JOINTS_0`, `WEIGHTS_0`, joint matrices, and inverse
+  bind matrices
+- basic pose animation by editing node local transforms
+
+For skinning, each vertex stores up to four joint indices and four weights. At
+draw time the model builds joint matrices from the current joint world transform
+and the inverse bind matrix. The vertex shader blends those matrices using the
+vertex weights. This is the path that lets the sample move from a T-pose to a
+simple animated pose.
+
 ## VRM Support Scope
 
 The current VRM support is intentionally small and focused on rendering a
@@ -201,13 +241,18 @@ beginner-friendly character sample in native OpenGL. It supports:
 
 - binary glTF/GLB-based `.vrm` files
 - scene node transforms
+- node hierarchy data and local/world node transforms
 - triangle meshes with indices
-- `POSITION`, `NORMAL`, `TEXCOORD_0`, and `COLOR_0`
+- `POSITION`, `NORMAL`, `TEXCOORD_0`, `COLOR_0`, `JOINTS_0`, and `WEIGHTS_0`
 - base color factors and base color textures
 - embedded and external PNG/JPEG textures
 - glTF texture sampler state
 - alpha mask, alpha blend, and double-sided materials
 - `KHR_texture_transform`
+- glTF skin data, joints, and inverse bind matrices
+- simple shader skinning
+- VRM 0.x humanoid lookup for upper arms and head
+- simple sample pose animation for arms, head, and tail
 - keyboard-driven movement through the sample `Character` transform
 - projected floor shadows
 - a simple normal-expanded toon-style outline
@@ -215,9 +260,8 @@ beginner-friendly character sample in native OpenGL. It supports:
 The loader does not yet implement the full VRM feature set. These are currently
 out of scope:
 
-- skeletal skinning
-- animation playback
-- humanoid retargeting
+- general animation clip playback
+- humanoid retargeting across arbitrary models
 - blend shapes and facial expressions
 - spring bones
 - first-person settings
