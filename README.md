@@ -6,19 +6,13 @@ one of the core foundations of 3D graphics. It covers transforms, camera
 matrices, lighting, shadows, model loading, animation, and debug tooling.
 
 The project is inspired by an older Managed DirectX sample and rebuilds the same
-kind of experience with a modern, portable native stack.
+kind of experience with a modern, portable native stack. The code is intentionally
+class-based and explicit so that transforms, rendering order, shadows, model
+loading, and simple animation can be studied by reading and changing the source.
 
-## Goals
+## Overview
 
-- Keep the code approachable and class-based.
-- Make matrix transforms visible in the implementation.
-- Build and run on Debian/WSLg and Windows/MSYS2.
-- Add features in small, reviewable commits.
-- Prefer simple graphics techniques first, then evolve them step by step.
-
-## Current Milestone
-
-The current milestone provides a small animated OpenGL scene:
+The current sample opens a small animated OpenGL scene with:
 
 - GLFW window and input handling
 - GLAD OpenGL function loading
@@ -36,12 +30,6 @@ The current milestone provides a small animated OpenGL scene:
 - an animated visible light marker
 - planar shadows projected onto the floor
 - optional Dear ImGui debug panel
-
-Upcoming milestones:
-
-1. Expand documentation as a beginner-friendly 3D graphics guide.
-2. Add more material and lighting controls.
-3. Test and refine the Windows/vcpkg build path on a real Windows machine.
 
 ## Tech Stack
 
