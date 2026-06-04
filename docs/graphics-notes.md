@@ -4,6 +4,30 @@ This document is a reading guide for Matrix Alchemy's current rendering sample.
 It focuses on the graphics concepts that are visible in the implementation and
 points to the source files where each idea appears.
 
+## Source Map
+
+The project is grouped by responsibility:
+
+- `app`: application lifetime, input callbacks, update loop, and render order.
+- `scene`: objects that exist in the scene, such as the floor, camera, cubes,
+  light marker, and character.
+- `render`: OpenGL wrappers for meshes, textures, shader programs, and shadow
+  matrix helpers.
+- `asset`: glTF/VRM loading, model data conversion, skinning data, and pose
+  animation.
+- `ui`: Dear ImGui debug controls.
+
+The central flow is:
+
+```text
+main.cpp
+  -> app::App::run()
+  -> app::App::update()
+  -> app::App::render()
+  -> scene objects
+  -> render wrappers and shaders
+```
+
 ## Coordinate System and Matrices
 
 Matrix Alchemy uses OpenGL-style 3D rendering with GLM matrices. The scene is
@@ -35,6 +59,14 @@ introduced:
 The axis helper uses the common OpenGL convention in this sample: red is X,
 green is Y, and blue is Z. Y is the vertical direction in the scene.
 
+Good code entry points:
+
+- `scene::OrbitCamera::viewMatrix()` in `src/scene/OrbitCamera.cpp`
+- `scene::FloatingCubes::modelMatrix()` in `src/scene/FloatingCubes.cpp`
+- `scene::VrmCharacter::draw()` in `src/scene/VrmCharacter.cpp`
+- `app::App::render()` in `src/app/App.cpp`
+- `main()` in `src/main.cpp`
+
 ## Scene Objects
 
 The scene is intentionally split into small classes:
@@ -53,21 +85,37 @@ to the projected floor shadow implement `scene::IShadowCaster`. This mirrors the
 old sample's class-based style while keeping the OpenGL-specific rendering code
 in smaller render classes.
 
+The two scene interfaces are intentionally tiny:
+
+- `IDrawable::draw()` means the object can render itself with the active shader.
+- `IShadowCaster::drawShadow()` means the object can draw itself through a
+  shadow projection matrix.
+
+This keeps the sample close to the original class-based learning style without
+introducing a full scene graph or entity system.
+
 ## Rendering Order
 
 `app::App` coordinates the render order. The sample uses a straightforward
 forward-rendered pipeline:
 
 1. Clear the framebuffer and update the camera.
-2. Draw the floor.
-3. Draw planar shadows on the floor.
-4. Draw the character, cubes, axes, and light marker.
-5. Draw the character outline.
+2. Draw the floor while writing the floor area to the stencil buffer.
+3. Draw planar shadows only where the stencil buffer says the floor exists.
+4. Draw axes, the light marker, floating cubes, and the character.
+5. Draw the character outline as part of the character draw path.
 6. Draw the optional Dear ImGui debug UI.
 
 The floor shadow is intentionally simple. It projects object geometry onto the
 Y=0 floor plane from the current light position, clips the result to the floor
 area, and draws it as translucent dark geometry.
+
+The render-state changes are worth reading in `app::App::render()`:
+
+- `glStencilFunc`, `glStencilMask`, and `glStencilOp` keep shadows on the floor.
+- `glEnable(GL_BLEND)` and `glBlendFunc` make the projected shadow translucent.
+- `glDepthMask(GL_FALSE)` prevents the shadow pass from writing depth.
+- `uUseColorOverride` forces the shadow color independent of model materials.
 
 ## Shaders
 
@@ -79,6 +127,20 @@ runtime asset lookup for the shader files.
 `render::ShaderProgram` owns shader compilation, program linking, and uniform
 lookup helpers. `render::ColoredMesh` and `render::ModelMesh` use that shader
 program to draw simple geometry and loaded model primitives.
+
+The vertex shader uses these attributes:
+
+- location 0: `aPosition`
+- location 1: `aColor`
+- location 2: `aTexCoord`
+- location 3: `aNormal`
+- location 4: `aJoints`
+- location 5: `aWeights`
+
+`render::ColoredMesh` uploads the simpler position/color/normal data used by the
+floor, axes, fallback character, light marker, and cubes. `render::ModelMesh`
+uploads the full model vertex format, including texture coordinates and skinning
+attributes.
 
 ## Model Loading
 
@@ -100,6 +162,24 @@ sample character:
 
 `asset::Model` owns the OpenGL-side representation. It uploads mesh data,
 textures, and model primitives, then evaluates node transforms before drawing.
+
+The model loading data flow is:
+
+```text
+cgltf data
+  -> asset::GltfModelLoader
+  -> asset::ModelData
+  -> asset::Model
+  -> render::ModelMesh / render::Texture2D
+```
+
+`asset::ModelData` is the handoff structure between loading and rendering:
+
+- `ModelPrimitive`: CPU-side vertices and material flags for one primitive.
+- `ModelInstance`: a primitive attached to a scene node, optionally with a skin.
+- `ModelNode`: local/world transforms and parent relationship.
+- `ModelSkin`: joint node indices and inverse bind matrices.
+- `textures`: decoded and uploaded texture objects.
 
 ## Skinning
 
@@ -124,6 +204,19 @@ The implementation currently uses a fixed uniform array for joint matrices. That
 is simple and readable for this sample. Larger production renderers often move
 bone matrices to uniform buffers, shader storage buffers, or textures.
 
+The important implementation points are:
+
+- `GltfModelLoader.cpp` reads `JOINTS_0`, `WEIGHTS_0`, skins, and inverse bind
+  matrices.
+- `ModelMesh.cpp` binds joint indices with `glVertexAttribIPointer` because
+  joint indices are integer vertex attributes.
+- `Model::jointMatrices()` builds the matrix array sent to the shader.
+- `assets/shaders/color.vert` blends the joint matrices and applies the result
+  before the normal outline and model/view/projection transform.
+
+The current sample limits the shader to 128 joint matrices. This is enough for
+the sample character and keeps the shader uniform path easy to follow.
+
 ## Pose Animation
 
 `asset::ModelPoseAnimator` applies a small procedural pose animation to the
@@ -141,6 +234,22 @@ The animator currently handles:
 The Dear ImGui debug panel exposes the animation settings so the effect of each
 parameter can be inspected while the scene is running.
 
+The pose data flow is:
+
+```text
+DebugUi sliders
+  -> app::App::poseAnimationSettings()
+  -> scene::VrmCharacter::update()
+  -> asset::Model::applyDemoPose()
+  -> asset::ModelPoseAnimator::apply()
+  -> node local transforms
+  -> skinning matrices
+```
+
+This is useful for learning because the animation does not hide behind a clip
+player. The code directly changes a few local node transforms, then lets the
+normal node hierarchy and skinning path handle the result.
+
 ## Lighting, Shadows, and Outline
 
 Lighting is intentionally simple. A moving light position is used by the shader
@@ -151,6 +260,33 @@ The outline effect is also simple: the model is drawn again with vertices
 expanded along their normals and a solid outline color. This is not a complete
 toon renderer, but it gives the VRM character a clearer silhouette and keeps the
 technique easy to inspect.
+
+Important files:
+
+- `render::planarShadowMatrix()` in `src/render/Shadow.cpp`
+- `scene::LightMarker::update()` in `src/scene/LightMarker.cpp`
+- `scene::VrmCharacter::drawShadow()` in `src/scene/VrmCharacter.cpp`
+- `asset::Model::drawOutline()` in `src/asset/Model.cpp`
+- `uOutlineWidth` handling in `assets/shaders/color.vert`
+
+## Debug UI
+
+The debug UI is optional at configure time. When Dear ImGui and its GLFW/OpenGL3
+backends are found, CMake defines `MATRIXALCHEMY_HAS_IMGUI` and compiles
+`src/ui/DebugUi.cpp`.
+
+The debug panel exposes values that are useful while learning:
+
+- camera radius, theta, and phi
+- character position, render height, and rotation
+- floating cube rotation
+- arm animation speed and angles
+- head yaw amount
+- tail swing amount
+
+The panel is intentionally connected to `app::App` accessors instead of owning
+scene state directly. That keeps the debug UI as an inspection/control layer
+rather than another owner of the scene.
 
 ## Where to Read First
 
@@ -172,3 +308,11 @@ A good reading order is:
 
 This order starts with the application loop, then moves through simple scene
 objects, model loading, skinning, pose animation, and finally shader behavior.
+
+After that, these deeper paths are useful:
+
+- Texture loading: `src/render/Texture2D.cpp`
+- Shader compilation: `src/render/ShaderProgram.cpp`
+- VRM humanoid lookup: `src/asset/GltfModelLoader.cpp`
+- Debug controls: `src/ui/DebugUi.cpp`
+- Generated shader embedding: `cmake/GenerateShaderSources.cmake`
