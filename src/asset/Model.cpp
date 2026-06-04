@@ -3,10 +3,18 @@
 #include "matrixalchemy/asset/GltfModelLoader.hpp"
 #include "matrixalchemy/platform/Gl.hpp"
 
+#include <algorithm>
 #include <utility>
+#include <vector>
 
 namespace matrixalchemy::asset
 {
+    namespace
+    {
+
+        constexpr std::size_t maxJointMatrices = 128;
+
+    } // namespace
 
     void Model::load(const std::filesystem::path &path, const glm::vec3 &color)
     {
@@ -74,6 +82,9 @@ namespace matrixalchemy::asset
 
             shader.setMat4("uModel", modelMatrix * instance.transform);
             const Mesh &mesh = meshes_[instance.meshIndex];
+            const std::vector<glm::mat4> joints = jointMatrices(instance);
+            shader.setBool("uUseSkinning", !joints.empty());
+            shader.setMat4Array("uJointMatrices[0]", joints);
 
             if (useMaterialState && mesh.doubleSided)
             {
@@ -108,6 +119,7 @@ namespace matrixalchemy::asset
             }
             meshes_[instance.meshIndex].geometry.draw();
         }
+        shader.setBool("uUseSkinning", false);
         shader.setBool("uUseTexture", false);
         shader.setBool("uUseAlphaMask", false);
 
@@ -154,11 +166,15 @@ namespace matrixalchemy::asset
             }
 
             shader.setMat4("uModel", modelMatrix * instance.transform);
+            const std::vector<glm::mat4> joints = jointMatrices(instance);
+            shader.setBool("uUseSkinning", !joints.empty());
+            shader.setMat4Array("uJointMatrices[0]", joints);
             meshes_[instance.meshIndex].geometry.draw();
         }
 
         shader.setFloat("uOutlineWidth", 0.0F);
         shader.setBool("uUseColorOverride", false);
+        shader.setBool("uUseSkinning", false);
 
         glCullFace(GL_BACK);
         if (previousCullFace)
@@ -178,6 +194,34 @@ namespace matrixalchemy::asset
         {
             glDisable(GL_BLEND);
         }
+    }
+
+    std::vector<glm::mat4> Model::jointMatrices(const MeshInstance &instance) const
+    {
+        if (!instance.hasSkin || instance.skinIndex >= skins_.size())
+        {
+            return {};
+        }
+
+        const ModelSkin &skin = skins_[instance.skinIndex];
+        const std::size_t jointCount = std::min({skin.jointNodeIndices.size(), skin.inverseBindMatrices.size(), maxJointMatrices});
+        std::vector<glm::mat4> matrices;
+        matrices.reserve(jointCount);
+
+        const glm::mat4 inverseMeshTransform = glm::inverse(instance.transform);
+        for (std::size_t jointIndex = 0; jointIndex < jointCount; ++jointIndex)
+        {
+            const std::size_t nodeIndex = skin.jointNodeIndices[jointIndex];
+            if (nodeIndex >= nodes_.size())
+            {
+                matrices.push_back(glm::mat4(1.0F));
+                continue;
+            }
+
+            matrices.push_back(inverseMeshTransform * nodes_[nodeIndex].worldTransform * skin.inverseBindMatrices[jointIndex]);
+        }
+
+        return matrices;
     }
 
 } // namespace matrixalchemy::asset

@@ -48,6 +48,8 @@ namespace matrixalchemy::asset
         std::vector<ModelNode> nodes_;
         std::vector<ModelSkin> skins_;
         std::vector<render::Texture2D> textures_;
+
+        [[nodiscard]] std::vector<glm::mat4> jointMatrices(const MeshInstance &instance) const;
     };
 
 } // namespace matrixalchemy::asset

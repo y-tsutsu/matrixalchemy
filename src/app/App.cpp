@@ -270,6 +270,7 @@ namespace matrixalchemy::app
         shader_.setBool("uUseColorOverride", false);
         shader_.setBool("uUseTexture", false);
         shader_.setBool("uUseAlphaMask", false);
+        shader_.setBool("uUseSkinning", false);
         shader_.setFloat("uOutlineWidth", 0.0F);
 
         glEnable(GL_STENCIL_TEST);
