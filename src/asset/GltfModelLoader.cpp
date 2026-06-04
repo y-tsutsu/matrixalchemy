@@ -467,6 +467,8 @@ namespace matrixalchemy::asset
             {
                 const cgltf_node &node = data.nodes[nodeIndex];
                 ModelNode modelNode;
+                modelNode.name = node.name == nullptr ? "" : node.name;
+                modelNode.baseLocalTransform = nodeLocalTransform(node);
                 modelNode.localTransform = nodeLocalTransform(node);
                 modelNode.worldTransform = nodeWorldTransform(node);
                 if (node.parent != nullptr)

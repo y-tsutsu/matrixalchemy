@@ -31,6 +31,7 @@ namespace matrixalchemy::scene
         CharacterController controller_;
         float modelScale_ = 1.18F;
         float outlineWidth_ = 0.012F;
+        float poseSeconds_ = 0.0F;
     };
 
 } // namespace matrixalchemy::scene

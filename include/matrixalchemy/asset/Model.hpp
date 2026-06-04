@@ -7,6 +7,7 @@
 
 #include <filesystem>
 #include <glm/glm.hpp>
+#include <string_view>
 #include <vector>
 
 namespace matrixalchemy::asset
@@ -17,6 +18,7 @@ namespace matrixalchemy::asset
     public:
         void load(const std::filesystem::path &path, const glm::vec3 &color);
         void release();
+        void applyDemoPose(float elapsedSeconds);
         void draw(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, bool useMaterialState = true) const;
         void drawOutline(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, float width) const;
 
@@ -50,6 +52,8 @@ namespace matrixalchemy::asset
         std::vector<render::Texture2D> textures_;
 
         [[nodiscard]] std::vector<glm::mat4> jointMatrices(const MeshInstance &instance) const;
+        [[nodiscard]] std::size_t findNodeIndex(std::string_view name) const;
+        void updateWorldTransforms();
     };
 
 } // namespace matrixalchemy::asset

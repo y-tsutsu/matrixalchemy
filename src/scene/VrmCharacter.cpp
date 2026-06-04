@@ -18,6 +18,8 @@ namespace matrixalchemy::scene
     void VrmCharacter::update(float deltaSeconds, const CharacterInput &input)
     {
         controller_.update(deltaSeconds, input);
+        poseSeconds_ += deltaSeconds;
+        model_.applyDemoPose(poseSeconds_);
     }
 
     void VrmCharacter::draw(render::ShaderProgram &shader) const

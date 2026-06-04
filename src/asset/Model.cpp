@@ -3,7 +3,11 @@
 #include "matrixalchemy/asset/GltfModelLoader.hpp"
 #include "matrixalchemy/platform/Gl.hpp"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include <algorithm>
+#include <cmath>
+#include <limits>
 #include <utility>
 #include <vector>
 
@@ -13,6 +17,13 @@ namespace matrixalchemy::asset
     {
 
         constexpr std::size_t maxJointMatrices = 128;
+        constexpr float pi = 3.14159265358979323846F;
+        constexpr std::size_t invalidNodeIndex = std::numeric_limits<std::size_t>::max();
+
+        float radians(float degrees)
+        {
+            return degrees * pi / 180.0F;
+        }
 
     } // namespace
 
@@ -51,6 +62,29 @@ namespace matrixalchemy::asset
             release();
             throw;
         }
+    }
+
+    void Model::applyDemoPose(float elapsedSeconds)
+    {
+        for (ModelNode &node : nodes_)
+        {
+            node.localTransform = node.baseLocalTransform;
+        }
+
+        const float armAngle = radians(58.0F + std::sin(elapsedSeconds * 1.7F) * 6.0F);
+        const std::size_t leftArm = findNodeIndex("LeftArm");
+        if (leftArm != invalidNodeIndex)
+        {
+            nodes_[leftArm].localTransform = nodes_[leftArm].baseLocalTransform * glm::rotate(glm::mat4(1.0F), armAngle, {0.0F, 0.0F, 1.0F});
+        }
+
+        const std::size_t rightArm = findNodeIndex("RightArm");
+        if (rightArm != invalidNodeIndex)
+        {
+            nodes_[rightArm].localTransform = nodes_[rightArm].baseLocalTransform * glm::rotate(glm::mat4(1.0F), -armAngle, {0.0F, 0.0F, 1.0F});
+        }
+
+        updateWorldTransforms();
     }
 
     void Model::release()
@@ -222,6 +256,34 @@ namespace matrixalchemy::asset
         }
 
         return matrices;
+    }
+
+    std::size_t Model::findNodeIndex(std::string_view name) const
+    {
+        for (std::size_t index = 0; index < nodes_.size(); ++index)
+        {
+            if (nodes_[index].name == name)
+            {
+                return index;
+            }
+        }
+
+        return invalidNodeIndex;
+    }
+
+    void Model::updateWorldTransforms()
+    {
+        for (ModelNode &node : nodes_)
+        {
+            if (node.hasParent && node.parentIndex < nodes_.size())
+            {
+                node.worldTransform = nodes_[node.parentIndex].worldTransform * node.localTransform;
+            }
+            else
+            {
+                node.worldTransform = node.localTransform;
+            }
+        }
     }
 
 } // namespace matrixalchemy::asset

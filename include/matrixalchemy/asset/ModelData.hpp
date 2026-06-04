@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include <cstddef>
+#include <string>
 #include <vector>
 
 namespace matrixalchemy::asset
@@ -33,7 +34,9 @@ namespace matrixalchemy::asset
 
     struct ModelNode
     {
+        std::string name;
         std::size_t parentIndex = 0;
+        glm::mat4 baseLocalTransform = glm::mat4(1.0F);
         glm::mat4 localTransform = glm::mat4(1.0F);
         glm::mat4 worldTransform = glm::mat4(1.0F);
         bool hasParent = false;
