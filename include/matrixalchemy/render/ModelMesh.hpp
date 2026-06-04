@@ -13,6 +13,8 @@ namespace matrixalchemy::render
         glm::vec4 color;
         glm::vec2 texCoord;
         glm::vec3 normal;
+        glm::uvec4 joints = {0, 0, 0, 0};
+        glm::vec4 weights = {0.0F, 0.0F, 0.0F, 0.0F};
     };
 
     class ModelMesh

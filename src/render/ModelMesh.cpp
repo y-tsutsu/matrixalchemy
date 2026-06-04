@@ -53,6 +53,10 @@ namespace matrixalchemy::render
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(ModelVertex), reinterpret_cast<void *>(offsetof(ModelVertex, normal)));
         glEnableVertexAttribArray(3);
+        glVertexAttribIPointer(4, 4, GL_UNSIGNED_INT, sizeof(ModelVertex), reinterpret_cast<void *>(offsetof(ModelVertex, joints)));
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(ModelVertex), reinterpret_cast<void *>(offsetof(ModelVertex, weights)));
+        glEnableVertexAttribArray(5);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);

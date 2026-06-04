@@ -72,6 +72,34 @@ namespace
         return nullptr;
     }
 
+    const cgltf_accessor *findJointsAccessor(const cgltf_primitive &primitive)
+    {
+        for (cgltf_size index = 0; index < primitive.attributes_count; ++index)
+        {
+            const cgltf_attribute &attribute = primitive.attributes[index];
+            if (attribute.type == cgltf_attribute_type_joints && attribute.index == 0)
+            {
+                return attribute.data;
+            }
+        }
+
+        return nullptr;
+    }
+
+    const cgltf_accessor *findWeightsAccessor(const cgltf_primitive &primitive)
+    {
+        for (cgltf_size index = 0; index < primitive.attributes_count; ++index)
+        {
+            const cgltf_attribute &attribute = primitive.attributes[index];
+            if (attribute.type == cgltf_attribute_type_weights && attribute.index == 0)
+            {
+                return attribute.data;
+            }
+        }
+
+        return nullptr;
+    }
+
     glm::vec4 readVertexColor(const cgltf_accessor *colors, cgltf_size index, const glm::vec4 &fallbackColor)
     {
         if (colors == nullptr)
@@ -106,6 +134,35 @@ namespace
         float normal[3] = {0.0F, 1.0F, 0.0F};
         cgltf_accessor_read_float(normals, index, normal, 3);
         return glm::normalize(glm::vec3(normal[0], normal[1], normal[2]));
+    }
+
+    glm::uvec4 readJoints(const cgltf_accessor *joints, cgltf_size index)
+    {
+        if (joints == nullptr)
+        {
+            return {0, 0, 0, 0};
+        }
+
+        float jointValues[4] = {};
+        cgltf_accessor_read_float(joints, index, jointValues, 4);
+        return {
+            static_cast<unsigned int>(jointValues[0]),
+            static_cast<unsigned int>(jointValues[1]),
+            static_cast<unsigned int>(jointValues[2]),
+            static_cast<unsigned int>(jointValues[3]),
+        };
+    }
+
+    glm::vec4 readWeights(const cgltf_accessor *weights, cgltf_size index)
+    {
+        if (weights == nullptr)
+        {
+            return {0.0F, 0.0F, 0.0F, 0.0F};
+        }
+
+        float weightValues[4] = {};
+        cgltf_accessor_read_float(weights, index, weightValues, 4);
+        return {weightValues[0], weightValues[1], weightValues[2], weightValues[3]};
     }
 
     glm::vec2 applyTextureTransform(const glm::vec2 &texCoord, const cgltf_texture_view &textureView)
@@ -294,6 +351,8 @@ namespace matrixalchemy::asset
                 const cgltf_accessor *colors = findColorAccessor(primitive);
                 const cgltf_accessor *texCoords = findTexCoordAccessor(primitive);
                 const cgltf_accessor *normals = findNormalAccessor(primitive);
+                const cgltf_accessor *joints = findJointsAccessor(primitive);
+                const cgltf_accessor *weights = findWeightsAccessor(primitive);
                 const glm::vec4 baseColor = materialBaseColor(primitive.material);
                 const cgltf_texture_view *textureView = baseColorTextureView(primitive.material);
                 const std::optional<std::size_t> textureIndex =
@@ -319,7 +378,9 @@ namespace matrixalchemy::asset
                         loadedPrimitive.vertices.push_back({{position[0], position[1], position[2]},
                                                             readVertexColor(colors, vertexIndex, fallbackVertexColor) * baseColor,
                                                             textureView == nullptr ? readTexCoord(texCoords, vertexIndex) : applyTextureTransform(readTexCoord(texCoords, vertexIndex), *textureView),
-                                                            readNormal(normals, vertexIndex)});
+                                                            readNormal(normals, vertexIndex),
+                                                            readJoints(joints, vertexIndex),
+                                                            readWeights(weights, vertexIndex)});
                     }
                 }
                 else
@@ -332,7 +393,9 @@ namespace matrixalchemy::asset
                         loadedPrimitive.vertices.push_back({{position[0], position[1], position[2]},
                                                             readVertexColor(colors, index, fallbackVertexColor) * baseColor,
                                                             textureView == nullptr ? readTexCoord(texCoords, index) : applyTextureTransform(readTexCoord(texCoords, index), *textureView),
-                                                            readNormal(normals, index)});
+                                                            readNormal(normals, index),
+                                                            readJoints(joints, index),
+                                                            readWeights(weights, index)});
                     }
                 }
 
