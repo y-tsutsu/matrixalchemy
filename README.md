@@ -155,6 +155,10 @@ camera, a floor plane, XYZ axes, random cubes, a character model, and projected
 shadows. Matrix Alchemy intentionally keeps those ideas visible in the code so
 that the rendering pipeline can be learned by reading and changing the source.
 
+For a more detailed guide to the rendering pipeline, scene classes, model
+loading, skinning, and pose animation, see
+[`docs/graphics-notes.md`](docs/graphics-notes.md).
+
 Shader sources live under `assets/shaders` for editing. CMake converts them into
 a generated C++ header under the build directory, so the executable does not need
 to load shader files at runtime.
