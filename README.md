@@ -1,8 +1,9 @@
 # Matrix Alchemy
 
-Matrix Alchemy is a small C++ OpenGL playground for learning the fundamentals of
-3D graphics: transforms, camera matrices, lighting, shadows, model loading, and
-debug tooling.
+Matrix Alchemy is a small C++ OpenGL playground for learning how rendering
+techniques that can feel almost magical are built from matrix transformations,
+one of the core foundations of 3D graphics. It covers transforms, camera
+matrices, lighting, shadows, model loading, animation, and debug tooling.
 
 The project is inspired by an older Managed DirectX sample and rebuilds the same
 kind of experience with a modern, portable native stack.
