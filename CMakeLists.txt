@@ -21,6 +21,9 @@ if(NOT glm_FOUND)
 endif()
 
 find_path(STB_INCLUDE_DIR stb_image.h PATH_SUFFIXES stb REQUIRED)
+find_path(IMGUI_BACKENDS_INCLUDE_DIR
+  NAMES imgui_impl_glfw.h
+  PATH_SUFFIXES . backends imgui/backends)
 
 set(MATRIXALCHEMY_GENERATED_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
 set(MATRIXALCHEMY_SHADER_SOURCES_HPP
@@ -99,24 +102,26 @@ target_link_libraries(matrixalchemy
 
 if(MATRIXALCHEMY_ENABLE_IMGUI)
   find_package(imgui CONFIG QUIET)
-  if(TARGET imgui::imgui)
+  if(TARGET imgui::imgui AND IMGUI_BACKENDS_INCLUDE_DIR)
     target_sources(matrixalchemy
       PRIVATE
         src/ui/DebugUi.cpp)
+    target_include_directories(matrixalchemy PRIVATE ${IMGUI_BACKENDS_INCLUDE_DIR})
     target_link_libraries(matrixalchemy PRIVATE imgui::imgui)
     target_compile_definitions(matrixalchemy PRIVATE MATRIXALCHEMY_HAS_IMGUI=1)
   else()
     if(PkgConfig_FOUND)
       pkg_check_modules(IMGUI QUIET IMPORTED_TARGET imgui)
     endif()
-    if(TARGET PkgConfig::IMGUI)
+    if(TARGET PkgConfig::IMGUI AND IMGUI_BACKENDS_INCLUDE_DIR)
       target_sources(matrixalchemy
         PRIVATE
           src/ui/DebugUi.cpp)
+      target_include_directories(matrixalchemy PRIVATE ${IMGUI_BACKENDS_INCLUDE_DIR})
       target_link_libraries(matrixalchemy PRIVATE PkgConfig::IMGUI)
       target_compile_definitions(matrixalchemy PRIVATE MATRIXALCHEMY_HAS_IMGUI=1)
     else()
-      message(STATUS "Dear ImGui was not found. Building without the debug UI.")
+      message(STATUS "Dear ImGui or its GLFW/OpenGL3 backends were not found. Building without the debug UI.")
     endif()
   endif()
 endif()
