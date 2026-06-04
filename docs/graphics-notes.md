@@ -73,6 +73,7 @@ The scene is intentionally split into small classes:
 
 - `scene::GridFloor`: checkerboard floor mesh.
 - `scene::AxisGizmo`: RGB axis lines.
+- `scene::ArcaneRing`: animated additive line ring around the character.
 - `scene::FloatingCubes`: randomly colored cubes with smooth wandering motion.
 - `scene::LightMarker`: visible sphere-like marker for the moving light.
 - `scene::VrmCharacter`: VRM model wrapper used as the keyboard-controlled
@@ -272,6 +273,7 @@ technique easy to inspect.
 Important files:
 
 - `render::planarShadowMatrix()` in `src/render/Shadow.cpp`
+- `scene::ArcaneRing::draw()` in `src/scene/ArcaneRing.cpp`
 - `scene::LightMarker::update()` in `src/scene/LightMarker.cpp`
 - `scene::VrmCharacter::drawShadow()` in `src/scene/VrmCharacter.cpp`
 - `asset::Model::drawOutline()` in `src/asset/Model.cpp`

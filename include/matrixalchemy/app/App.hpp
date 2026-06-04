@@ -2,6 +2,7 @@
 
 #include "matrixalchemy/render/ShaderProgram.hpp"
 #include "matrixalchemy/render/ToonLighting.hpp"
+#include "matrixalchemy/scene/ArcaneRing.hpp"
 #include "matrixalchemy/scene/AxisGizmo.hpp"
 #include "matrixalchemy/scene/Character.hpp"
 #include "matrixalchemy/scene/FloatingCubes.hpp"
@@ -63,6 +64,7 @@ namespace matrixalchemy::app
 
         render::ShaderProgram shader_;
         scene::GridFloor gridFloor_;
+        scene::ArcaneRing arcaneRing_;
         scene::AxisGizmo axisGizmo_;
         scene::LightMarker lightMarker_;
         scene::FloatingCubes floatingCubes_;

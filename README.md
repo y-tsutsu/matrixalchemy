@@ -20,6 +20,7 @@ The current sample opens a small animated OpenGL scene with:
 - GLSL shader files embedded into the executable at build time
 - a checkerboard floor grid
 - RGB XYZ axes, toggled with the debug UI
+- an animated arcane ring drawn with line primitives and additive blending
 - floating colored cubes with randomized colors and motion
 - a keyboard-controlled VRM character preview
 - a VRM preview model loaded through cgltf with node transforms, vertex colors,
@@ -197,6 +198,7 @@ The project currently demonstrates these 3D graphics concepts in code:
 - embedded shader source generation through CMake
 - textured and vertex-colored glTF primitives
 - planar projected shadows
+- additive line rendering for the animated arcane ring
 - normal-expanded outline rendering
 - skeletal skinning with `JOINTS_0`, `WEIGHTS_0`, joint matrices, and inverse
   bind matrices

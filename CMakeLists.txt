@@ -65,6 +65,7 @@ add_executable(matrixalchemy
   src/render/ShaderProgram.cpp
   src/render/Shadow.cpp
   src/render/Texture2D.cpp
+  src/scene/ArcaneRing.cpp
   src/scene/AxisGizmo.cpp
   src/scene/Character.cpp
   src/scene/CharacterController.cpp

@@ -49,6 +49,7 @@ namespace matrixalchemy::app
         floatingCubes_.release();
         lightMarker_.release();
         axisGizmo_.release();
+        arcaneRing_.release();
         gridFloor_.release();
         shader_.release();
         if (window_ != nullptr)
@@ -236,6 +237,7 @@ namespace matrixalchemy::app
         shader_.create(render::shader_sources::colorVertex, render::shader_sources::colorFragment);
 
         gridFloor_.create(floorHalfSize, floorTileCount);
+        arcaneRing_.create(1.55F, 128);
         axisGizmo_.create(axisLength);
         lightMarker_.create(lightMarkerRadius, lightMarkerSlices, lightMarkerStacks);
         lightMarker_.setPosition(initialLightPosition);
@@ -273,6 +275,7 @@ namespace matrixalchemy::app
     {
         floatingCubes_.update(deltaSeconds);
         lightMarker_.update(deltaSeconds);
+        arcaneRing_.update(deltaSeconds);
         if (useVrmCharacter_)
         {
             vrmCharacter_.update(deltaSeconds, characterInput_, poseAnimationSettings_);
@@ -345,6 +348,7 @@ namespace matrixalchemy::app
         {
             axisGizmo_.draw(shader_);
         }
+        arcaneRing_.draw(shader_);
         lightMarker_.draw(shader_);
         floatingCubes_.draw(shader_);
         if (useVrmCharacter_)
