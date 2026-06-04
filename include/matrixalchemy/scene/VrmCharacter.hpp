@@ -1,6 +1,7 @@
 #pragma once
 
 #include "matrixalchemy/asset/Model.hpp"
+#include "matrixalchemy/render/ToonLighting.hpp"
 #include "matrixalchemy/scene/CharacterController.hpp"
 #include "matrixalchemy/scene/IDrawable.hpp"
 #include "matrixalchemy/scene/IShadowCaster.hpp"
@@ -17,6 +18,7 @@ namespace matrixalchemy::scene
         void load(const std::filesystem::path &path);
         void release();
         void update(float deltaSeconds, const CharacterInput &input, const asset::PoseAnimationSettings &poseSettings);
+        void draw(render::ShaderProgram &shader, const render::ToonLighting &toonLighting) const;
         void draw(render::ShaderProgram &shader) const override;
         void drawShadow(render::ShaderProgram &shader, const glm::mat4 &shadowMatrix) const override;
 

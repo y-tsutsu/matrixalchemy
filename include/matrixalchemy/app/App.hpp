@@ -1,6 +1,7 @@
 #pragma once
 
 #include "matrixalchemy/render/ShaderProgram.hpp"
+#include "matrixalchemy/render/ToonLighting.hpp"
 #include "matrixalchemy/scene/AxisGizmo.hpp"
 #include "matrixalchemy/scene/Character.hpp"
 #include "matrixalchemy/scene/FloatingCubes.hpp"
@@ -35,6 +36,8 @@ namespace matrixalchemy::app
         [[nodiscard]] float characterRenderHeight() const;
         [[nodiscard]] const asset::PoseAnimationSettings &poseAnimationSettings() const { return poseAnimationSettings_; }
         [[nodiscard]] asset::PoseAnimationSettings &poseAnimationSettings() { return poseAnimationSettings_; }
+        [[nodiscard]] const render::ToonLighting &toonLighting() const { return toonLighting_; }
+        [[nodiscard]] render::ToonLighting &toonLighting() { return toonLighting_; }
         [[nodiscard]] bool debugUiVisible() const { return showDebugUi_; }
 
     private:
@@ -69,6 +72,7 @@ namespace matrixalchemy::app
         scene::OrbitCamera camera_;
         scene::CharacterInput characterInput_;
         asset::PoseAnimationSettings poseAnimationSettings_;
+        render::ToonLighting toonLighting_;
     };
 
 } // namespace matrixalchemy::app

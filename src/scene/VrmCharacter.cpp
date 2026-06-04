@@ -22,13 +22,18 @@ namespace matrixalchemy::scene
         model_.applyDemoPose(poseSeconds_, poseSettings);
     }
 
-    void VrmCharacter::draw(render::ShaderProgram &shader) const
+    void VrmCharacter::draw(render::ShaderProgram &shader, const render::ToonLighting &toonLighting) const
     {
         const glm::mat4 transform = transformMatrix() * glm::scale(glm::mat4(1.0F), glm::vec3(modelScale_));
         model_.drawOutline(shader, transform, outlineWidth_);
-        shader.setBool("uUseToonLighting", true);
+        shader.setBool("uUseToonLighting", toonLighting.enabled);
         model_.draw(shader, transform);
         shader.setBool("uUseToonLighting", false);
+    }
+
+    void VrmCharacter::draw(render::ShaderProgram &shader) const
+    {
+        draw(shader, {});
     }
 
     void VrmCharacter::drawShadow(render::ShaderProgram &shader, const glm::mat4 &shadowMatrix) const

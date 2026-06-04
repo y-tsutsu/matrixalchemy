@@ -256,6 +256,11 @@ Lighting is intentionally simple. A moving light position is used by the shader
 and visualized by `scene::LightMarker`. This keeps the relationship between
 light position, shaded geometry, and projected shadow visible.
 
+The VRM character uses a small toon-lighting pass in the fragment shader. It is
+not a full MToon implementation, but it uses the world normal, light position,
+half-Lambert lighting, and a shade-color blend to make the model read more like a
+toon character.
+
 The outline effect is also simple: the model is drawn again with vertices
 expanded along their normals and a solid outline color. This is not a complete
 toon renderer, but it gives the VRM character a clearer silhouette and keeps the
@@ -283,6 +288,7 @@ The debug panel exposes values that are useful while learning:
 - arm animation speed and angles
 - head yaw amount
 - tail swing amount
+- toon lighting on/off, shade color, threshold, softness, and lit strength
 
 The panel is intentionally connected to `app::App` accessors instead of owning
 scene state directly. That keeps the debug UI as an inspection/control layer

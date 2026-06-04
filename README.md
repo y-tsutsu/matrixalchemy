@@ -147,6 +147,7 @@ sample pose animation controls:
 - arm spread angle
 - head animation on/off and yaw amount
 - tail animation on/off and swing amount
+- toon lighting on/off and shade parameters
 
 ## Development Notes
 

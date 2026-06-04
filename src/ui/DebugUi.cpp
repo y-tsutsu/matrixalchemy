@@ -5,6 +5,7 @@
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -66,6 +67,13 @@ namespace matrixalchemy::ui
         ImGui::SliderFloat("Head yaw", &poseSettings.headYawDegrees, 0.0F, 25.0F, "%.1f deg");
         ImGui::Checkbox("Tail animation", &poseSettings.tailEnabled);
         ImGui::SliderFloat("Tail swing", &poseSettings.tailSwingDegrees, 0.0F, 35.0F, "%.1f deg");
+        ImGui::Separator();
+        auto &toonLighting = app.toonLighting();
+        ImGui::Checkbox("Toon lighting", &toonLighting.enabled);
+        ImGui::ColorEdit3("Shade color", glm::value_ptr(toonLighting.shadeColor));
+        ImGui::SliderFloat("Shade threshold", &toonLighting.threshold, 0.0F, 1.0F, "%.2f");
+        ImGui::SliderFloat("Shade softness", &toonLighting.softness, 0.0F, 0.35F, "%.2f");
+        ImGui::SliderFloat("Lit strength", &toonLighting.litStrength, 0.5F, 1.5F, "%.2f");
         ImGui::End();
     }
 
