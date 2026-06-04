@@ -1,13 +1,13 @@
 #pragma once
 
 #include "matrixalchemy/asset/ModelData.hpp"
+#include "matrixalchemy/asset/ModelPoseAnimator.hpp"
 #include "matrixalchemy/render/ModelMesh.hpp"
 #include "matrixalchemy/render/ShaderProgram.hpp"
 #include "matrixalchemy/render/Texture2D.hpp"
 
 #include <filesystem>
 #include <glm/glm.hpp>
-#include <string_view>
 #include <vector>
 
 namespace matrixalchemy::asset
@@ -50,9 +50,10 @@ namespace matrixalchemy::asset
         std::vector<ModelNode> nodes_;
         std::vector<ModelSkin> skins_;
         std::vector<render::Texture2D> textures_;
+        ModelPoseAnimator poseAnimator_;
 
         [[nodiscard]] std::vector<glm::mat4> jointMatrices(const MeshInstance &instance) const;
-        [[nodiscard]] std::size_t findNodeIndex(std::string_view name) const;
+        void resetNodeLocalTransforms();
         void updateWorldTransforms();
     };
 

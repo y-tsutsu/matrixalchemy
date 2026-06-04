@@ -51,6 +51,7 @@ add_executable(matrixalchemy
   src/asset/Cgltf.cpp
   src/asset/GltfModelLoader.cpp
   src/asset/Model.cpp
+  src/asset/ModelPoseAnimator.cpp
   src/main.cpp
   src/platform/FileSystem.cpp
   src/render/ColoredMesh.cpp

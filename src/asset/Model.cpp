@@ -3,11 +3,7 @@
 #include "matrixalchemy/asset/GltfModelLoader.hpp"
 #include "matrixalchemy/platform/Gl.hpp"
 
-#include <glm/gtc/matrix_transform.hpp>
-
 #include <algorithm>
-#include <cmath>
-#include <limits>
 #include <utility>
 #include <vector>
 
@@ -17,13 +13,6 @@ namespace matrixalchemy::asset
     {
 
         constexpr std::size_t maxJointMatrices = 128;
-        constexpr float pi = 3.14159265358979323846F;
-        constexpr std::size_t invalidNodeIndex = std::numeric_limits<std::size_t>::max();
-
-        float radians(float degrees)
-        {
-            return degrees * pi / 180.0F;
-        }
 
     } // namespace
 
@@ -37,6 +26,7 @@ namespace matrixalchemy::asset
             nodes_ = std::move(modelData.nodes);
             skins_ = std::move(modelData.skins);
             textures_ = std::move(modelData.textures);
+            poseAnimator_.initialize(nodes_);
 
             for (ModelPrimitive &primitive : modelData.primitives)
             {
@@ -66,24 +56,8 @@ namespace matrixalchemy::asset
 
     void Model::applyDemoPose(float elapsedSeconds)
     {
-        for (ModelNode &node : nodes_)
-        {
-            node.localTransform = node.baseLocalTransform;
-        }
-
-        const float armAngle = radians(58.0F + std::sin(elapsedSeconds * 1.7F) * 6.0F);
-        const std::size_t leftArm = findNodeIndex("LeftArm");
-        if (leftArm != invalidNodeIndex)
-        {
-            nodes_[leftArm].localTransform = nodes_[leftArm].baseLocalTransform * glm::rotate(glm::mat4(1.0F), armAngle, {0.0F, 0.0F, 1.0F});
-        }
-
-        const std::size_t rightArm = findNodeIndex("RightArm");
-        if (rightArm != invalidNodeIndex)
-        {
-            nodes_[rightArm].localTransform = nodes_[rightArm].baseLocalTransform * glm::rotate(glm::mat4(1.0F), -armAngle, {0.0F, 0.0F, 1.0F});
-        }
-
+        resetNodeLocalTransforms();
+        poseAnimator_.apply(elapsedSeconds, nodes_);
         updateWorldTransforms();
     }
 
@@ -258,17 +232,12 @@ namespace matrixalchemy::asset
         return matrices;
     }
 
-    std::size_t Model::findNodeIndex(std::string_view name) const
+    void Model::resetNodeLocalTransforms()
     {
-        for (std::size_t index = 0; index < nodes_.size(); ++index)
+        for (ModelNode &node : nodes_)
         {
-            if (nodes_[index].name == name)
-            {
-                return index;
-            }
+            node.localTransform = node.baseLocalTransform;
         }
-
-        return invalidNodeIndex;
     }
 
     void Model::updateWorldTransforms()
