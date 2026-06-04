@@ -126,6 +126,12 @@ namespace matrixalchemy::app
         auto *app = static_cast<App *>(glfwGetWindowUserPointer(window));
         if (app != nullptr)
         {
+#if MATRIXALCHEMY_HAS_IMGUI
+            if (app->showDebugUi_ && ui::DebugUi::wantsMouseInput())
+            {
+                return;
+            }
+#endif
             app->camera_.drag(x, y);
         }
     }
@@ -137,6 +143,14 @@ namespace matrixalchemy::app
         {
             return;
         }
+
+#if MATRIXALCHEMY_HAS_IMGUI
+        if (app->showDebugUi_ && ui::DebugUi::wantsMouseInput())
+        {
+            app->camera_.endDrag();
+            return;
+        }
+#endif
 
         if (action == GLFW_PRESS)
         {
@@ -156,6 +170,12 @@ namespace matrixalchemy::app
         auto *app = static_cast<App *>(glfwGetWindowUserPointer(window));
         if (app != nullptr)
         {
+#if MATRIXALCHEMY_HAS_IMGUI
+            if (app->showDebugUi_ && ui::DebugUi::wantsMouseInput())
+            {
+                return;
+            }
+#endif
             app->camera_.zoom(yOffset);
         }
     }
@@ -236,6 +256,13 @@ namespace matrixalchemy::app
 
     void App::processInput()
     {
+#if MATRIXALCHEMY_HAS_IMGUI
+        if (showDebugUi_ && ui::DebugUi::wantsKeyboardInput())
+        {
+            characterInput_ = {};
+            return;
+        }
+#endif
         characterInput_.moveForward = glfwGetKey(window_, GLFW_KEY_UP) == GLFW_PRESS;
         characterInput_.moveBackward = glfwGetKey(window_, GLFW_KEY_DOWN) == GLFW_PRESS;
         characterInput_.turnLeft = glfwGetKey(window_, GLFW_KEY_LEFT) == GLFW_PRESS;

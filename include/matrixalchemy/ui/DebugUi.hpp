@@ -17,6 +17,8 @@ namespace matrixalchemy::ui
         static void beginFrame();
         static void draw(app::App &app);
         static void render();
+        static bool wantsKeyboardInput();
+        static bool wantsMouseInput();
         static void shutdown();
     };
 

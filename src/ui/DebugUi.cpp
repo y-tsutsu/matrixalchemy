@@ -83,6 +83,16 @@ namespace matrixalchemy::ui
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
+    bool DebugUi::wantsKeyboardInput()
+    {
+        return ImGui::GetCurrentContext() != nullptr && ImGui::GetIO().WantCaptureKeyboard;
+    }
+
+    bool DebugUi::wantsMouseInput()
+    {
+        return ImGui::GetCurrentContext() != nullptr && ImGui::GetIO().WantCaptureMouse;
+    }
+
     void DebugUi::shutdown()
     {
         if (ImGui::GetCurrentContext() == nullptr)
