@@ -70,6 +70,7 @@ namespace matrixalchemy::ui
         ImGui::Separator();
         auto &toonLighting = app.toonLighting();
         ImGui::Checkbox("Toon lighting", &toonLighting.enabled);
+        ImGui::Checkbox("Use material shade", &toonLighting.useMaterialShadeColor);
         ImGui::ColorEdit3("Shade color", glm::value_ptr(toonLighting.shadeColor));
         ImGui::SliderFloat("Shade threshold", &toonLighting.threshold, 0.0F, 1.0F, "%.2f");
         ImGui::SliderFloat("Shade softness", &toonLighting.softness, 0.0F, 0.35F, "%.2f");

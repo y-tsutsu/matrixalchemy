@@ -159,6 +159,7 @@ sample character:
 - scene nodes and parent/child hierarchy
 - glTF skins and inverse bind matrices
 - VRM 0.x humanoid bone lookup for selected bones
+- VRM 0.x MToon `_ShadeColor` lookup for toon lighting
 
 `asset::Model` owns the OpenGL-side representation. It uploads mesh data,
 textures, and model primitives, then evaluates node transforms before drawing.
@@ -259,7 +260,9 @@ light position, shaded geometry, and projected shadow visible.
 The VRM character uses a small toon-lighting pass in the fragment shader. It is
 not a full MToon implementation, but it uses the world normal, light position,
 half-Lambert lighting, and a shade-color blend to make the model read more like a
-toon character.
+toon character. When a VRM 0.x material provides MToon `_ShadeColor`, that color
+can be used as the material shade color. The debug UI can also disable material
+shade usage and use one global shade color instead.
 
 The outline effect is also simple: the model is drawn again with vertices
 expanded along their normals and a solid outline color. This is not a complete
@@ -288,7 +291,8 @@ The debug panel exposes values that are useful while learning:
 - arm animation speed and angles
 - head yaw amount
 - tail swing amount
-- toon lighting on/off, shade color, threshold, softness, and lit strength
+- toon lighting on/off, material shade usage, shade color, threshold, softness,
+  and lit strength
 
 The panel is intentionally connected to `app::App` accessors instead of owning
 scene state directly. That keeps the debug UI as an inspection/control layer

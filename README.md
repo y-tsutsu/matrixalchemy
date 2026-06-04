@@ -147,7 +147,7 @@ sample pose animation controls:
 - arm spread angle
 - head animation on/off and yaw amount
 - tail animation on/off and swing amount
-- toon lighting on/off and shade parameters
+- toon lighting on/off, material shade usage, and shade parameters
 
 ## Development Notes
 
@@ -230,6 +230,7 @@ beginner-friendly character sample in native OpenGL. It supports:
 - keyboard-driven movement through the sample `Character` transform
 - projected floor shadows
 - a simple normal-expanded toon-style outline
+- VRM 0.x MToon `_ShadeColor` for the sample toon lighting path
 
 The loader does not yet implement the full VRM feature set. These are currently
 out of scope:

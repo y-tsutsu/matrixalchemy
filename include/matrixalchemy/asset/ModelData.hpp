@@ -18,6 +18,7 @@ namespace matrixalchemy::asset
         std::vector<render::ModelVertex> vertices;
         std::size_t textureIndex = 0;
         float alphaCutoff = 0.5F;
+        std::optional<glm::vec3> toonShadeColor;
         bool hasTexture = false;
         bool alphaMask = false;
         bool alphaBlend = false;

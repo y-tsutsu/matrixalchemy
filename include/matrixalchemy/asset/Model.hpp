@@ -8,6 +8,7 @@
 
 #include <filesystem>
 #include <glm/glm.hpp>
+#include <optional>
 #include <vector>
 
 namespace matrixalchemy::asset
@@ -19,7 +20,11 @@ namespace matrixalchemy::asset
         void load(const std::filesystem::path &path, const glm::vec3 &color);
         void release();
         void applyDemoPose(float elapsedSeconds, const PoseAnimationSettings &settings);
-        void draw(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, bool useMaterialState = true) const;
+        void draw(render::ShaderProgram &shader,
+                  const glm::mat4 &modelMatrix,
+                  bool useMaterialState = true,
+                  const glm::vec3 *toonShadeColor = nullptr,
+                  bool useMaterialToonShadeColor = true) const;
         void drawOutline(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, float width) const;
 
         [[nodiscard]] bool empty() const { return meshes_.empty(); }
@@ -30,6 +35,7 @@ namespace matrixalchemy::asset
             render::ModelMesh geometry;
             std::size_t textureIndex = 0;
             float alphaCutoff = 0.5F;
+            std::optional<glm::vec3> toonShadeColor;
             bool hasTexture = false;
             bool alphaMask = false;
             bool alphaBlend = false;

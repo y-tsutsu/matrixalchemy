@@ -42,6 +42,7 @@ namespace matrixalchemy::asset
                 loadedMesh.geometry.upload(primitive.vertices, GL_TRIANGLES);
                 loadedMesh.textureIndex = primitive.textureIndex;
                 loadedMesh.alphaCutoff = primitive.alphaCutoff;
+                loadedMesh.toonShadeColor = primitive.toonShadeColor;
                 loadedMesh.hasTexture = primitive.hasTexture;
                 loadedMesh.alphaMask = primitive.alphaMask;
                 loadedMesh.alphaBlend = primitive.alphaBlend;
@@ -82,7 +83,11 @@ namespace matrixalchemy::asset
         textures_.clear();
     }
 
-    void Model::draw(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, bool useMaterialState) const
+    void Model::draw(render::ShaderProgram &shader,
+                     const glm::mat4 &modelMatrix,
+                     bool useMaterialState,
+                     const glm::vec3 *toonShadeColor,
+                     bool useMaterialToonShadeColor) const
     {
         const bool previousCullFace = glIsEnabled(GL_CULL_FACE) == GL_TRUE;
         const bool previousBlend = glIsEnabled(GL_BLEND) == GL_TRUE;
@@ -125,6 +130,14 @@ namespace matrixalchemy::asset
             }
 
             const bool useTexture = useMaterialState && mesh.hasTexture && mesh.textureIndex < textures_.size() && textures_[mesh.textureIndex].valid();
+            if (useMaterialState && useMaterialToonShadeColor && mesh.toonShadeColor.has_value())
+            {
+                shader.setVec3("uToonShadeColor", *mesh.toonShadeColor);
+            }
+            else if (useMaterialState && toonShadeColor != nullptr)
+            {
+                shader.setVec3("uToonShadeColor", *toonShadeColor);
+            }
             shader.setBool("uUseTexture", useTexture);
             shader.setBool("uUseAlphaMask", useMaterialState && mesh.alphaMask);
             shader.setFloat("uAlphaCutoff", mesh.alphaCutoff);

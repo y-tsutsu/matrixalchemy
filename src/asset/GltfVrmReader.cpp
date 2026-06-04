@@ -1,5 +1,7 @@
 #include "GltfModelLoaderInternals.hpp"
 
+#include <algorithm>
+#include <array>
 #include <cctype>
 #include <optional>
 #include <string>
@@ -85,6 +87,90 @@ namespace matrixalchemy::asset::gltf
             }
         }
 
+        std::optional<std::string_view> readJsonStringProperty(std::string_view json, std::string_view propertyName)
+        {
+            const std::string key = "\"" + std::string(propertyName) + "\"";
+            const std::size_t keyPosition = json.find(key);
+            if (keyPosition == std::string_view::npos)
+            {
+                return std::nullopt;
+            }
+
+            const std::size_t valueBegin = json.find('\"', json.find(':', keyPosition) + 1);
+            if (valueBegin == std::string_view::npos)
+            {
+                return std::nullopt;
+            }
+            const std::size_t valueEnd = json.find('\"', valueBegin + 1);
+            if (valueEnd == std::string_view::npos)
+            {
+                return std::nullopt;
+            }
+
+            return json.substr(valueBegin + 1, valueEnd - valueBegin - 1);
+        }
+
+        std::optional<std::array<float, 4>> readJsonVec4Property(std::string_view json, std::string_view propertyName)
+        {
+            const std::string key = "\"" + std::string(propertyName) + "\"";
+            const std::size_t keyPosition = json.find(key);
+            if (keyPosition == std::string_view::npos)
+            {
+                return std::nullopt;
+            }
+
+            const std::size_t arrayBegin = json.find('[', keyPosition);
+            const std::size_t arrayEnd = json.find(']', arrayBegin);
+            if (arrayBegin == std::string_view::npos || arrayEnd == std::string_view::npos)
+            {
+                return std::nullopt;
+            }
+
+            std::array<float, 4> values = {1.0F, 1.0F, 1.0F, 1.0F};
+            std::size_t cursor = arrayBegin + 1;
+            for (float &value : values)
+            {
+                while (cursor < arrayEnd && (std::isspace(static_cast<unsigned char>(json[cursor])) != 0 || json[cursor] == ','))
+                {
+                    ++cursor;
+                }
+
+                const std::size_t valueEnd = json.find_first_of(",]", cursor);
+                if (valueEnd == std::string_view::npos || valueEnd > arrayEnd)
+                {
+                    return std::nullopt;
+                }
+
+                value = std::stof(std::string(json.substr(cursor, valueEnd - cursor)));
+                cursor = valueEnd + 1;
+            }
+
+            return values;
+        }
+
+        std::optional<std::string_view> findMaterialPropertyObject(std::string_view vrmJson, std::string_view materialName)
+        {
+            std::size_t searchFrom = 0;
+            while (true)
+            {
+                const std::size_t nameKey = vrmJson.find("\"name\"", searchFrom);
+                if (nameKey == std::string_view::npos)
+                {
+                    return std::nullopt;
+                }
+
+                const std::size_t remainingSize = vrmJson.size() - nameKey;
+                const std::string_view materialWindow = vrmJson.substr(nameKey, std::min<std::size_t>(remainingSize, 4096));
+                const std::optional<std::string_view> name = readJsonStringProperty(materialWindow, "name");
+                if (name.has_value() && *name == materialName)
+                {
+                    return materialWindow;
+                }
+
+                searchFrom = nameKey + 1;
+            }
+        }
+
     } // namespace
 
     void readVrmHumanoid(ModelData &modelData, const cgltf_data &data)
@@ -99,6 +185,35 @@ namespace matrixalchemy::asset::gltf
         modelData.leftUpperArmNodeIndex = readVrmHumanoidBoneNode(vrmJson, "leftUpperArm");
         modelData.rightUpperArmNodeIndex = readVrmHumanoidBoneNode(vrmJson, "rightUpperArm");
         modelData.headNodeIndex = readVrmHumanoidBoneNode(vrmJson, "head");
+    }
+
+    std::optional<glm::vec3> readVrmMaterialShadeColor(const cgltf_material *material, const cgltf_data &data)
+    {
+        if (material == nullptr || material->name == nullptr)
+        {
+            return std::nullopt;
+        }
+
+        const cgltf_extension *vrmExtension = findExtension(data.data_extensions, data.data_extensions_count, "VRM");
+        if (vrmExtension == nullptr || vrmExtension->data == nullptr)
+        {
+            return std::nullopt;
+        }
+
+        const std::string_view vrmJson(vrmExtension->data);
+        const std::optional<std::string_view> materialProperty = findMaterialPropertyObject(vrmJson, material->name);
+        if (!materialProperty.has_value())
+        {
+            return std::nullopt;
+        }
+
+        const std::optional<std::array<float, 4>> shadeColor = readJsonVec4Property(*materialProperty, "_ShadeColor");
+        if (!shadeColor.has_value())
+        {
+            return std::nullopt;
+        }
+
+        return glm::vec3((*shadeColor)[0], (*shadeColor)[1], (*shadeColor)[2]);
     }
 
 } // namespace matrixalchemy::asset::gltf

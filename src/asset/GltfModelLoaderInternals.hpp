@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include <filesystem>
+#include <optional>
 #include <vector>
 
 namespace matrixalchemy::asset::gltf
@@ -23,5 +24,6 @@ namespace matrixalchemy::asset::gltf
     std::vector<ModelNode> readNodes(const cgltf_data &data);
     std::vector<ModelSkin> readSkins(const cgltf_data &data);
     void readVrmHumanoid(ModelData &modelData, const cgltf_data &data);
+    std::optional<glm::vec3> readVrmMaterialShadeColor(const cgltf_material *material, const cgltf_data &data);
 
 } // namespace matrixalchemy::asset::gltf
