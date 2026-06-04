@@ -258,6 +258,20 @@ namespace
         return transform;
     }
 
+    glm::mat4 readMatrix(const cgltf_accessor *accessor, cgltf_size index)
+    {
+        glm::mat4 matrix(1.0F);
+        if (accessor == nullptr)
+        {
+            return matrix;
+        }
+
+        float values[16] = {};
+        cgltf_accessor_read_float(accessor, index, values, 16);
+        matrix = glm::make_mat4(values);
+        return matrix;
+    }
+
     void throwIfFailed(cgltf_result result, const char *message)
     {
         if (result != cgltf_result_success)
@@ -405,6 +419,38 @@ namespace matrixalchemy::asset
             return primitives;
         }
 
+        std::vector<ModelSkin> readSkins(const cgltf_data &data)
+        {
+            std::vector<ModelSkin> skins;
+            skins.reserve(static_cast<std::size_t>(data.skins_count));
+
+            for (cgltf_size skinIndex = 0; skinIndex < data.skins_count; ++skinIndex)
+            {
+                const cgltf_skin &skin = data.skins[skinIndex];
+                ModelSkin modelSkin;
+                modelSkin.jointNodeIndices.reserve(static_cast<std::size_t>(skin.joints_count));
+                modelSkin.inverseBindMatrices.reserve(static_cast<std::size_t>(skin.joints_count));
+
+                for (cgltf_size jointIndex = 0; jointIndex < skin.joints_count; ++jointIndex)
+                {
+                    const cgltf_node *jointNode = skin.joints[jointIndex];
+                    if (jointNode == nullptr)
+                    {
+                        modelSkin.jointNodeIndices.push_back(0);
+                    }
+                    else
+                    {
+                        modelSkin.jointNodeIndices.push_back(static_cast<std::size_t>(jointNode - data.nodes));
+                    }
+                    modelSkin.inverseBindMatrices.push_back(readMatrix(skin.inverse_bind_matrices, jointIndex));
+                }
+
+                skins.push_back(std::move(modelSkin));
+            }
+
+            return skins;
+        }
+
     } // namespace
 
     ModelData loadGltfModel(const std::filesystem::path &path, const glm::vec3 &fallbackColor)
@@ -420,6 +466,7 @@ namespace matrixalchemy::asset
             throwIfFailed(cgltf_validate(data), "Failed to validate glTF file.");
 
             ModelData modelData;
+            modelData.skins = readSkins(*data);
             std::vector<std::size_t> textureIndices(data->textures_count, std::numeric_limits<std::size_t>::max());
             std::vector<std::vector<std::size_t>> meshPrimitiveIndices(data->meshes_count);
             for (cgltf_size meshIndex = 0; meshIndex < data->meshes_count; ++meshIndex)
@@ -457,9 +504,11 @@ namespace matrixalchemy::asset
                         const cgltf_size meshIndex = static_cast<cgltf_size>(node->mesh - data->meshes);
                         if (meshIndex < meshPrimitiveIndices.size())
                         {
+                            const bool hasSkin = node->skin != nullptr;
+                            const std::size_t skinIndex = hasSkin ? static_cast<std::size_t>(node->skin - data->skins) : 0;
                             for (const std::size_t primitiveIndex : meshPrimitiveIndices[meshIndex])
                             {
-                                modelData.instances.push_back({primitiveIndex, nodeWorldTransform(*node)});
+                                modelData.instances.push_back({primitiveIndex, skinIndex, nodeWorldTransform(*node), hasSkin});
                             }
                         }
                     }

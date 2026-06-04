@@ -33,7 +33,7 @@ namespace matrixalchemy::asset
             instances_.reserve(modelData.instances.size());
             for (const ModelInstance &instance : modelData.instances)
             {
-                instances_.push_back({instance.primitiveIndex, instance.transform});
+                instances_.push_back({instance.primitiveIndex, instance.skinIndex, instance.transform, instance.hasSkin});
             }
         }
         catch (...)

@@ -36,7 +36,9 @@ namespace matrixalchemy::asset
         struct MeshInstance
         {
             std::size_t meshIndex = 0;
+            std::size_t skinIndex = 0;
             glm::mat4 transform = glm::mat4(1.0F);
+            bool hasSkin = false;
         };
 
         std::vector<Mesh> meshes_;
