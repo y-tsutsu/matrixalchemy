@@ -276,6 +276,7 @@ namespace matrixalchemy::app
         floatingCubes_.update(deltaSeconds);
         lightMarker_.update(deltaSeconds);
         arcaneRing_.update(deltaSeconds);
+        arcaneRing_.setCenter(characterPosition());
         if (useVrmCharacter_)
         {
             vrmCharacter_.update(deltaSeconds, characterInput_, poseAnimationSettings_);

@@ -14,9 +14,9 @@ namespace
     constexpr float pi = 3.14159265358979323846F;
     constexpr float ringHeight = 0.028F;
     constexpr float rotationSpeed = 24.0F;
-    constexpr glm::vec3 cyan = {0.32F, 0.92F, 1.00F};
-    constexpr glm::vec3 blue = {0.28F, 0.45F, 1.00F};
-    constexpr glm::vec3 pale = {0.82F, 0.98F, 1.00F};
+    constexpr glm::vec3 cyan = {0.04F, 0.32F, 1.00F};
+    constexpr glm::vec3 blue = {0.02F, 0.10F, 0.74F};
+    constexpr glm::vec3 pale = {0.18F, 0.48F, 1.00F};
 
     float radians(float degrees)
     {
@@ -92,6 +92,11 @@ namespace matrixalchemy::scene
         rotationDegrees_ += rotationSpeed * deltaSeconds;
     }
 
+    void ArcaneRing::setCenter(const glm::vec3 &center)
+    {
+        center_ = {center.x, 0.0F, center.z};
+    }
+
     void ArcaneRing::draw(render::ShaderProgram &shader) const
     {
         const bool previousBlend = glIsEnabled(GL_BLEND) == GL_TRUE;
@@ -103,11 +108,12 @@ namespace matrixalchemy::scene
         glDepthMask(GL_FALSE);
         glLineWidth(2.0F);
 
-        const glm::mat4 base = glm::rotate(glm::mat4(1.0F), radians(rotationDegrees_), {0.0F, 1.0F, 0.0F});
+        const glm::mat4 translation = glm::translate(glm::mat4(1.0F), center_);
+        const glm::mat4 base = translation * glm::rotate(glm::mat4(1.0F), radians(rotationDegrees_), {0.0F, 1.0F, 0.0F});
         shader.setMat4("uModel", base);
         mesh_.draw();
 
-        const glm::mat4 counter = glm::rotate(glm::mat4(1.0F), radians(-rotationDegrees_ * 0.55F), {0.0F, 1.0F, 0.0F});
+        const glm::mat4 counter = translation * glm::rotate(glm::mat4(1.0F), radians(-rotationDegrees_ * 0.55F), {0.0F, 1.0F, 0.0F});
         shader.setMat4("uModel", counter);
         mesh_.draw();
 
