@@ -7,6 +7,8 @@ project(matrixalchemy
 
 option(MATRIXALCHEMY_ENABLE_IMGUI "Enable Dear ImGui debug UI when the package is available" ON)
 
+include(CTest)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -58,6 +60,7 @@ add_executable(matrixalchemy
   src/asset/GltfVrmReader.cpp
   src/asset/Model.cpp
   src/asset/ModelPoseAnimator.cpp
+  src/asset/VrmJsonReader.cpp
   src/main.cpp
   src/platform/FileSystem.cpp
   src/render/ColoredMesh.cpp
@@ -134,4 +137,29 @@ if(MSVC)
   target_compile_options(matrixalchemy PRIVATE /W4 /permissive-)
 else()
   target_compile_options(matrixalchemy PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+if(BUILD_TESTING)
+  add_executable(matrixalchemy_tests
+    tests/VrmJsonReaderTest.cpp
+    src/asset/VrmJsonReader.cpp)
+
+  target_include_directories(matrixalchemy_tests
+    PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/asset)
+
+  if(glm_FOUND)
+    target_link_libraries(matrixalchemy_tests PRIVATE glm::glm)
+  else()
+    target_include_directories(matrixalchemy_tests PRIVATE ${GLM_INCLUDE_DIR})
+  endif()
+
+  if(MSVC)
+    target_compile_options(matrixalchemy_tests PRIVATE /W4 /permissive-)
+  else()
+    target_compile_options(matrixalchemy_tests PRIVATE -Wall -Wextra -Wpedantic)
+  endif()
+
+  add_test(NAME matrixalchemy_tests COMMAND matrixalchemy_tests)
 endif()

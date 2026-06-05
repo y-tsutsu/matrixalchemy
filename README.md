@@ -77,6 +77,12 @@ Run:
 $ ./build/matrixalchemy
 ```
 
+Run tests:
+
+```console
+$ ctest --preset debug
+```
+
 ## Windows / Clink + MSYS2 + vcpkg Setup
 
 Use MSYS2 for the MinGW compiler tools and Clink/cmd.exe for the project build
@@ -124,6 +130,12 @@ Run:
 
 ```console
 $ .\build\matrixalchemy.exe
+```
+
+Run tests:
+
+```console
+$ ctest --preset windows-mingw
 ```
 
 With the dynamic triplet, vcpkg normally copies required runtime DLLs next to the
