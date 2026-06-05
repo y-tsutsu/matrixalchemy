@@ -141,7 +141,10 @@ endif()
 
 if(BUILD_TESTING)
   add_executable(matrixalchemy_tests
-    tests/VrmJsonReaderTest.cpp
+    tests/MatrixAlchemyTest.cpp
+    src/render/Shadow.cpp
+    src/scene/CharacterController.cpp
+    src/scene/OrbitCamera.cpp
     src/asset/VrmJsonReader.cpp)
 
   target_include_directories(matrixalchemy_tests
