@@ -18,17 +18,20 @@ namespace
 namespace matrixalchemy::scene
 {
 
-    glm::mat4 OrbitCamera::viewMatrix() const
+    glm::vec3 OrbitCamera::position() const
     {
         const float theta = radians(thetaDegrees_);
         const float phi = radians(phiDegrees_);
-        const glm::vec3 cameraPosition = {
+        return {
             radius_ * std::cos(theta) * std::cos(phi),
             radius_ * std::sin(phi),
             radius_ * std::sin(theta) * std::cos(phi),
         };
+    }
 
-        return glm::lookAt(cameraPosition, target_, {0.0F, 1.0F, 0.0F});
+    glm::mat4 OrbitCamera::viewMatrix() const
+    {
+        return glm::lookAt(position(), target_, {0.0F, 1.0F, 0.0F});
     }
 
     void OrbitCamera::beginDrag(double x, double y)

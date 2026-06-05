@@ -43,6 +43,8 @@ namespace matrixalchemy::asset
                 loadedMesh.textureIndex = primitive.textureIndex;
                 loadedMesh.alphaCutoff = primitive.alphaCutoff;
                 loadedMesh.toonShadeColor = primitive.toonShadeColor;
+                loadedMesh.toonRimColor = primitive.toonRimColor;
+                loadedMesh.toonEmissionColor = primitive.toonEmissionColor;
                 loadedMesh.toonOutlineColor = primitive.toonOutlineColor;
                 loadedMesh.toonOutlineWidth = primitive.toonOutlineWidth;
                 loadedMesh.hasTexture = primitive.hasTexture;
@@ -140,6 +142,8 @@ namespace matrixalchemy::asset
             {
                 shader.setVec3("uToonShadeColor", *toonShadeColor);
             }
+            shader.setVec3("uToonRimColor", useMaterialState ? mesh.toonRimColor.value_or(glm::vec3(0.0F)) : glm::vec3(0.0F));
+            shader.setVec3("uToonEmissionColor", useMaterialState ? mesh.toonEmissionColor.value_or(glm::vec3(0.0F)) : glm::vec3(0.0F));
             shader.setBool("uUseTexture", useTexture);
             shader.setBool("uUseAlphaMask", useMaterialState && mesh.alphaMask);
             shader.setFloat("uAlphaCutoff", mesh.alphaCutoff);

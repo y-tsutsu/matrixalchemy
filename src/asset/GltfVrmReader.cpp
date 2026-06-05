@@ -248,6 +248,64 @@ namespace matrixalchemy::asset::gltf
         return glm::vec3((*shadeColor)[0], (*shadeColor)[1], (*shadeColor)[2]);
     }
 
+    std::optional<glm::vec3> readVrmMaterialRimColor(const cgltf_material *material, const cgltf_data &data)
+    {
+        if (material == nullptr || material->name == nullptr)
+        {
+            return std::nullopt;
+        }
+
+        const cgltf_extension *vrmExtension = findExtension(data.data_extensions, data.data_extensions_count, "VRM");
+        if (vrmExtension == nullptr || vrmExtension->data == nullptr)
+        {
+            return std::nullopt;
+        }
+
+        const std::string_view vrmJson(vrmExtension->data);
+        const std::optional<std::string_view> materialProperty = findMaterialPropertyObject(vrmJson, material->name);
+        if (!materialProperty.has_value())
+        {
+            return std::nullopt;
+        }
+
+        const std::optional<std::array<float, 4>> rimColor = readJsonVec4Property(*materialProperty, "_RimColor");
+        if (!rimColor.has_value())
+        {
+            return std::nullopt;
+        }
+
+        return glm::vec3((*rimColor)[0], (*rimColor)[1], (*rimColor)[2]) * (*rimColor)[3];
+    }
+
+    std::optional<glm::vec3> readVrmMaterialEmissionColor(const cgltf_material *material, const cgltf_data &data)
+    {
+        if (material == nullptr || material->name == nullptr)
+        {
+            return std::nullopt;
+        }
+
+        const cgltf_extension *vrmExtension = findExtension(data.data_extensions, data.data_extensions_count, "VRM");
+        if (vrmExtension == nullptr || vrmExtension->data == nullptr)
+        {
+            return std::nullopt;
+        }
+
+        const std::string_view vrmJson(vrmExtension->data);
+        const std::optional<std::string_view> materialProperty = findMaterialPropertyObject(vrmJson, material->name);
+        if (!materialProperty.has_value())
+        {
+            return std::nullopt;
+        }
+
+        const std::optional<std::array<float, 4>> emissionColor = readJsonVec4Property(*materialProperty, "_EmissionColor");
+        if (!emissionColor.has_value())
+        {
+            return std::nullopt;
+        }
+
+        return glm::vec3((*emissionColor)[0], (*emissionColor)[1], (*emissionColor)[2]);
+    }
+
     std::optional<glm::vec4> readVrmMaterialOutlineColor(const cgltf_material *material, const cgltf_data &data)
     {
         if (material == nullptr || material->name == nullptr)

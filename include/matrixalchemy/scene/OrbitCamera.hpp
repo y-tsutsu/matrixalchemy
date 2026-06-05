@@ -8,6 +8,7 @@ namespace matrixalchemy::scene
     class OrbitCamera
     {
     public:
+        [[nodiscard]] glm::vec3 position() const;
         [[nodiscard]] glm::mat4 viewMatrix() const;
 
         void beginDrag(double x, double y);

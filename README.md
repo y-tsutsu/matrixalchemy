@@ -232,8 +232,8 @@ beginner-friendly character sample in native OpenGL. It supports:
 - keyboard-driven movement through the sample `Character` transform
 - projected floor shadows
 - a simple normal-expanded toon-style outline
-- VRM 0.x MToon `_ShadeColor`, `_OutlineColor`, and `_OutlineWidth` for the
-  sample toon lighting and outline paths
+- VRM 0.x MToon `_ShadeColor`, `_RimColor`, `_EmissionColor`, `_OutlineColor`,
+  and `_OutlineWidth` for the sample toon lighting and outline paths
 
 The loader does not yet implement the full VRM feature set. These are currently
 out of scope:

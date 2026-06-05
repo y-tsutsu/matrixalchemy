@@ -304,6 +304,7 @@ namespace matrixalchemy::app
         shader_.setBool("uUseSkinning", false);
         shader_.setBool("uUseToonLighting", false);
         shader_.setFloat("uOutlineWidth", 0.0F);
+        shader_.setVec3("uCameraPosition", camera_.position());
 
         // 床だけに影を出したいので、まず床を描きながらステンシルに床領域を記録する。
         glEnable(GL_STENCIL_TEST);
@@ -320,6 +321,8 @@ namespace matrixalchemy::app
         shader_.setFloat("uToonThreshold", toonLighting_.threshold);
         shader_.setFloat("uToonSoftness", toonLighting_.softness);
         shader_.setFloat("uToonLitStrength", toonLighting_.litStrength);
+        shader_.setVec3("uToonRimColor", {0.0F, 0.0F, 0.0F});
+        shader_.setVec3("uToonEmissionColor", {0.0F, 0.0F, 0.0F});
         const glm::mat4 shadowMatrix = render::planarShadowMatrix({0.0F, 1.0F, 0.0F, 0.0F}, lightPosition);
         // ステンシルで床領域だけを通し、影は半透明で重ねる。深度は書かない。
         glStencilFunc(GL_EQUAL, 1, 0xFF);
