@@ -145,12 +145,15 @@ if(BUILD_TESTING)
     src/render/Shadow.cpp
     src/scene/CharacterController.cpp
     src/scene/OrbitCamera.cpp
+    src/asset/Cgltf.cpp
+    src/asset/GltfSceneReader.cpp
     src/asset/VrmJsonReader.cpp)
 
   target_include_directories(matrixalchemy_tests
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/include
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/asset)
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/asset
+      ${CMAKE_CURRENT_SOURCE_DIR}/external/cgltf)
 
   if(glm_FOUND)
     target_link_libraries(matrixalchemy_tests PRIVATE glm::glm)

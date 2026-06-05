@@ -1,9 +1,11 @@
+#include "GltfModelLoaderInternals.hpp"
 #include "VrmJsonReader.hpp"
 #include "matrixalchemy/render/Shadow.hpp"
 #include "matrixalchemy/scene/CharacterController.hpp"
 #include "matrixalchemy/scene/OrbitCamera.hpp"
 
 #include <cassert>
+#include <cgltf.h>
 #include <cmath>
 #include <optional>
 #include <stdexcept>
@@ -27,6 +29,30 @@ namespace
         const glm::vec4 projected = matrix * glm::vec4(point, 1.0F);
         return glm::vec3(projected) / projected.w;
     }
+
+    struct ParsedGltf
+    {
+        cgltf_data *data = nullptr;
+
+        explicit ParsedGltf(std::string_view json)
+        {
+            cgltf_options options{};
+            const cgltf_result result = cgltf_parse(&options, json.data(), json.size(), &data);
+            assert(result == cgltf_result_success);
+            assert(data != nullptr);
+        }
+
+        ~ParsedGltf()
+        {
+            if (data != nullptr)
+            {
+                cgltf_free(data);
+            }
+        }
+
+        ParsedGltf(const ParsedGltf &) = delete;
+        ParsedGltf &operator=(const ParsedGltf &) = delete;
+    };
 
     void testPlanarShadowProjectsPointsOntoPlane()
     {
@@ -113,6 +139,55 @@ namespace
         }
 
         assert(nearlyEqual(controller.position().z, -4.5F));
+    }
+
+    void testGltfNodeReaderKeepsHierarchyAndTransforms()
+    {
+        constexpr std::string_view gltfJson = R"json(
+        {
+          "asset": {"version": "2.0"},
+          "nodes": [
+            {"name": "root", "translation": [1.0, 0.0, 0.0], "children": [1]},
+            {"name": "child", "translation": [2.0, 0.0, 0.0]}
+          ]
+        }
+        )json";
+        const ParsedGltf gltf(gltfJson);
+
+        const std::vector<matrixalchemy::asset::ModelNode> nodes = matrixalchemy::asset::gltf::readNodes(*gltf.data);
+
+        assert(nodes.size() == 2);
+        assert(nodes[0].name == "root");
+        assert(!nodes[0].hasParent);
+        assert(nodes[1].name == "child");
+        assert(nodes[1].hasParent);
+        assert(nodes[1].parentIndex == 0);
+        assert(nearlyEqual(nodes[0].localTransform[3].x, 1.0F));
+        assert(nearlyEqual(nodes[1].localTransform[3].x, 2.0F));
+        assert(nearlyEqual(nodes[1].worldTransform[3].x, 3.0F));
+    }
+
+    void testGltfSkinReaderUsesJointNodeIndices()
+    {
+        constexpr std::string_view gltfJson = R"json(
+        {
+          "asset": {"version": "2.0"},
+          "nodes": [{}, {}],
+          "skins": [
+            {"joints": [1, 0]}
+          ]
+        }
+        )json";
+        const ParsedGltf gltf(gltfJson);
+
+        const std::vector<matrixalchemy::asset::ModelSkin> skins = matrixalchemy::asset::gltf::readSkins(*gltf.data);
+
+        assert(skins.size() == 1);
+        assert(skins[0].jointNodeIndices.size() == 2);
+        assert(skins[0].jointNodeIndices[0] == 1);
+        assert(skins[0].jointNodeIndices[1] == 0);
+        assert(skins[0].inverseBindMatrices.size() == 2);
+        assert(nearlyEqual(skins[0].inverseBindMatrices[0][0].x, 1.0F));
     }
 
     void testVrmHumanoidBoneLookup()
@@ -241,6 +316,8 @@ int main()
     testOrbitCameraDragAndZoomClamp();
     testCharacterControllerMovesForwardAndTurns();
     testCharacterControllerBoundsPosition();
+    testGltfNodeReaderKeepsHierarchyAndTransforms();
+    testGltfSkinReaderUsesJointNodeIndices();
     testVrmHumanoidBoneLookup();
     testVrmMToonMaterialLookup();
     testVrmMToonMaterialSelectsNamedMaterial();
