@@ -135,7 +135,9 @@ $ .\build\matrixalchemy.exe
 Run tests:
 
 ```console
-$ ctest --preset windows-mingw
+$ cmake --preset windows-mingw-debug
+$ cmake --build --preset windows-mingw-debug --parallel
+$ ctest --preset windows-mingw-debug
 ```
 
 With the dynamic triplet, vcpkg normally copies required runtime DLLs next to the

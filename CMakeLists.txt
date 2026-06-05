@@ -139,7 +139,7 @@ else()
   target_compile_options(matrixalchemy PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
-if(BUILD_TESTING)
+if(BUILD_TESTING AND CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_executable(matrixalchemy_tests
     tests/MatrixAlchemyTest.cpp
     src/render/Shadow.cpp
@@ -169,4 +169,6 @@ if(BUILD_TESTING)
   endif()
 
   add_test(NAME matrixalchemy_tests COMMAND matrixalchemy_tests)
+elseif(BUILD_TESTING)
+  message(STATUS "Tests are only built for Debug configurations.")
 endif()
