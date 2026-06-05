@@ -87,7 +87,8 @@ namespace matrixalchemy::asset
                      const glm::mat4 &modelMatrix,
                      bool useMaterialState,
                      const glm::vec3 *toonShadeColor,
-                     bool useMaterialToonShadeColor) const
+                     bool useMaterialToonShadeColor,
+                     bool useMaterialToonLighting) const
     {
         const bool previousCullFace = glIsEnabled(GL_CULL_FACE) == GL_TRUE;
         const bool previousBlend = glIsEnabled(GL_BLEND) == GL_TRUE;
@@ -139,11 +140,12 @@ namespace matrixalchemy::asset
             {
                 shader.setVec3("uToonShadeColor", *toonShadeColor);
             }
-            shader.setVec3("uToonRimColor", useMaterialState ? toonMaterial.rimColor.value_or(glm::vec3(0.0F)) : glm::vec3(0.0F));
-            shader.setVec3("uToonEmissionColor", useMaterialState ? toonMaterial.emissionColor.value_or(glm::vec3(0.0F)) : glm::vec3(0.0F));
-            shader.setFloat("uToonShadeShift", useMaterialState ? toonMaterial.shadeShift.value_or(0.0F) : 0.0F);
-            shader.setFloat("uToonShadeToony", useMaterialState ? toonMaterial.shadeToony.value_or(0.0F) : 0.0F);
-            shader.setFloat("uToonRimPower", useMaterialState ? toonMaterial.rimFresnelPower.value_or(2.5F) : 2.5F);
+            const bool useToonLightingMaterial = useMaterialState && useMaterialToonLighting;
+            shader.setVec3("uToonRimColor", useToonLightingMaterial ? toonMaterial.rimColor.value_or(glm::vec3(0.0F)) : glm::vec3(0.0F));
+            shader.setVec3("uToonEmissionColor", useToonLightingMaterial ? toonMaterial.emissionColor.value_or(glm::vec3(0.0F)) : glm::vec3(0.0F));
+            shader.setFloat("uToonShadeShift", useToonLightingMaterial ? toonMaterial.shadeShift.value_or(0.0F) : 0.0F);
+            shader.setFloat("uToonShadeToony", useToonLightingMaterial ? toonMaterial.shadeToony.value_or(0.0F) : 0.0F);
+            shader.setFloat("uToonRimPower", useToonLightingMaterial ? toonMaterial.rimFresnelPower.value_or(2.5F) : 2.5F);
             shader.setBool("uUseTexture", useTexture);
             shader.setBool("uUseAlphaMask", useMaterialState && mesh.alphaMask);
             shader.setFloat("uAlphaCutoff", mesh.alphaCutoff);
@@ -178,7 +180,7 @@ namespace matrixalchemy::asset
         glDepthMask(previousDepthMask);
     }
 
-    void Model::drawOutline(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, float fallbackWidth) const
+    void Model::drawOutline(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, float fallbackWidth, bool useMaterialToonOutline) const
     {
         const bool previousCullFace = glIsEnabled(GL_CULL_FACE) == GL_TRUE;
         const bool previousBlend = glIsEnabled(GL_BLEND) == GL_TRUE;
@@ -201,12 +203,12 @@ namespace matrixalchemy::asset
             shader.setMat4("uModel", modelMatrix * instance.transform);
             const Mesh &mesh = meshes_[instance.meshIndex];
             const ToonMaterial &toonMaterial = mesh.toonMaterial;
-            const float width = toonMaterial.outlineWidth.value_or(fallbackWidth);
+            const float width = useMaterialToonOutline ? toonMaterial.outlineWidth.value_or(fallbackWidth) : fallbackWidth;
             if (width <= 0.0F)
             {
                 continue;
             }
-            shader.setVec4("uColorOverride", toonMaterial.outlineColor.value_or(glm::vec4(0.10F, 0.08F, 0.06F, 1.0F)));
+            shader.setVec4("uColorOverride", useMaterialToonOutline ? toonMaterial.outlineColor.value_or(glm::vec4(0.10F, 0.08F, 0.06F, 1.0F)) : glm::vec4(0.10F, 0.08F, 0.06F, 1.0F));
             shader.setFloat("uOutlineWidth", width);
             const std::vector<glm::mat4> joints = jointMatrices(instance);
             shader.setBool("uUseSkinning", !joints.empty());

@@ -25,9 +25,9 @@ namespace matrixalchemy::scene
     void VrmCharacter::draw(render::ShaderProgram &shader, const render::ToonLighting &toonLighting) const
     {
         const glm::mat4 transform = transformMatrix() * glm::scale(glm::mat4(1.0F), glm::vec3(modelScale_));
-        model_.drawOutline(shader, transform, outlineWidth_);
+        model_.drawOutline(shader, transform, outlineWidth_, toonLighting.useMaterialOutline);
         shader.setBool("uUseToonLighting", toonLighting.enabled);
-        model_.draw(shader, transform, true, &toonLighting.shadeColor, toonLighting.useMaterialShadeColor);
+        model_.draw(shader, transform, true, &toonLighting.shadeColor, toonLighting.useMaterialShadeColor, toonLighting.useMaterialLighting);
         shader.setBool("uUseToonLighting", false);
     }
 

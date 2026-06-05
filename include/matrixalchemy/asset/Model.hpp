@@ -24,8 +24,9 @@ namespace matrixalchemy::asset
                   const glm::mat4 &modelMatrix,
                   bool useMaterialState = true,
                   const glm::vec3 *toonShadeColor = nullptr,
-                  bool useMaterialToonShadeColor = true) const;
-        void drawOutline(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, float fallbackWidth) const;
+                  bool useMaterialToonShadeColor = true,
+                  bool useMaterialToonLighting = true) const;
+        void drawOutline(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, float fallbackWidth, bool useMaterialToonOutline = true) const;
 
         [[nodiscard]] bool empty() const { return meshes_.empty(); }
 

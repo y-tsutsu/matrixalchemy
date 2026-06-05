@@ -70,11 +70,14 @@ namespace matrixalchemy::ui
         ImGui::Separator();
         auto &toonLighting = app.toonLighting();
         ImGui::Checkbox("Toon lighting", &toonLighting.enabled);
-        ImGui::Checkbox("Use material shade", &toonLighting.useMaterialShadeColor);
+        ImGui::Checkbox("MToon shade color", &toonLighting.useMaterialShadeColor);
+        ImGui::Checkbox("MToon lighting params", &toonLighting.useMaterialLighting);
+        ImGui::Checkbox("MToon outline params", &toonLighting.useMaterialOutline);
         ImGui::ColorEdit3("Shade color", glm::value_ptr(toonLighting.shadeColor));
         ImGui::SliderFloat("Shade threshold", &toonLighting.threshold, 0.0F, 1.0F, "%.2f");
         ImGui::SliderFloat("Shade softness", &toonLighting.softness, 0.0F, 0.35F, "%.2f");
         ImGui::SliderFloat("Lit strength", &toonLighting.litStrength, 0.5F, 1.5F, "%.2f");
+        ImGui::Text("MToon: shade / rim / emission / outline");
         ImGui::End();
     }
 

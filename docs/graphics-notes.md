@@ -300,8 +300,8 @@ The debug panel exposes values that are useful while learning:
 - arm animation speed and angles
 - head yaw amount
 - tail swing amount
-- toon lighting on/off, material shade usage, shade color, threshold, softness,
-  and lit strength
+- toon lighting on/off, MToon material toggles, shade color, threshold,
+  softness, and lit strength
 
 The panel is intentionally connected to `app::App` accessors instead of owning
 scene state directly. That keeps the debug UI as an inspection/control layer
