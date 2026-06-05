@@ -10,6 +10,8 @@ kind of experience with a modern, portable native stack. The code is intentional
 class-based and explicit so that transforms, rendering order, shadows, model
 loading, and simple animation can be studied by reading and changing the source.
 
+![Matrix Alchemy sample scene](docs/images/matrixalchemy-screenshot.png)
+
 ## Overview
 
 The current sample opens a small animated OpenGL scene with:
