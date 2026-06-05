@@ -27,6 +27,9 @@ namespace matrixalchemy::asset::gltf
     std::optional<glm::vec3> readVrmMaterialShadeColor(const cgltf_material *material, const cgltf_data &data);
     std::optional<glm::vec3> readVrmMaterialRimColor(const cgltf_material *material, const cgltf_data &data);
     std::optional<glm::vec3> readVrmMaterialEmissionColor(const cgltf_material *material, const cgltf_data &data);
+    std::optional<float> readVrmMaterialShadeShift(const cgltf_material *material, const cgltf_data &data);
+    std::optional<float> readVrmMaterialShadeToony(const cgltf_material *material, const cgltf_data &data);
+    std::optional<float> readVrmMaterialRimFresnelPower(const cgltf_material *material, const cgltf_data &data);
     std::optional<glm::vec4> readVrmMaterialOutlineColor(const cgltf_material *material, const cgltf_data &data);
     std::optional<float> readVrmMaterialOutlineWidth(const cgltf_material *material, const cgltf_data &data);
 

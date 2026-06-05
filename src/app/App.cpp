@@ -323,6 +323,9 @@ namespace matrixalchemy::app
         shader_.setFloat("uToonLitStrength", toonLighting_.litStrength);
         shader_.setVec3("uToonRimColor", {0.0F, 0.0F, 0.0F});
         shader_.setVec3("uToonEmissionColor", {0.0F, 0.0F, 0.0F});
+        shader_.setFloat("uToonShadeShift", 0.0F);
+        shader_.setFloat("uToonShadeToony", 0.0F);
+        shader_.setFloat("uToonRimPower", 2.5F);
         const glm::mat4 shadowMatrix = render::planarShadowMatrix({0.0F, 1.0F, 0.0F, 0.0F}, lightPosition);
         // ステンシルで床領域だけを通し、影は半透明で重ねる。深度は書かない。
         glStencilFunc(GL_EQUAL, 1, 0xFF);

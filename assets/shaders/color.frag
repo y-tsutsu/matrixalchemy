@@ -21,6 +21,9 @@ uniform vec3 uToonEmissionColor;
 uniform float uToonThreshold;
 uniform float uToonSoftness;
 uniform float uToonLitStrength;
+uniform float uToonShadeShift;
+uniform float uToonShadeToony;
+uniform float uToonRimPower;
 
 void main()
 {
@@ -46,12 +49,14 @@ void main()
         vec3 normal = normalize(vWorldNormal);
         vec3 lightDirection = normalize(uLightPosition - vWorldPosition);
         float halfLambert = dot(normal, lightDirection) * 0.5 + 0.5;
-        float litArea = smoothstep(uToonThreshold - uToonSoftness, uToonThreshold + uToonSoftness, halfLambert);
+        float materialThreshold = clamp(uToonThreshold + uToonShadeShift * 0.35, 0.0, 1.0);
+        float materialSoftness = max(uToonSoftness * mix(1.0, 0.25, clamp(uToonShadeToony, 0.0, 1.0)), 0.001);
+        float litArea = smoothstep(materialThreshold - materialSoftness, materialThreshold + materialSoftness, halfLambert);
         vec3 toonLight = mix(uToonShadeColor, vec3(uToonLitStrength), litArea);
         baseColor.rgb *= toonLight;
 
         vec3 viewDirection = normalize(uCameraPosition - vWorldPosition);
-        float rim = pow(1.0 - max(dot(normal, viewDirection), 0.0), 2.5);
+        float rim = pow(1.0 - max(dot(normal, viewDirection), 0.0), max(uToonRimPower, 0.1));
         baseColor.rgb += uToonRimColor * rim;
         baseColor.rgb += uToonEmissionColor;
     }

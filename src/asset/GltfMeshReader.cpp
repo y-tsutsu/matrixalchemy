@@ -298,6 +298,9 @@ namespace matrixalchemy::asset::gltf
             loadedPrimitive.toonShadeColor = readVrmMaterialShadeColor(primitive.material, data);
             loadedPrimitive.toonRimColor = readVrmMaterialRimColor(primitive.material, data);
             loadedPrimitive.toonEmissionColor = readVrmMaterialEmissionColor(primitive.material, data);
+            loadedPrimitive.toonShadeShift = readVrmMaterialShadeShift(primitive.material, data);
+            loadedPrimitive.toonShadeToony = readVrmMaterialShadeToony(primitive.material, data);
+            loadedPrimitive.toonRimFresnelPower = readVrmMaterialRimFresnelPower(primitive.material, data);
             loadedPrimitive.toonOutlineColor = readVrmMaterialOutlineColor(primitive.material, data);
             loadedPrimitive.toonOutlineWidth = readVrmMaterialOutlineWidth(primitive.material, data);
             loadedPrimitive.alphaMask = primitive.material != nullptr && primitive.material->alpha_mode == cgltf_alpha_mode_mask;

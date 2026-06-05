@@ -301,6 +301,21 @@ namespace matrixalchemy::asset::gltf
         return readVrmMaterialVec3Property(material, data, "_EmissionColor");
     }
 
+    std::optional<float> readVrmMaterialShadeShift(const cgltf_material *material, const cgltf_data &data)
+    {
+        return readVrmMaterialFloatProperty(material, data, "_ShadeShift");
+    }
+
+    std::optional<float> readVrmMaterialShadeToony(const cgltf_material *material, const cgltf_data &data)
+    {
+        return readVrmMaterialFloatProperty(material, data, "_ShadeToony");
+    }
+
+    std::optional<float> readVrmMaterialRimFresnelPower(const cgltf_material *material, const cgltf_data &data)
+    {
+        return readVrmMaterialFloatProperty(material, data, "_RimFresnelPower");
+    }
+
     std::optional<glm::vec4> readVrmMaterialOutlineColor(const cgltf_material *material, const cgltf_data &data)
     {
         return readVrmMaterialVec4Property(material, data, "_OutlineColor");

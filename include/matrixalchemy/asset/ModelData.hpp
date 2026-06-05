@@ -21,6 +21,9 @@ namespace matrixalchemy::asset
         std::optional<glm::vec3> toonShadeColor;
         std::optional<glm::vec3> toonRimColor;
         std::optional<glm::vec3> toonEmissionColor;
+        std::optional<float> toonShadeShift;
+        std::optional<float> toonShadeToony;
+        std::optional<float> toonRimFresnelPower;
         std::optional<glm::vec4> toonOutlineColor;
         std::optional<float> toonOutlineWidth;
         bool hasTexture = false;
