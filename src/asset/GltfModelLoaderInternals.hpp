@@ -24,13 +24,6 @@ namespace matrixalchemy::asset::gltf
     std::vector<ModelNode> readNodes(const cgltf_data &data);
     std::vector<ModelSkin> readSkins(const cgltf_data &data);
     void readVrmHumanoid(ModelData &modelData, const cgltf_data &data);
-    std::optional<glm::vec3> readVrmMaterialShadeColor(const cgltf_material *material, const cgltf_data &data);
-    std::optional<glm::vec3> readVrmMaterialRimColor(const cgltf_material *material, const cgltf_data &data);
-    std::optional<glm::vec3> readVrmMaterialEmissionColor(const cgltf_material *material, const cgltf_data &data);
-    std::optional<float> readVrmMaterialShadeShift(const cgltf_material *material, const cgltf_data &data);
-    std::optional<float> readVrmMaterialShadeToony(const cgltf_material *material, const cgltf_data &data);
-    std::optional<float> readVrmMaterialRimFresnelPower(const cgltf_material *material, const cgltf_data &data);
-    std::optional<glm::vec4> readVrmMaterialOutlineColor(const cgltf_material *material, const cgltf_data &data);
-    std::optional<float> readVrmMaterialOutlineWidth(const cgltf_material *material, const cgltf_data &data);
+    ToonMaterial readVrmMaterialToonMaterial(const cgltf_material *material, const cgltf_data &data);
 
 } // namespace matrixalchemy::asset::gltf

@@ -35,14 +35,7 @@ namespace matrixalchemy::asset
             render::ModelMesh geometry;
             std::size_t textureIndex = 0;
             float alphaCutoff = 0.5F;
-            std::optional<glm::vec3> toonShadeColor;
-            std::optional<glm::vec3> toonRimColor;
-            std::optional<glm::vec3> toonEmissionColor;
-            std::optional<float> toonShadeShift;
-            std::optional<float> toonShadeToony;
-            std::optional<float> toonRimFresnelPower;
-            std::optional<glm::vec4> toonOutlineColor;
-            std::optional<float> toonOutlineWidth;
+            ToonMaterial toonMaterial;
             bool hasTexture = false;
             bool alphaMask = false;
             bool alphaBlend = false;

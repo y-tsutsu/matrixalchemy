@@ -280,56 +280,27 @@ namespace matrixalchemy::asset::gltf
         modelData.headNodeIndex = readVrmHumanoidBoneNode(vrmJson, "head");
     }
 
-    std::optional<glm::vec3> readVrmMaterialShadeColor(const cgltf_material *material, const cgltf_data &data)
+    ToonMaterial readVrmMaterialToonMaterial(const cgltf_material *material, const cgltf_data &data)
     {
-        return readVrmMaterialVec3Property(material, data, "_ShadeColor");
-    }
-
-    std::optional<glm::vec3> readVrmMaterialRimColor(const cgltf_material *material, const cgltf_data &data)
-    {
+        ToonMaterial toonMaterial;
+        toonMaterial.shadeColor = readVrmMaterialVec3Property(material, data, "_ShadeColor");
         const std::optional<glm::vec4> rimColor = readVrmMaterialVec4Property(material, data, "_RimColor");
-        if (!rimColor.has_value())
+        if (rimColor.has_value())
         {
-            return std::nullopt;
+            toonMaterial.rimColor = glm::vec3(*rimColor) * rimColor->a;
         }
-
-        return glm::vec3(*rimColor) * rimColor->a;
-    }
-
-    std::optional<glm::vec3> readVrmMaterialEmissionColor(const cgltf_material *material, const cgltf_data &data)
-    {
-        return readVrmMaterialVec3Property(material, data, "_EmissionColor");
-    }
-
-    std::optional<float> readVrmMaterialShadeShift(const cgltf_material *material, const cgltf_data &data)
-    {
-        return readVrmMaterialFloatProperty(material, data, "_ShadeShift");
-    }
-
-    std::optional<float> readVrmMaterialShadeToony(const cgltf_material *material, const cgltf_data &data)
-    {
-        return readVrmMaterialFloatProperty(material, data, "_ShadeToony");
-    }
-
-    std::optional<float> readVrmMaterialRimFresnelPower(const cgltf_material *material, const cgltf_data &data)
-    {
-        return readVrmMaterialFloatProperty(material, data, "_RimFresnelPower");
-    }
-
-    std::optional<glm::vec4> readVrmMaterialOutlineColor(const cgltf_material *material, const cgltf_data &data)
-    {
-        return readVrmMaterialVec4Property(material, data, "_OutlineColor");
-    }
-
-    std::optional<float> readVrmMaterialOutlineWidth(const cgltf_material *material, const cgltf_data &data)
-    {
+        toonMaterial.emissionColor = readVrmMaterialVec3Property(material, data, "_EmissionColor");
+        toonMaterial.shadeShift = readVrmMaterialFloatProperty(material, data, "_ShadeShift");
+        toonMaterial.shadeToony = readVrmMaterialFloatProperty(material, data, "_ShadeToony");
+        toonMaterial.rimFresnelPower = readVrmMaterialFloatProperty(material, data, "_RimFresnelPower");
+        toonMaterial.outlineColor = readVrmMaterialVec4Property(material, data, "_OutlineColor");
         const std::optional<float> outlineWidth = readVrmMaterialFloatProperty(material, data, "_OutlineWidth");
-        if (!outlineWidth.has_value())
+        if (outlineWidth.has_value())
         {
-            return std::nullopt;
+            toonMaterial.outlineWidth = *outlineWidth * 0.02F;
         }
 
-        return *outlineWidth * 0.02F;
+        return toonMaterial;
     }
 
 } // namespace matrixalchemy::asset::gltf

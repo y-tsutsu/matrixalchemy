@@ -13,19 +13,24 @@
 namespace matrixalchemy::asset
 {
 
+    struct ToonMaterial
+    {
+        std::optional<glm::vec3> shadeColor;
+        std::optional<glm::vec3> rimColor;
+        std::optional<glm::vec3> emissionColor;
+        std::optional<float> shadeShift;
+        std::optional<float> shadeToony;
+        std::optional<float> rimFresnelPower;
+        std::optional<glm::vec4> outlineColor;
+        std::optional<float> outlineWidth;
+    };
+
     struct ModelPrimitive
     {
         std::vector<render::ModelVertex> vertices;
         std::size_t textureIndex = 0;
         float alphaCutoff = 0.5F;
-        std::optional<glm::vec3> toonShadeColor;
-        std::optional<glm::vec3> toonRimColor;
-        std::optional<glm::vec3> toonEmissionColor;
-        std::optional<float> toonShadeShift;
-        std::optional<float> toonShadeToony;
-        std::optional<float> toonRimFresnelPower;
-        std::optional<glm::vec4> toonOutlineColor;
-        std::optional<float> toonOutlineWidth;
+        ToonMaterial toonMaterial;
         bool hasTexture = false;
         bool alphaMask = false;
         bool alphaBlend = false;

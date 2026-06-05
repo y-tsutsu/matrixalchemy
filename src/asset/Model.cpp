@@ -42,14 +42,7 @@ namespace matrixalchemy::asset
                 loadedMesh.geometry.upload(primitive.vertices, GL_TRIANGLES);
                 loadedMesh.textureIndex = primitive.textureIndex;
                 loadedMesh.alphaCutoff = primitive.alphaCutoff;
-                loadedMesh.toonShadeColor = primitive.toonShadeColor;
-                loadedMesh.toonRimColor = primitive.toonRimColor;
-                loadedMesh.toonEmissionColor = primitive.toonEmissionColor;
-                loadedMesh.toonShadeShift = primitive.toonShadeShift;
-                loadedMesh.toonShadeToony = primitive.toonShadeToony;
-                loadedMesh.toonRimFresnelPower = primitive.toonRimFresnelPower;
-                loadedMesh.toonOutlineColor = primitive.toonOutlineColor;
-                loadedMesh.toonOutlineWidth = primitive.toonOutlineWidth;
+                loadedMesh.toonMaterial = primitive.toonMaterial;
                 loadedMesh.hasTexture = primitive.hasTexture;
                 loadedMesh.alphaMask = primitive.alphaMask;
                 loadedMesh.alphaBlend = primitive.alphaBlend;
@@ -137,19 +130,20 @@ namespace matrixalchemy::asset
             }
 
             const bool useTexture = useMaterialState && mesh.hasTexture && mesh.textureIndex < textures_.size() && textures_[mesh.textureIndex].valid();
-            if (useMaterialState && useMaterialToonShadeColor && mesh.toonShadeColor.has_value())
+            const ToonMaterial &toonMaterial = mesh.toonMaterial;
+            if (useMaterialState && useMaterialToonShadeColor && toonMaterial.shadeColor.has_value())
             {
-                shader.setVec3("uToonShadeColor", *mesh.toonShadeColor);
+                shader.setVec3("uToonShadeColor", *toonMaterial.shadeColor);
             }
             else if (useMaterialState && toonShadeColor != nullptr)
             {
                 shader.setVec3("uToonShadeColor", *toonShadeColor);
             }
-            shader.setVec3("uToonRimColor", useMaterialState ? mesh.toonRimColor.value_or(glm::vec3(0.0F)) : glm::vec3(0.0F));
-            shader.setVec3("uToonEmissionColor", useMaterialState ? mesh.toonEmissionColor.value_or(glm::vec3(0.0F)) : glm::vec3(0.0F));
-            shader.setFloat("uToonShadeShift", useMaterialState ? mesh.toonShadeShift.value_or(0.0F) : 0.0F);
-            shader.setFloat("uToonShadeToony", useMaterialState ? mesh.toonShadeToony.value_or(0.0F) : 0.0F);
-            shader.setFloat("uToonRimPower", useMaterialState ? mesh.toonRimFresnelPower.value_or(2.5F) : 2.5F);
+            shader.setVec3("uToonRimColor", useMaterialState ? toonMaterial.rimColor.value_or(glm::vec3(0.0F)) : glm::vec3(0.0F));
+            shader.setVec3("uToonEmissionColor", useMaterialState ? toonMaterial.emissionColor.value_or(glm::vec3(0.0F)) : glm::vec3(0.0F));
+            shader.setFloat("uToonShadeShift", useMaterialState ? toonMaterial.shadeShift.value_or(0.0F) : 0.0F);
+            shader.setFloat("uToonShadeToony", useMaterialState ? toonMaterial.shadeToony.value_or(0.0F) : 0.0F);
+            shader.setFloat("uToonRimPower", useMaterialState ? toonMaterial.rimFresnelPower.value_or(2.5F) : 2.5F);
             shader.setBool("uUseTexture", useTexture);
             shader.setBool("uUseAlphaMask", useMaterialState && mesh.alphaMask);
             shader.setFloat("uAlphaCutoff", mesh.alphaCutoff);
@@ -206,12 +200,13 @@ namespace matrixalchemy::asset
 
             shader.setMat4("uModel", modelMatrix * instance.transform);
             const Mesh &mesh = meshes_[instance.meshIndex];
-            const float width = mesh.toonOutlineWidth.value_or(fallbackWidth);
+            const ToonMaterial &toonMaterial = mesh.toonMaterial;
+            const float width = toonMaterial.outlineWidth.value_or(fallbackWidth);
             if (width <= 0.0F)
             {
                 continue;
             }
-            shader.setVec4("uColorOverride", mesh.toonOutlineColor.value_or(glm::vec4(0.10F, 0.08F, 0.06F, 1.0F)));
+            shader.setVec4("uColorOverride", toonMaterial.outlineColor.value_or(glm::vec4(0.10F, 0.08F, 0.06F, 1.0F)));
             shader.setFloat("uOutlineWidth", width);
             const std::vector<glm::mat4> joints = jointMatrices(instance);
             shader.setBool("uUseSkinning", !joints.empty());
