@@ -148,7 +148,9 @@ sample pose animation controls:
 - arm spread angle
 - head animation on/off and yaw amount
 - tail animation on/off and swing amount
-- toon lighting on/off, material shade usage, and shade parameters
+- toon lighting on/off
+- MToon material shade, lighting, and outline toggles
+- global shade color and shade parameters
 
 ## Development Notes
 
@@ -159,7 +161,8 @@ that the rendering pipeline can be learned by reading and changing the source.
 
 For a more detailed guide to the rendering pipeline, scene classes, model
 loading, skinning, and pose animation, see
-[`docs/graphics-notes.md`](docs/graphics-notes.md).
+[`docs/graphics-notes.md`](docs/graphics-notes.md). A Japanese version is also
+available at [`docs/graphics-notes.ja.md`](docs/graphics-notes.ja.md).
 
 Shader sources live under `assets/shaders` for editing. CMake converts them into
 a generated C++ header under the build directory, so the executable does not need
@@ -235,6 +238,10 @@ beginner-friendly character sample in native OpenGL. It supports:
 - VRM 0.x MToon `_ShadeColor`, `_ShadeShift`, `_ShadeToony`, `_RimColor`,
   `_RimFresnelPower`, `_EmissionColor`, `_OutlineColor`, and `_OutlineWidth` for
   the sample toon lighting and outline paths
+
+The MToon path is a compact learning-oriented approximation. It intentionally
+uses a small set of material values in the sample shader instead of trying to
+reproduce the full Unity MToon renderer.
 
 The loader does not yet implement the full VRM feature set. These are currently
 out of scope:

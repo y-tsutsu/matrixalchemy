@@ -180,6 +180,8 @@ cgltf data
 `asset::ModelData` is the handoff structure between loading and rendering:
 
 - `ModelPrimitive`: CPU-side vertices and material flags for one primitive.
+- `ToonMaterial`: the small subset of VRM 0.x MToon values used by the sample
+  toon shader and outline pass.
 - `ModelInstance`: a primitive attached to a scene node, optionally with a skin.
 - `ModelNode`: local/world transforms and parent relationship.
 - `ModelSkin`: joint node indices and inverse bind matrices.
@@ -269,6 +271,10 @@ shade usage and use one global shade color instead. `_ShadeShift` moves the
 light/shade boundary, `_ShadeToony` makes the boundary sharper, `_RimColor` and
 `_RimFresnelPower` add a small view-dependent rim light, and `_EmissionColor`
 adds an unlit color contribution to the material.
+
+These values are stored in `asset::ToonMaterial`. The renderer treats them as
+optional material hints: when a value is missing or the matching debug toggle is
+off, the shader falls back to the sample's global toon-lighting values.
 
 The outline effect is also simple: the model is drawn again with vertices
 expanded along their normals and a solid outline color. When available, VRM 0.x
