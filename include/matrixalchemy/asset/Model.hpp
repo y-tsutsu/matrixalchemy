@@ -25,7 +25,7 @@ namespace matrixalchemy::asset
                   bool useMaterialState = true,
                   const glm::vec3 *toonShadeColor = nullptr,
                   bool useMaterialToonShadeColor = true) const;
-        void drawOutline(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, float width) const;
+        void drawOutline(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, float fallbackWidth) const;
 
         [[nodiscard]] bool empty() const { return meshes_.empty(); }
 
@@ -36,6 +36,8 @@ namespace matrixalchemy::asset
             std::size_t textureIndex = 0;
             float alphaCutoff = 0.5F;
             std::optional<glm::vec3> toonShadeColor;
+            std::optional<glm::vec4> toonOutlineColor;
+            std::optional<float> toonOutlineWidth;
             bool hasTexture = false;
             bool alphaMask = false;
             bool alphaBlend = false;

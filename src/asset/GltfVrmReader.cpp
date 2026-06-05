@@ -148,6 +148,36 @@ namespace matrixalchemy::asset::gltf
             return values;
         }
 
+        std::optional<float> readJsonFloatProperty(std::string_view json, std::string_view propertyName)
+        {
+            const std::string key = "\"" + std::string(propertyName) + "\"";
+            const std::size_t keyPosition = json.find(key);
+            if (keyPosition == std::string_view::npos)
+            {
+                return std::nullopt;
+            }
+
+            const std::size_t colon = json.find(':', keyPosition);
+            if (colon == std::string_view::npos)
+            {
+                return std::nullopt;
+            }
+
+            std::size_t valueBegin = colon + 1;
+            while (valueBegin < json.size() && std::isspace(static_cast<unsigned char>(json[valueBegin])) != 0)
+            {
+                ++valueBegin;
+            }
+
+            const std::size_t valueEnd = json.find_first_of(",}", valueBegin);
+            if (valueBegin >= json.size() || valueEnd == std::string_view::npos)
+            {
+                return std::nullopt;
+            }
+
+            return std::stof(std::string(json.substr(valueBegin, valueEnd - valueBegin)));
+        }
+
         std::optional<std::string_view> findMaterialPropertyObject(std::string_view vrmJson, std::string_view materialName)
         {
             std::size_t searchFrom = 0;
@@ -159,8 +189,10 @@ namespace matrixalchemy::asset::gltf
                     return std::nullopt;
                 }
 
-                const std::size_t remainingSize = vrmJson.size() - nameKey;
-                const std::string_view materialWindow = vrmJson.substr(nameKey, std::min<std::size_t>(remainingSize, 4096));
+                const std::size_t objectBegin = vrmJson.rfind("{\"floatProperties\"", nameKey);
+                const std::size_t windowBegin = objectBegin == std::string_view::npos ? nameKey : objectBegin;
+                const std::size_t remainingSize = vrmJson.size() - windowBegin;
+                const std::string_view materialWindow = vrmJson.substr(windowBegin, std::min<std::size_t>(remainingSize, 4096));
                 const std::optional<std::string_view> name = readJsonStringProperty(materialWindow, "name");
                 if (name.has_value() && *name == materialName)
                 {
@@ -214,6 +246,64 @@ namespace matrixalchemy::asset::gltf
         }
 
         return glm::vec3((*shadeColor)[0], (*shadeColor)[1], (*shadeColor)[2]);
+    }
+
+    std::optional<glm::vec4> readVrmMaterialOutlineColor(const cgltf_material *material, const cgltf_data &data)
+    {
+        if (material == nullptr || material->name == nullptr)
+        {
+            return std::nullopt;
+        }
+
+        const cgltf_extension *vrmExtension = findExtension(data.data_extensions, data.data_extensions_count, "VRM");
+        if (vrmExtension == nullptr || vrmExtension->data == nullptr)
+        {
+            return std::nullopt;
+        }
+
+        const std::string_view vrmJson(vrmExtension->data);
+        const std::optional<std::string_view> materialProperty = findMaterialPropertyObject(vrmJson, material->name);
+        if (!materialProperty.has_value())
+        {
+            return std::nullopt;
+        }
+
+        const std::optional<std::array<float, 4>> outlineColor = readJsonVec4Property(*materialProperty, "_OutlineColor");
+        if (!outlineColor.has_value())
+        {
+            return std::nullopt;
+        }
+
+        return glm::vec4((*outlineColor)[0], (*outlineColor)[1], (*outlineColor)[2], (*outlineColor)[3]);
+    }
+
+    std::optional<float> readVrmMaterialOutlineWidth(const cgltf_material *material, const cgltf_data &data)
+    {
+        if (material == nullptr || material->name == nullptr)
+        {
+            return std::nullopt;
+        }
+
+        const cgltf_extension *vrmExtension = findExtension(data.data_extensions, data.data_extensions_count, "VRM");
+        if (vrmExtension == nullptr || vrmExtension->data == nullptr)
+        {
+            return std::nullopt;
+        }
+
+        const std::string_view vrmJson(vrmExtension->data);
+        const std::optional<std::string_view> materialProperty = findMaterialPropertyObject(vrmJson, material->name);
+        if (!materialProperty.has_value())
+        {
+            return std::nullopt;
+        }
+
+        const std::optional<float> outlineWidth = readJsonFloatProperty(*materialProperty, "_OutlineWidth");
+        if (!outlineWidth.has_value())
+        {
+            return std::nullopt;
+        }
+
+        return *outlineWidth * 0.02F;
     }
 
 } // namespace matrixalchemy::asset::gltf

@@ -19,6 +19,8 @@ namespace matrixalchemy::asset
         std::size_t textureIndex = 0;
         float alphaCutoff = 0.5F;
         std::optional<glm::vec3> toonShadeColor;
+        std::optional<glm::vec4> toonOutlineColor;
+        std::optional<float> toonOutlineWidth;
         bool hasTexture = false;
         bool alphaMask = false;
         bool alphaBlend = false;

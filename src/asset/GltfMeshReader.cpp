@@ -296,6 +296,8 @@ namespace matrixalchemy::asset::gltf
             loadedPrimitive.hasTexture = textureIndex.has_value();
             loadedPrimitive.alphaCutoff = primitive.material == nullptr ? 0.5F : primitive.material->alpha_cutoff;
             loadedPrimitive.toonShadeColor = readVrmMaterialShadeColor(primitive.material, data);
+            loadedPrimitive.toonOutlineColor = readVrmMaterialOutlineColor(primitive.material, data);
+            loadedPrimitive.toonOutlineWidth = readVrmMaterialOutlineWidth(primitive.material, data);
             loadedPrimitive.alphaMask = primitive.material != nullptr && primitive.material->alpha_mode == cgltf_alpha_mode_mask;
             loadedPrimitive.alphaBlend = primitive.material != nullptr && primitive.material->alpha_mode == cgltf_alpha_mode_blend;
             loadedPrimitive.doubleSided = primitive.material != nullptr && primitive.material->double_sided;

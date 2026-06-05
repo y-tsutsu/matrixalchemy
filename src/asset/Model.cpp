@@ -43,6 +43,8 @@ namespace matrixalchemy::asset
                 loadedMesh.textureIndex = primitive.textureIndex;
                 loadedMesh.alphaCutoff = primitive.alphaCutoff;
                 loadedMesh.toonShadeColor = primitive.toonShadeColor;
+                loadedMesh.toonOutlineColor = primitive.toonOutlineColor;
+                loadedMesh.toonOutlineWidth = primitive.toonOutlineWidth;
                 loadedMesh.hasTexture = primitive.hasTexture;
                 loadedMesh.alphaMask = primitive.alphaMask;
                 loadedMesh.alphaBlend = primitive.alphaBlend;
@@ -172,7 +174,7 @@ namespace matrixalchemy::asset
         glDepthMask(previousDepthMask);
     }
 
-    void Model::drawOutline(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, float width) const
+    void Model::drawOutline(render::ShaderProgram &shader, const glm::mat4 &modelMatrix, float fallbackWidth) const
     {
         const bool previousCullFace = glIsEnabled(GL_CULL_FACE) == GL_TRUE;
         const bool previousBlend = glIsEnabled(GL_BLEND) == GL_TRUE;
@@ -182,10 +184,8 @@ namespace matrixalchemy::asset
         glDisable(GL_BLEND);
 
         shader.setBool("uUseColorOverride", true);
-        shader.setVec4("uColorOverride", {0.10F, 0.08F, 0.06F, 1.0F});
         shader.setBool("uUseTexture", false);
         shader.setBool("uUseAlphaMask", false);
-        shader.setFloat("uOutlineWidth", width);
 
         for (const MeshInstance &instance : instances_)
         {
@@ -195,10 +195,18 @@ namespace matrixalchemy::asset
             }
 
             shader.setMat4("uModel", modelMatrix * instance.transform);
+            const Mesh &mesh = meshes_[instance.meshIndex];
+            const float width = mesh.toonOutlineWidth.value_or(fallbackWidth);
+            if (width <= 0.0F)
+            {
+                continue;
+            }
+            shader.setVec4("uColorOverride", mesh.toonOutlineColor.value_or(glm::vec4(0.10F, 0.08F, 0.06F, 1.0F)));
+            shader.setFloat("uOutlineWidth", width);
             const std::vector<glm::mat4> joints = jointMatrices(instance);
             shader.setBool("uUseSkinning", !joints.empty());
             shader.setMat4Array("uJointMatrices[0]", joints);
-            meshes_[instance.meshIndex].geometry.draw();
+            mesh.geometry.draw();
         }
 
         shader.setFloat("uOutlineWidth", 0.0F);

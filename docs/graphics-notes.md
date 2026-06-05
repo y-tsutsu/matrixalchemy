@@ -160,7 +160,8 @@ sample character:
 - scene nodes and parent/child hierarchy
 - glTF skins and inverse bind matrices
 - VRM 0.x humanoid bone lookup for selected bones
-- VRM 0.x MToon `_ShadeColor` lookup for toon lighting
+- VRM 0.x MToon `_ShadeColor`, `_OutlineColor`, and `_OutlineWidth` lookup for
+  toon lighting and outline rendering
 
 `asset::Model` owns the OpenGL-side representation. It uploads mesh data,
 textures, and model primitives, then evaluates node transforms before drawing.
@@ -266,9 +267,11 @@ can be used as the material shade color. The debug UI can also disable material
 shade usage and use one global shade color instead.
 
 The outline effect is also simple: the model is drawn again with vertices
-expanded along their normals and a solid outline color. This is not a complete
-toon renderer, but it gives the VRM character a clearer silhouette and keeps the
-technique easy to inspect.
+expanded along their normals and a solid outline color. When available, VRM 0.x
+MToon `_OutlineColor` and `_OutlineWidth` are used per material. Materials
+without those settings fall back to the sample's default outline color and width.
+This is not a complete toon renderer, but it gives the VRM character a clearer
+silhouette and keeps the technique easy to inspect.
 
 Important files:
 

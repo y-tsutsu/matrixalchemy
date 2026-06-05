@@ -25,5 +25,7 @@ namespace matrixalchemy::asset::gltf
     std::vector<ModelSkin> readSkins(const cgltf_data &data);
     void readVrmHumanoid(ModelData &modelData, const cgltf_data &data);
     std::optional<glm::vec3> readVrmMaterialShadeColor(const cgltf_material *material, const cgltf_data &data);
+    std::optional<glm::vec4> readVrmMaterialOutlineColor(const cgltf_material *material, const cgltf_data &data);
+    std::optional<float> readVrmMaterialOutlineWidth(const cgltf_material *material, const cgltf_data &data);
 
 } // namespace matrixalchemy::asset::gltf
