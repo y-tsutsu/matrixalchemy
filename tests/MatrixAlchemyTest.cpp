@@ -1,5 +1,6 @@
 #include "GltfModelLoaderInternals.hpp"
 #include "VrmJsonReader.hpp"
+#include "matrixalchemy/asset/ModelPoseAnimator.hpp"
 #include "matrixalchemy/render/Shadow.hpp"
 #include "matrixalchemy/scene/CharacterController.hpp"
 #include "matrixalchemy/scene/OrbitCamera.hpp"
@@ -190,6 +191,62 @@ namespace
         assert(nearlyEqual(skins[0].inverseBindMatrices[0][0].x, 1.0F));
     }
 
+    void testPoseAnimatorAppliesArmPoseFromNodeNames()
+    {
+        std::vector<matrixalchemy::asset::ModelNode> nodes(2);
+        nodes[0].name = "LeftArm";
+        nodes[1].name = "RightArm";
+
+        matrixalchemy::asset::ModelPoseAnimator animator;
+        animator.initialize(nodes);
+
+        matrixalchemy::asset::PoseAnimationSettings settings;
+        settings.enabled = false;
+        settings.baseArmAngleDegrees = 30.0F;
+        settings.spreadAngleDegrees = 10.0F;
+        settings.headEnabled = false;
+        settings.tailEnabled = false;
+
+        animator.apply(0.0F, settings, nodes);
+
+        const glm::vec3 leftXAxis = glm::vec3(nodes[0].localTransform * glm::vec4(1.0F, 0.0F, 0.0F, 0.0F));
+        const glm::vec3 rightXAxis = glm::vec3(nodes[1].localTransform * glm::vec4(1.0F, 0.0F, 0.0F, 0.0F));
+
+        assert(nearlyEqual(leftXAxis.x, std::cos(glm::radians(30.0F))));
+        assert(nearlyEqual(leftXAxis.y, std::sin(glm::radians(30.0F))));
+        assert(nearlyEqual(rightXAxis.x, std::cos(glm::radians(30.0F))));
+        assert(nearlyEqual(rightXAxis.y, -std::sin(glm::radians(30.0F))));
+    }
+
+    void testPoseAnimatorHonorsHeadAndTailToggles()
+    {
+        std::vector<matrixalchemy::asset::ModelNode> nodes(2);
+        nodes[0].name = "Head";
+        nodes[1].name = "tail01";
+
+        matrixalchemy::asset::ModelPoseAnimator animator;
+        animator.initialize(nodes);
+
+        matrixalchemy::asset::PoseAnimationSettings settings;
+        settings.enabled = false;
+        settings.headEnabled = false;
+        settings.tailEnabled = false;
+
+        animator.apply(1.0F, settings, nodes);
+        assert(nearlyEqual(nodes[0].localTransform[0].x, 1.0F));
+        assert(nearlyEqual(nodes[1].localTransform[0].x, 1.0F));
+
+        settings.headEnabled = true;
+        settings.tailEnabled = true;
+        settings.speed = 1.0F;
+        settings.headYawDegrees = 10.0F;
+        settings.tailSwingDegrees = 20.0F;
+
+        animator.apply(1.0F, settings, nodes);
+        assert(!nearlyEqual(nodes[0].localTransform[0].x, 1.0F));
+        assert(!nearlyEqual(nodes[1].localTransform[0].x, 1.0F));
+    }
+
     void testVrmHumanoidBoneLookup()
     {
         constexpr std::string_view vrmJson = R"json(
@@ -318,6 +375,8 @@ int main()
     testCharacterControllerBoundsPosition();
     testGltfNodeReaderKeepsHierarchyAndTransforms();
     testGltfSkinReaderUsesJointNodeIndices();
+    testPoseAnimatorAppliesArmPoseFromNodeNames();
+    testPoseAnimatorHonorsHeadAndTailToggles();
     testVrmHumanoidBoneLookup();
     testVrmMToonMaterialLookup();
     testVrmMToonMaterialSelectsNamedMaterial();

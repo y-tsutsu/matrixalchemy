@@ -147,6 +147,7 @@ if(BUILD_TESTING)
     src/scene/OrbitCamera.cpp
     src/asset/Cgltf.cpp
     src/asset/GltfSceneReader.cpp
+    src/asset/ModelPoseAnimator.cpp
     src/asset/VrmJsonReader.cpp)
 
   target_include_directories(matrixalchemy_tests
