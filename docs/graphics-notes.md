@@ -263,15 +263,16 @@ Lighting is intentionally simple. A moving light position is used by the shader
 and visualized by `scene::LightMarker`. This keeps the relationship between
 light position, shaded geometry, and projected shadow visible.
 
-The VRM character uses a small toon-lighting pass in the fragment shader. It is
-not a full MToon implementation, but it uses the world normal, light position,
-half-Lambert lighting, and a shade-color blend to make the model read more like a
-toon character. When a VRM 0.x material provides MToon `_ShadeColor`, that color
-can be used as the material shade color. The debug UI can also disable material
-shade usage and use one global shade color instead. `_ShadeShift` moves the
-light/shade boundary, `_ShadeToony` makes the boundary sharper, `_RimColor` and
-`_RimFresnelPower` add a small view-dependent rim light, and `_EmissionColor`
-adds an unlit color contribution to the material.
+The VRM character and floating cubes use a small toon-lighting pass in the
+fragment shader. It is not a full MToon implementation, but it uses the world
+normal, light position, half-Lambert lighting, and a shade-color blend to make
+the model and cubes read with clearer lit and shaded faces. When a VRM 0.x
+material provides MToon `_ShadeColor`, that color can be used as the material
+shade color. The debug UI can also disable material shade usage and use one
+global shade color instead. `_ShadeShift` moves the light/shade boundary,
+`_ShadeToony` makes the boundary sharper, `_RimColor` and `_RimFresnelPower` add
+a small view-dependent rim light, and `_EmissionColor` adds an unlit color
+contribution to the material.
 
 These values are stored in `asset::ToonMaterial`. The renderer treats them as
 optional material hints: when a value is missing or the matching debug toggle is

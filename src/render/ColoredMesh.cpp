@@ -2,6 +2,7 @@
 
 #include "matrixalchemy/platform/Gl.hpp"
 
+#include <cstddef>
 #include <utility>
 
 namespace matrixalchemy::render
@@ -44,10 +45,12 @@ namespace matrixalchemy::render
         glBindBuffer(GL_ARRAY_BUFFER, vbo_);
         glBufferData(GL_ARRAY_BUFFER, static_cast<long>(vertices.size_bytes()), vertices.data(), GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), nullptr);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), reinterpret_cast<void *>(offsetof(ColoredVertex, position)));
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), reinterpret_cast<void *>(sizeof(glm::vec3)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), reinterpret_cast<void *>(offsetof(ColoredVertex, color)));
         glEnableVertexAttribArray(1);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(ColoredVertex), reinterpret_cast<void *>(offsetof(ColoredVertex, normal)));
+        glEnableVertexAttribArray(3);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);

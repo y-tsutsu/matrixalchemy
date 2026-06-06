@@ -64,6 +64,11 @@ namespace
         return std::sqrt(3.0F) * size * 0.5F + floorClearance;
     }
 
+    matrixalchemy::render::ColoredVertex cubeVertex(const glm::vec3 &position, const glm::vec3 &color, const glm::vec3 &normal)
+    {
+        return {position, color, normal};
+    }
+
 } // namespace
 
 namespace matrixalchemy::scene
@@ -79,48 +84,55 @@ namespace matrixalchemy::scene
         const glm::vec3 purple = {0.65F, 0.35F, 0.85F};
         const glm::vec3 cyan = {0.15F, 0.75F, 0.80F};
 
+        constexpr glm::vec3 backNormal = {0.0F, 0.0F, -1.0F};
+        constexpr glm::vec3 frontNormal = {0.0F, 0.0F, 1.0F};
+        constexpr glm::vec3 leftNormal = {-1.0F, 0.0F, 0.0F};
+        constexpr glm::vec3 rightNormal = {1.0F, 0.0F, 0.0F};
+        constexpr glm::vec3 bottomNormal = {0.0F, -1.0F, 0.0F};
+        constexpr glm::vec3 topNormal = {0.0F, 1.0F, 0.0F};
+
         const std::array<render::ColoredVertex, 36> vertices = {
-            render::ColoredVertex{{-half, -half, -half}, red},
-            render::ColoredVertex{{half, -half, -half}, red},
-            render::ColoredVertex{{half, half, -half}, red},
-            render::ColoredVertex{{half, half, -half}, red},
-            render::ColoredVertex{{-half, half, -half}, red},
-            render::ColoredVertex{{-half, -half, -half}, red},
+            cubeVertex({-half, -half, -half}, red, backNormal),
+            cubeVertex({half, -half, -half}, red, backNormal),
+            cubeVertex({half, half, -half}, red, backNormal),
+            cubeVertex({half, half, -half}, red, backNormal),
+            cubeVertex({-half, half, -half}, red, backNormal),
+            cubeVertex({-half, -half, -half}, red, backNormal),
 
-            render::ColoredVertex{{-half, -half, half}, blue},
-            render::ColoredVertex{{half, -half, half}, blue},
-            render::ColoredVertex{{half, half, half}, blue},
-            render::ColoredVertex{{half, half, half}, blue},
-            render::ColoredVertex{{-half, half, half}, blue},
-            render::ColoredVertex{{-half, -half, half}, blue},
+            cubeVertex({-half, -half, half}, blue, frontNormal),
+            cubeVertex({half, -half, half}, blue, frontNormal),
+            cubeVertex({half, half, half}, blue, frontNormal),
+            cubeVertex({half, half, half}, blue, frontNormal),
+            cubeVertex({-half, half, half}, blue, frontNormal),
+            cubeVertex({-half, -half, half}, blue, frontNormal),
 
-            render::ColoredVertex{{-half, half, half}, green},
-            render::ColoredVertex{{-half, half, -half}, green},
-            render::ColoredVertex{{-half, -half, -half}, green},
-            render::ColoredVertex{{-half, -half, -half}, green},
-            render::ColoredVertex{{-half, -half, half}, green},
-            render::ColoredVertex{{-half, half, half}, green},
+            cubeVertex({-half, half, half}, green, leftNormal),
+            cubeVertex({-half, half, -half}, green, leftNormal),
+            cubeVertex({-half, -half, -half}, green, leftNormal),
+            cubeVertex({-half, -half, -half}, green, leftNormal),
+            cubeVertex({-half, -half, half}, green, leftNormal),
+            cubeVertex({-half, half, half}, green, leftNormal),
 
-            render::ColoredVertex{{half, half, half}, yellow},
-            render::ColoredVertex{{half, half, -half}, yellow},
-            render::ColoredVertex{{half, -half, -half}, yellow},
-            render::ColoredVertex{{half, -half, -half}, yellow},
-            render::ColoredVertex{{half, -half, half}, yellow},
-            render::ColoredVertex{{half, half, half}, yellow},
+            cubeVertex({half, half, half}, yellow, rightNormal),
+            cubeVertex({half, half, -half}, yellow, rightNormal),
+            cubeVertex({half, -half, -half}, yellow, rightNormal),
+            cubeVertex({half, -half, -half}, yellow, rightNormal),
+            cubeVertex({half, -half, half}, yellow, rightNormal),
+            cubeVertex({half, half, half}, yellow, rightNormal),
 
-            render::ColoredVertex{{-half, -half, -half}, purple},
-            render::ColoredVertex{{half, -half, -half}, purple},
-            render::ColoredVertex{{half, -half, half}, purple},
-            render::ColoredVertex{{half, -half, half}, purple},
-            render::ColoredVertex{{-half, -half, half}, purple},
-            render::ColoredVertex{{-half, -half, -half}, purple},
+            cubeVertex({-half, -half, -half}, purple, bottomNormal),
+            cubeVertex({half, -half, -half}, purple, bottomNormal),
+            cubeVertex({half, -half, half}, purple, bottomNormal),
+            cubeVertex({half, -half, half}, purple, bottomNormal),
+            cubeVertex({-half, -half, half}, purple, bottomNormal),
+            cubeVertex({-half, -half, -half}, purple, bottomNormal),
 
-            render::ColoredVertex{{-half, half, -half}, cyan},
-            render::ColoredVertex{{half, half, -half}, cyan},
-            render::ColoredVertex{{half, half, half}, cyan},
-            render::ColoredVertex{{half, half, half}, cyan},
-            render::ColoredVertex{{-half, half, half}, cyan},
-            render::ColoredVertex{{-half, half, -half}, cyan},
+            cubeVertex({-half, half, -half}, cyan, topNormal),
+            cubeVertex({half, half, -half}, cyan, topNormal),
+            cubeVertex({half, half, half}, cyan, topNormal),
+            cubeVertex({half, half, half}, cyan, topNormal),
+            cubeVertex({-half, half, half}, cyan, topNormal),
+            cubeVertex({-half, half, -half}, cyan, topNormal),
         };
 
         mesh_.upload(vertices, GL_TRIANGLES);
@@ -188,6 +200,7 @@ namespace matrixalchemy::scene
 
     void FloatingCubes::draw(render::ShaderProgram &shader) const
     {
+        shader.setBool("uUseToonLighting", true);
         for (const CubeInstance &cube : cubes_)
         {
             shader.setVec4("uColorOverride", {cube.colorScale, 1.0F});
@@ -196,6 +209,7 @@ namespace matrixalchemy::scene
             mesh_.draw();
         }
         shader.setBool("uUseColorOverride", false);
+        shader.setBool("uUseToonLighting", false);
     }
 
     void FloatingCubes::drawShadow(render::ShaderProgram &shader, const glm::mat4 &shadowMatrix) const

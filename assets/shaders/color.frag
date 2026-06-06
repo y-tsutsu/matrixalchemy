@@ -27,14 +27,8 @@ uniform float uToonRimPower;
 
 void main()
 {
-    if (uUseColorOverride)
-    {
-        fragColor = uColorOverride;
-        return;
-    }
-
-    vec4 baseColor = vColor;
-    if (uUseTexture)
+    vec4 baseColor = uUseColorOverride ? uColorOverride : vColor;
+    if (!uUseColorOverride && uUseTexture)
     {
         baseColor *= texture(uBaseColorTexture, vTexCoord);
     }

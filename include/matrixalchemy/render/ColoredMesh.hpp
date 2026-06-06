@@ -12,6 +12,7 @@ namespace matrixalchemy::render
     {
         glm::vec3 position;
         glm::vec3 color;
+        glm::vec3 normal = {0.0F, 1.0F, 0.0F};
     };
 
     class ColoredMesh

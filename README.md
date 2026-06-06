@@ -23,7 +23,7 @@ The current sample opens a small animated OpenGL scene with:
 - a checkerboard floor grid
 - RGB XYZ axes, toggled with the debug UI
 - an animated arcane ring drawn with line primitives and additive blending
-- floating colored cubes with randomized colors and motion
+- toon-lit floating colored cubes with randomized colors and motion
 - a keyboard-controlled VRM character preview
 - a VRM preview model loaded through cgltf with node transforms, vertex colors,
   base color factors, base color textures, alpha modes, double-sided materials,
