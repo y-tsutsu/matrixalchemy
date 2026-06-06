@@ -32,6 +32,7 @@ namespace matrixalchemy::app
 
     } // namespace
 
+    /// @brief アプリケーションに必要なウィンドウ、OpenGL、シーンを初期化する。
     App::App()
     {
         initializeWindow();
@@ -39,6 +40,7 @@ namespace matrixalchemy::app
         initializeScene();
     }
 
+    /// @brief OpenGLリソース、Debug UI、GLFWウィンドウを終了順に解放する。
     App::~App()
     {
 #if MATRIXALCHEMY_HAS_IMGUI
@@ -53,6 +55,8 @@ namespace matrixalchemy::app
         glfwTerminate();
     }
 
+    /// @brief メインループを実行する。
+    /// @return アプリケーションの終了コード。
     int App::run()
     {
         auto previousTime = std::chrono::steady_clock::now();
@@ -74,21 +78,31 @@ namespace matrixalchemy::app
         return 0;
     }
 
+    /// @brief 現在有効なキャラクターのワールド座標を取得する。
+    /// @return VRMキャラクター、またはフォールバックキャラクターの座標。
     glm::vec3 App::characterPosition() const
     {
         return useVrmCharacter_ ? vrmCharacter_.position() : fallbackCharacter_.position();
     }
 
+    /// @brief 現在有効なキャラクターのY軸回転角を取得する。
+    /// @return キャラクターの回転角度。単位は度。
     float App::characterRotationDegrees() const
     {
         return useVrmCharacter_ ? vrmCharacter_.rotationDegrees() : fallbackCharacter_.rotationDegrees();
     }
 
+    /// @brief 現在有効なキャラクターの描画上の高さを取得する。
+    /// @return Debug UIに表示するキャラクターの高さ。
     float App::characterRenderHeight() const
     {
         return useVrmCharacter_ ? vrmCharacter_.renderHeight() : fallbackCharacter_.renderHeight();
     }
 
+    /// @brief GLFWのフレームバッファサイズ変更通知をAppのリサイズ処理へ橋渡しする。
+    /// @param window コールバックを発生させたGLFWウィンドウ。
+    /// @param width 新しいフレームバッファ幅。
+    /// @param height 新しいフレームバッファ高さ。
     void App::framebufferSizeCallback(GLFWwindow *window, int width, int height)
     {
         auto *app = static_cast<App *>(glfwGetWindowUserPointer(window));
@@ -98,6 +112,10 @@ namespace matrixalchemy::app
         }
     }
 
+    /// @brief GLFWのキー入力通知をAppのショートカット処理へ橋渡しする。
+    /// @param window コールバックを発生させたGLFWウィンドウ。
+    /// @param key 入力されたGLFWキーコード。
+    /// @param action キー操作の種類。
     void App::keyCallback(GLFWwindow *window, int key, int, int action, int)
     {
         auto *app = static_cast<App *>(glfwGetWindowUserPointer(window));
@@ -116,6 +134,10 @@ namespace matrixalchemy::app
         }
     }
 
+    /// @brief GLFWのカーソル移動通知をカメラドラッグへ橋渡しする。
+    /// @param window コールバックを発生させたGLFWウィンドウ。
+    /// @param x カーソルのX座標。
+    /// @param y カーソルのY座標。
     void App::cursorPositionCallback(GLFWwindow *window, double x, double y)
     {
         auto *app = static_cast<App *>(glfwGetWindowUserPointer(window));
@@ -131,6 +153,10 @@ namespace matrixalchemy::app
         }
     }
 
+    /// @brief GLFWのマウスボタン通知をカメラドラッグの開始・終了へ橋渡しする。
+    /// @param window コールバックを発生させたGLFWウィンドウ。
+    /// @param button 入力されたGLFWマウスボタン。
+    /// @param action ボタン操作の種類。
     void App::mouseButtonCallback(GLFWwindow *window, int button, int action, int)
     {
         auto *app = static_cast<App *>(glfwGetWindowUserPointer(window));
@@ -160,6 +186,9 @@ namespace matrixalchemy::app
         }
     }
 
+    /// @brief GLFWのスクロール通知をカメラズームへ橋渡しする。
+    /// @param window コールバックを発生させたGLFWウィンドウ。
+    /// @param yOffset 縦方向のスクロール量。
     void App::scrollCallback(GLFWwindow *window, double, double yOffset)
     {
         auto *app = static_cast<App *>(glfwGetWindowUserPointer(window));
@@ -175,6 +204,7 @@ namespace matrixalchemy::app
         }
     }
 
+    /// @brief GLFWを初期化し、OpenGLコンテキストを持つウィンドウを作成する。
     void App::initializeWindow()
     {
         if (glfwInit() == GLFW_FALSE)
@@ -204,6 +234,7 @@ namespace matrixalchemy::app
         glfwSwapInterval(1);
     }
 
+    /// @brief OpenGL関数ローダーと初期レンダーステートを設定する。
     void App::initializeOpenGL()
     {
 #if MATRIXALCHEMY_GLAD2
@@ -226,6 +257,7 @@ namespace matrixalchemy::app
 #endif
     }
 
+    /// @brief シェーダーとシーンオブジェクトを作成し、実行時モデルを読み込む。
     void App::initializeScene()
     {
         shader_.create(render::shader_sources::colorVertex, render::shader_sources::colorFragment);
@@ -252,6 +284,7 @@ namespace matrixalchemy::app
         registerSceneObjects();
     }
 
+    /// @brief 毎フレーム共通処理する通常のシーンオブジェクトを描画順に登録する。
     void App::registerSceneObjects()
     {
         sceneObjects_ = {
@@ -270,6 +303,7 @@ namespace matrixalchemy::app
         }
     }
 
+    /// @brief Appが所有するシーンオブジェクトのOpenGLリソースを明示的に解放する。
     void App::releaseSceneResources()
     {
         // 床はステンシル制御、デバッグ軸はF1表示、キャラクターはMToon設定が絡むので通常sceneリストから外している。
@@ -284,6 +318,7 @@ namespace matrixalchemy::app
         }
     }
 
+    /// @brief キーボード状態を読み取り、キャラクター入力へ反映する。
     void App::processInput()
     {
 #if MATRIXALCHEMY_HAS_IMGUI
@@ -299,6 +334,8 @@ namespace matrixalchemy::app
         characterInput_.turnRight = glfwGetKey(window_, GLFW_KEY_RIGHT) == GLFW_PRESS;
     }
 
+    /// @brief 1フレーム分のシーン状態を更新する。
+    /// @param deltaSeconds 前フレームからの経過秒数。
     void App::update(float deltaSeconds)
     {
         updateRegisteredSceneObjects(deltaSeconds);
@@ -313,6 +350,7 @@ namespace matrixalchemy::app
         }
     }
 
+    /// @brief 1フレーム分の描画処理を実行する。
     void App::render()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -329,6 +367,8 @@ namespace matrixalchemy::app
         drawDebugUi();
     }
 
+    /// @brief 登録済みシーンオブジェクトの共通更新処理を呼び出す。
+    /// @param deltaSeconds 前フレームからの経過秒数。
     void App::updateRegisteredSceneObjects(float deltaSeconds)
     {
         for (scene::SceneObject *object : sceneObjects_)
@@ -337,6 +377,9 @@ namespace matrixalchemy::app
         }
     }
 
+    /// @brief フレーム描画の開始時に共通シェーダー状態を設定する。
+    /// @param projection 射影行列。
+    /// @param view ビュー行列。
     void App::setupFrameShader(const glm::mat4 &projection, const glm::mat4 &view)
     {
         shader_.use();
@@ -351,6 +394,7 @@ namespace matrixalchemy::app
         shader_.setVec3("uCameraPosition", camera_.position());
     }
 
+    /// @brief 床を描画し、影を制限するためのステンシルマスクを作成する。
     void App::drawFloorMask()
     {
         // 床だけに影を出したいので、まず床を描きながらステンシルに床領域を記録する。
@@ -362,6 +406,7 @@ namespace matrixalchemy::app
         glStencilMask(0x00);
     }
 
+    /// @brief ライト位置から床へ投影した平面影を描画する。
     void App::drawProjectedShadows()
     {
         // 影の形はライト位置から床平面へ頂点を投影する行列で作る。
@@ -401,6 +446,7 @@ namespace matrixalchemy::app
         glDisable(GL_STENCIL_TEST);
     }
 
+    /// @brief 登録済みシーンオブジェクトとデバッグ軸を描画する。
     void App::drawRegisteredSceneObjects()
     {
         if (showDebugUi_)
@@ -415,6 +461,7 @@ namespace matrixalchemy::app
         }
     }
 
+    /// @brief 現在有効なキャラクターを描画する。
     void App::drawActiveCharacter()
     {
         if (useVrmCharacter_)
@@ -427,6 +474,7 @@ namespace matrixalchemy::app
         }
     }
 
+    /// @brief Debug UIが有効な場合にDear ImGuiのフレームを描画する。
     void App::drawDebugUi()
     {
 #if MATRIXALCHEMY_HAS_IMGUI
@@ -439,6 +487,9 @@ namespace matrixalchemy::app
 #endif
     }
 
+    /// @brief フレームバッファサイズに合わせてビューポートを更新する。
+    /// @param width 新しい幅。
+    /// @param height 新しい高さ。
     void App::resize(int width, int height)
     {
         width_ = std::max(width, 1);
@@ -446,6 +497,7 @@ namespace matrixalchemy::app
         glViewport(0, 0, width_, height_);
     }
 
+    /// @brief GLFWウィンドウへ終了要求を設定する。
     void App::requestClose()
     {
         glfwSetWindowShouldClose(window_, GLFW_TRUE);
