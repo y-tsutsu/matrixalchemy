@@ -14,7 +14,7 @@ namespace matrixalchemy::scene
     public:
         void create();
         void release() override;
-        void update(float deltaSeconds, const CharacterInput &input);
+        void updateWithInput(float deltaSeconds, const CharacterInput &input);
         void draw(render::ShaderProgram &shader) const override;
         void drawShadow(render::ShaderProgram &shader, const glm::mat4 &shadowMatrix) const override;
 

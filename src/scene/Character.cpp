@@ -96,7 +96,7 @@ namespace matrixalchemy::scene
         mesh_.release();
     }
 
-    void Character::update(float deltaSeconds, const CharacterInput &input)
+    void Character::updateWithInput(float deltaSeconds, const CharacterInput &input)
     {
         controller_.update(deltaSeconds, input);
     }

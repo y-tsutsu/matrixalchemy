@@ -342,11 +342,11 @@ namespace matrixalchemy::app
         arcaneRing_.setCenter(characterPosition());
         if (useVrmCharacter_)
         {
-            vrmCharacter_.update(deltaSeconds, characterInput_, poseAnimationSettings_);
+            vrmCharacter_.updateWithInput(deltaSeconds, characterInput_, poseAnimationSettings_);
         }
         else
         {
-            fallbackCharacter_.update(deltaSeconds, characterInput_);
+            fallbackCharacter_.updateWithInput(deltaSeconds, characterInput_);
         }
     }
 

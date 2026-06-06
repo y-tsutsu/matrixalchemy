@@ -15,7 +15,7 @@ namespace matrixalchemy::scene
         model_.release();
     }
 
-    void VrmCharacter::update(float deltaSeconds, const CharacterInput &input, const asset::PoseAnimationSettings &poseSettings)
+    void VrmCharacter::updateWithInput(float deltaSeconds, const CharacterInput &input, const asset::PoseAnimationSettings &poseSettings)
     {
         controller_.update(deltaSeconds, input);
         poseSeconds_ += deltaSeconds;
