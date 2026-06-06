@@ -44,13 +44,7 @@ namespace matrixalchemy::app
 #if MATRIXALCHEMY_HAS_IMGUI
         ui::DebugUi::shutdown();
 #endif
-        fallbackCharacter_.release();
-        vrmCharacter_.release();
-        floatingCubes_.release();
-        lightMarker_.release();
-        axisGizmo_.release();
-        arcaneRing_.release();
-        gridFloor_.release();
+        releaseSceneResources();
         shader_.release();
         if (window_ != nullptr)
         {
@@ -254,6 +248,40 @@ namespace matrixalchemy::app
         {
             useVrmCharacter_ = false;
         }
+
+        registerSceneObjects();
+    }
+
+    void App::registerSceneObjects()
+    {
+        sceneObjects_ = {
+            &arcaneRing_,
+            &lightMarker_,
+            &floatingCubes_,
+        };
+
+        if (useVrmCharacter_)
+        {
+            activeCharacter_ = &vrmCharacter_;
+        }
+        else
+        {
+            activeCharacter_ = &fallbackCharacter_;
+        }
+    }
+
+    void App::releaseSceneResources()
+    {
+        // 床はステンシル制御、デバッグ軸はF1表示、キャラクターはMToon設定が絡むので通常sceneリストから外している。
+        axisGizmo_.release();
+        fallbackCharacter_.release();
+        vrmCharacter_.release();
+        gridFloor_.release();
+
+        for (auto iterator = sceneObjects_.rbegin(); iterator != sceneObjects_.rend(); ++iterator)
+        {
+            (*iterator)->release();
+        }
     }
 
     void App::processInput()
@@ -273,9 +301,7 @@ namespace matrixalchemy::app
 
     void App::update(float deltaSeconds)
     {
-        floatingCubes_.update(deltaSeconds);
-        lightMarker_.update(deltaSeconds);
-        arcaneRing_.update(deltaSeconds);
+        updateRegisteredSceneObjects(deltaSeconds);
         arcaneRing_.setCenter(characterPosition());
         if (useVrmCharacter_)
         {
@@ -295,6 +321,24 @@ namespace matrixalchemy::app
         const glm::mat4 projection = glm::perspective(glm::radians(60.0F), aspect, 0.1F, 100.0F);
         const glm::mat4 view = camera_.viewMatrix();
 
+        setupFrameShader(projection, view);
+        drawFloorMask();
+        drawProjectedShadows();
+        drawRegisteredSceneObjects();
+        drawActiveCharacter();
+        drawDebugUi();
+    }
+
+    void App::updateRegisteredSceneObjects(float deltaSeconds)
+    {
+        for (scene::SceneObject *object : sceneObjects_)
+        {
+            object->update(deltaSeconds);
+        }
+    }
+
+    void App::setupFrameShader(const glm::mat4 &projection, const glm::mat4 &view)
+    {
         shader_.use();
         shader_.setMat4("uProjection", projection);
         shader_.setMat4("uView", view);
@@ -305,7 +349,10 @@ namespace matrixalchemy::app
         shader_.setBool("uUseToonLighting", false);
         shader_.setFloat("uOutlineWidth", 0.0F);
         shader_.setVec3("uCameraPosition", camera_.position());
+    }
 
+    void App::drawFloorMask()
+    {
         // 床だけに影を出したいので、まず床を描きながらステンシルに床領域を記録する。
         glEnable(GL_STENCIL_TEST);
         glStencilMask(0xFF);
@@ -313,7 +360,10 @@ namespace matrixalchemy::app
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         gridFloor_.draw(shader_);
         glStencilMask(0x00);
+    }
 
+    void App::drawProjectedShadows()
+    {
         // 影の形はライト位置から床平面へ頂点を投影する行列で作る。
         const glm::vec4 lightPosition = {lightMarker_.position(), 1.0F};
         shader_.setVec3("uLightPosition", lightMarker_.position());
@@ -336,37 +386,49 @@ namespace matrixalchemy::app
         glDepthMask(GL_FALSE);
         shader_.setBool("uUseColorOverride", true);
         shader_.setVec4("uColorOverride", {0.0F, 0.0F, 0.0F, 0.35F});
-        floatingCubes_.drawShadow(shader_, shadowMatrix);
-        if (useVrmCharacter_)
+        for (const scene::SceneObject *object : sceneObjects_)
         {
-            vrmCharacter_.drawShadow(shader_, shadowMatrix);
+            object->drawShadow(shader_, shadowMatrix);
         }
-        else
+        if (activeCharacter_ != nullptr)
         {
-            fallbackCharacter_.drawShadow(shader_, shadowMatrix);
+            activeCharacter_->drawShadow(shader_, shadowMatrix);
         }
         shader_.setBool("uUseColorOverride", false);
         glDepthMask(GL_TRUE);
         glDisable(GL_BLEND);
         glStencilMask(0xFF);
         glDisable(GL_STENCIL_TEST);
+    }
 
+    void App::drawRegisteredSceneObjects()
+    {
         if (showDebugUi_)
         {
+            // デバッグ軸はF1で表示を切り替える補助表示なので、通常のsceneObjects_には登録しない。
             axisGizmo_.draw(shader_);
         }
-        arcaneRing_.draw(shader_);
-        lightMarker_.draw(shader_);
-        floatingCubes_.draw(shader_);
+
+        for (const scene::SceneObject *object : sceneObjects_)
+        {
+            object->draw(shader_);
+        }
+    }
+
+    void App::drawActiveCharacter()
+    {
         if (useVrmCharacter_)
         {
             vrmCharacter_.draw(shader_, toonLighting_);
         }
-        else
+        else if (activeCharacter_ != nullptr)
         {
-            fallbackCharacter_.draw(shader_);
+            activeCharacter_->draw(shader_);
         }
+    }
 
+    void App::drawDebugUi()
+    {
 #if MATRIXALCHEMY_HAS_IMGUI
         if (showDebugUi_)
         {

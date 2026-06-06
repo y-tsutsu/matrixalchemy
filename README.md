@@ -191,10 +191,10 @@ directory. If the runtime model is not available, the app falls back to the
 simple box character.
 
 Character movement is handled by `scene::CharacterController`. The VRM-specific
-scene object is `scene::VrmCharacter`, which wraps `asset::Model` and implements
-the drawable and shadow-casting scene interfaces. Pose animation is intentionally
-separated into `asset::ModelPoseAnimator`; it is a small sample animation layer,
-not a full VRM animation system.
+scene object is `scene::VrmCharacter`, which wraps `asset::Model` and derives
+from `scene::SceneObject`. Pose animation is intentionally separated into
+`asset::ModelPoseAnimator`; it is a small sample animation layer, not a full VRM
+animation system.
 
 The source tree is grouped by role. Headers mirror the implementation
 directories under `include/matrixalchemy`:
@@ -203,7 +203,7 @@ directories under `include/matrixalchemy`:
 - `platform`: filesystem and platform/OpenGL include boundaries
 - `render`: OpenGL rendering primitives, shaders, textures, and shadow helpers
 - `asset`: glTF/VRM loading and conversion
-- `scene`: scene objects, camera, and drawable/shadow-casting interfaces
+- `scene`: scene objects, camera, and scene object lifecycle hooks
 - `ui`: Dear ImGui debug UI
 
 ## Graphics Concepts Covered

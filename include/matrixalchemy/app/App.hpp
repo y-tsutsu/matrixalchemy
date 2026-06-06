@@ -9,10 +9,13 @@
 #include "matrixalchemy/scene/GridFloor.hpp"
 #include "matrixalchemy/scene/LightMarker.hpp"
 #include "matrixalchemy/scene/OrbitCamera.hpp"
+#include "matrixalchemy/scene/SceneObject.hpp"
 #include "matrixalchemy/scene/VrmCharacter.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+
+#include <vector>
 
 namespace matrixalchemy::app
 {
@@ -51,9 +54,18 @@ namespace matrixalchemy::app
         void initializeWindow();
         void initializeOpenGL();
         void initializeScene();
+        void registerSceneObjects();
+        void releaseSceneResources();
         void processInput();
         void update(float deltaSeconds);
         void render();
+        void updateRegisteredSceneObjects(float deltaSeconds);
+        void setupFrameShader(const glm::mat4 &projection, const glm::mat4 &view);
+        void drawFloorMask();
+        void drawProjectedShadows();
+        void drawRegisteredSceneObjects();
+        void drawActiveCharacter();
+        void drawDebugUi();
         void resize(int width, int height);
         void requestClose();
 
@@ -71,6 +83,8 @@ namespace matrixalchemy::app
         scene::Character fallbackCharacter_;
         scene::VrmCharacter vrmCharacter_;
         bool useVrmCharacter_ = false;
+        scene::SceneObject *activeCharacter_ = nullptr;
+        std::vector<scene::SceneObject *> sceneObjects_;
         scene::OrbitCamera camera_;
         scene::CharacterInput characterInput_;
         asset::PoseAnimationSettings poseAnimationSettings_;

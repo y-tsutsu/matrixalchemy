@@ -81,19 +81,20 @@ The scene is intentionally split into small classes:
 - `scene::OrbitCamera`: mouse-controlled camera.
 - `scene::CharacterController`: keyboard movement and rotation.
 
-Drawable scene objects implement `scene::IDrawable`. Objects that can contribute
-to the projected floor shadow implement `scene::IShadowCaster`. This mirrors the
-old sample's class-based style while keeping the OpenGL-specific rendering code
-in smaller render classes.
+Drawable scene objects derive from `scene::SceneObject`. It keeps the common
+scene lifecycle in one small base class:
 
-The two scene interfaces are intentionally tiny:
-
-- `IDrawable::draw()` means the object can render itself with the active shader.
-- `IShadowCaster::drawShadow()` means the object can draw itself through a
-  shadow projection matrix.
+- `SceneObject::draw()` is pure virtual, so every visible scene object must
+  implement its own drawing path.
+- `SceneObject::release()` is pure virtual, so OpenGL resources stay explicitly
+  releasable while the context is alive.
+- `SceneObject::update()` has an empty default for static objects.
+- `SceneObject::drawShadow()` has an empty default for objects that do not
+  contribute to the projected floor shadow.
 
 This keeps the sample close to the original class-based learning style without
-introducing a full scene graph or entity system.
+introducing a full scene graph or entity system. `app::App` owns the concrete
+scene instances and registers the regular per-frame objects in draw order.
 
 ## Rendering Order
 
@@ -320,8 +321,8 @@ A good reading order is:
 1. `src/main.cpp`
 2. `include/matrixalchemy/app/App.hpp`
 3. `src/app/App.cpp`
-4. `include/matrixalchemy/scene/IDrawable.hpp`
-5. `include/matrixalchemy/scene/IShadowCaster.hpp`
+4. `include/matrixalchemy/scene/SceneObject.hpp`
+5. `src/scene/ArcaneRing.cpp`
 6. `src/scene/GridFloor.cpp`
 7. `src/scene/FloatingCubes.cpp`
 8. `src/scene/VrmCharacter.cpp`

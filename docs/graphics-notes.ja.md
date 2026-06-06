@@ -71,16 +71,16 @@ clipPosition = projection * view * model * objectPosition
 - `scene::OrbitCamera`: マウス操作のカメラ。
 - `scene::CharacterController`: キーボード移動と回転。
 
-描画できるシーンオブジェクトは`scene::IDrawable`を実装します。
-床に投影する影を描けるオブジェクトは`scene::IShadowCaster`を実装します。
-これは昔のサンプルのクラスベースな雰囲気を保ちつつ、OpenGL固有の描画コードを小さなrenderクラスへ分けるための構成です。
+描画できるシーンオブジェクトは`scene::SceneObject`を継承します。
+共通のライフサイクルは、小さな基底クラスにまとめています。
 
-2つのシーンインターフェースは意図的に小さくしています。
-
-- `IDrawable::draw()`は、現在有効なシェーダーで自分自身を描画できることを表します。
-- `IShadowCaster::drawShadow()`は、影の投影行列を通して自分自身を描画できることを表します。
+- `SceneObject::draw()`は純粋仮想関数です。表示するシーンオブジェクトは、自分自身の描画処理を必ず実装します。
+- `SceneObject::release()`も純粋仮想関数です。OpenGLコンテキストが生きている間にGPUリソースを明示的に解放できるようにしています。
+- `SceneObject::update()`は空のデフォルト実装を持ちます。静的なオブジェクトでは実装不要です。
+- `SceneObject::drawShadow()`も空のデフォルト実装を持ちます。床に投影する影を出さないオブジェクトでは実装不要です。
 
 これにより、フル機能のシーングラフやエンティティシステムを導入せず、元の学習用コードに近い読みやすさを保っています。
+`app::App`は具体的なシーンインスタンスを所有し、毎フレーム呼び出す通常のオブジェクトを描画順に登録します。
 
 ## 描画順序
 
@@ -281,8 +281,8 @@ Dear ImGuiとGLFW/OpenGL3バックエンドが見つかると、CMakeが`MATRIXA
 1. `src/main.cpp`
 2. `include/matrixalchemy/app/App.hpp`
 3. `src/app/App.cpp`
-4. `include/matrixalchemy/scene/IDrawable.hpp`
-5. `include/matrixalchemy/scene/IShadowCaster.hpp`
+4. `include/matrixalchemy/scene/SceneObject.hpp`
+5. `src/scene/ArcaneRing.cpp`
 6. `src/scene/GridFloor.cpp`
 7. `src/scene/FloatingCubes.cpp`
 8. `src/scene/VrmCharacter.cpp`

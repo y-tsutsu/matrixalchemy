@@ -1,16 +1,16 @@
 #pragma once
 
 #include "matrixalchemy/render/ColoredMesh.hpp"
-#include "matrixalchemy/scene/IDrawable.hpp"
+#include "matrixalchemy/scene/SceneObject.hpp"
 
 namespace matrixalchemy::scene
 {
 
-    class GridFloor final : public IDrawable
+    class GridFloor final : public SceneObject
     {
     public:
         void create(float halfSize, int tileCount);
-        void release();
+        void release() override;
         void draw(render::ShaderProgram &shader) const override;
 
     private:

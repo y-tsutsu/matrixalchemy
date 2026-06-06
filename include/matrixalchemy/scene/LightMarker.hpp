@@ -1,19 +1,19 @@
 #pragma once
 
 #include "matrixalchemy/render/ColoredMesh.hpp"
-#include "matrixalchemy/scene/IDrawable.hpp"
+#include "matrixalchemy/scene/SceneObject.hpp"
 
 #include <glm/glm.hpp>
 
 namespace matrixalchemy::scene
 {
 
-    class LightMarker final : public IDrawable
+    class LightMarker final : public SceneObject
     {
     public:
         void create(float radius, int slices, int stacks);
-        void release();
-        void update(float deltaSeconds);
+        void release() override;
+        void update(float deltaSeconds) override;
         void setPosition(const glm::vec3 &position) { position_ = position; }
         [[nodiscard]] glm::vec3 position() const { return position_; }
         void draw(render::ShaderProgram &shader) const override;

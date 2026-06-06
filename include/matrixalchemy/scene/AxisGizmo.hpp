@@ -1,16 +1,16 @@
 #pragma once
 
 #include "matrixalchemy/render/ColoredMesh.hpp"
-#include "matrixalchemy/scene/IDrawable.hpp"
+#include "matrixalchemy/scene/SceneObject.hpp"
 
 namespace matrixalchemy::scene
 {
 
-    class AxisGizmo final : public IDrawable
+    class AxisGizmo final : public SceneObject
     {
     public:
         void create(float length);
-        void release();
+        void release() override;
         void draw(render::ShaderProgram &shader) const override;
 
     private:

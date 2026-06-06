@@ -2,19 +2,18 @@
 
 #include "matrixalchemy/render/ColoredMesh.hpp"
 #include "matrixalchemy/scene/CharacterController.hpp"
-#include "matrixalchemy/scene/IDrawable.hpp"
-#include "matrixalchemy/scene/IShadowCaster.hpp"
+#include "matrixalchemy/scene/SceneObject.hpp"
 
 #include <glm/glm.hpp>
 
 namespace matrixalchemy::scene
 {
 
-    class Character final : public IDrawable, public IShadowCaster
+    class Character final : public SceneObject
     {
     public:
         void create();
-        void release();
+        void release() override;
         void update(float deltaSeconds, const CharacterInput &input);
         void draw(render::ShaderProgram &shader) const override;
         void drawShadow(render::ShaderProgram &shader, const glm::mat4 &shadowMatrix) const override;

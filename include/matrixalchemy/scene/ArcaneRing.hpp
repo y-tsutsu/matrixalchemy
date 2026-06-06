@@ -1,19 +1,19 @@
 #pragma once
 
 #include "matrixalchemy/render/ColoredMesh.hpp"
-#include "matrixalchemy/scene/IDrawable.hpp"
+#include "matrixalchemy/scene/SceneObject.hpp"
 
 #include <glm/glm.hpp>
 
 namespace matrixalchemy::scene
 {
 
-    class ArcaneRing final : public IDrawable
+    class ArcaneRing final : public SceneObject
     {
     public:
         void create(float radius, int segments);
-        void release();
-        void update(float deltaSeconds);
+        void release() override;
+        void update(float deltaSeconds) override;
         void setCenter(const glm::vec3 &center);
         void draw(render::ShaderProgram &shader) const override;
 
