@@ -4,10 +4,7 @@
 #include "matrixalchemy/platform/Gl.hpp"
 #include "matrixalchemy/render/ShaderSources.hpp"
 #include "matrixalchemy/render/Shadow.hpp"
-
-#if MATRIXALCHEMY_HAS_IMGUI
 #include "matrixalchemy/ui/DebugUi.hpp"
-#endif
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -43,9 +40,7 @@ namespace matrixalchemy::app
     /// @brief OpenGLリソース、Debug UI、GLFWウィンドウを終了順に解放する。
     App::~App()
     {
-#if MATRIXALCHEMY_HAS_IMGUI
         ui::DebugUi::shutdown();
-#endif
         releaseSceneResources();
         shader_.release();
         if (window_ != nullptr)
@@ -143,12 +138,10 @@ namespace matrixalchemy::app
         auto *app = static_cast<App *>(glfwGetWindowUserPointer(window));
         if (app != nullptr)
         {
-#if MATRIXALCHEMY_HAS_IMGUI
             if (app->showDebugUi_ && ui::DebugUi::wantsMouseInput())
             {
                 return;
             }
-#endif
             app->camera_.drag(x, y);
         }
     }
@@ -165,13 +158,11 @@ namespace matrixalchemy::app
             return;
         }
 
-#if MATRIXALCHEMY_HAS_IMGUI
         if (app->showDebugUi_ && ui::DebugUi::wantsMouseInput())
         {
             app->camera_.endDrag();
             return;
         }
-#endif
 
         if (action == GLFW_PRESS)
         {
@@ -194,12 +185,10 @@ namespace matrixalchemy::app
         auto *app = static_cast<App *>(glfwGetWindowUserPointer(window));
         if (app != nullptr)
         {
-#if MATRIXALCHEMY_HAS_IMGUI
             if (app->showDebugUi_ && ui::DebugUi::wantsMouseInput())
             {
                 return;
             }
-#endif
             app->camera_.zoom(yOffset);
         }
     }
@@ -252,9 +241,7 @@ namespace matrixalchemy::app
         glEnable(GL_DEPTH_TEST);
         glClearColor(0.62F, 0.70F, 0.80F, 1.0F);
 
-#if MATRIXALCHEMY_HAS_IMGUI
         ui::DebugUi::initialize(window_);
-#endif
     }
 
     /// @brief シェーダーとシーンオブジェクトを作成し、実行時モデルを読み込む。
@@ -321,13 +308,11 @@ namespace matrixalchemy::app
     /// @brief キーボード状態を読み取り、キャラクター入力へ反映する。
     void App::processInput()
     {
-#if MATRIXALCHEMY_HAS_IMGUI
         if (showDebugUi_ && ui::DebugUi::wantsKeyboardInput())
         {
             characterInput_ = {};
             return;
         }
-#endif
         characterInput_.moveForward = glfwGetKey(window_, GLFW_KEY_UP) == GLFW_PRESS;
         characterInput_.moveBackward = glfwGetKey(window_, GLFW_KEY_DOWN) == GLFW_PRESS;
         characterInput_.turnLeft = glfwGetKey(window_, GLFW_KEY_LEFT) == GLFW_PRESS;
@@ -477,14 +462,12 @@ namespace matrixalchemy::app
     /// @brief Debug UIが有効な場合にDear ImGuiのフレームを描画する。
     void App::drawDebugUi()
     {
-#if MATRIXALCHEMY_HAS_IMGUI
         if (showDebugUi_)
         {
             ui::DebugUi::beginFrame();
             ui::DebugUi::draw(*this);
             ui::DebugUi::render();
         }
-#endif
     }
 
     /// @brief フレームバッファサイズに合わせてビューポートを更新する。

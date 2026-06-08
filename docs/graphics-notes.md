@@ -106,7 +106,7 @@ forward-rendered pipeline:
 3. Draw planar shadows only where the stencil buffer says the floor exists.
 4. Draw axes, the light marker, floating cubes, and the character.
 5. Draw the character outline as part of the character draw path.
-6. Draw the optional Dear ImGui debug UI.
+6. Draw the Dear ImGui debug UI.
 
 The floor shadow is intentionally simple. It projects object geometry onto the
 Y=0 floor plane from the current light position, clips the result to the floor
@@ -296,9 +296,8 @@ Important files:
 
 ## Debug UI
 
-The debug UI is optional at configure time. When Dear ImGui and its GLFW/OpenGL3
-backends are found, CMake defines `MATRIXALCHEMY_HAS_IMGUI` and compiles
-`src/ui/DebugUi.cpp`.
+The debug UI is built as a required part of the application. CMake requires Dear
+ImGui and its GLFW/OpenGL3 backends, then compiles `src/ui/DebugUi.cpp`.
 
 The debug panel exposes values that are useful while learning:
 

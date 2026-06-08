@@ -5,8 +5,6 @@ project(matrixalchemy
   DESCRIPTION "A small OpenGL playground for learning 3D graphics fundamentals."
   LANGUAGES C CXX)
 
-option(MATRIXALCHEMY_ENABLE_IMGUI "Enable Dear ImGui debug UI when the package is available" ON)
-
 include(CTest)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -107,31 +105,27 @@ target_link_libraries(matrixalchemy
     glfw
     matrixalchemy_glad)
 
-if(MATRIXALCHEMY_ENABLE_IMGUI)
-  find_package(imgui CONFIG QUIET)
-  if(TARGET imgui::imgui AND IMGUI_BACKENDS_INCLUDE_DIR)
-    target_sources(matrixalchemy
-      PRIVATE
-        src/ui/DebugUi.cpp)
-    target_include_directories(matrixalchemy PRIVATE ${IMGUI_BACKENDS_INCLUDE_DIR})
-    target_link_libraries(matrixalchemy PRIVATE imgui::imgui)
-    target_compile_definitions(matrixalchemy PRIVATE MATRIXALCHEMY_HAS_IMGUI=1)
-  else()
-    if(PkgConfig_FOUND)
-      pkg_check_modules(IMGUI QUIET IMPORTED_TARGET imgui)
-    endif()
-    if(TARGET PkgConfig::IMGUI AND IMGUI_BACKENDS_INCLUDE_DIR)
-      target_sources(matrixalchemy
-        PRIVATE
-          src/ui/DebugUi.cpp)
-      target_include_directories(matrixalchemy PRIVATE ${IMGUI_BACKENDS_INCLUDE_DIR})
-      target_link_libraries(matrixalchemy PRIVATE PkgConfig::IMGUI)
-      target_compile_definitions(matrixalchemy PRIVATE MATRIXALCHEMY_HAS_IMGUI=1)
-    else()
-      message(STATUS "Dear ImGui or its GLFW/OpenGL3 backends were not found. Building without the debug UI.")
-    endif()
+find_package(imgui CONFIG QUIET)
+if(TARGET imgui::imgui)
+  set(MATRIXALCHEMY_IMGUI_TARGET imgui::imgui)
+else()
+  if(PkgConfig_FOUND)
+    pkg_check_modules(IMGUI QUIET IMPORTED_TARGET imgui)
+  endif()
+  if(TARGET PkgConfig::IMGUI)
+    set(MATRIXALCHEMY_IMGUI_TARGET PkgConfig::IMGUI)
   endif()
 endif()
+
+if(NOT MATRIXALCHEMY_IMGUI_TARGET)
+  message(FATAL_ERROR "Dear ImGui was not found. Install libimgui-dev on Debian/WSLg or run vcpkg install for the configured triplet.")
+endif()
+
+target_sources(matrixalchemy
+  PRIVATE
+    src/ui/DebugUi.cpp)
+target_include_directories(matrixalchemy PRIVATE ${IMGUI_BACKENDS_INCLUDE_DIR})
+target_link_libraries(matrixalchemy PRIVATE ${MATRIXALCHEMY_IMGUI_TARGET})
 
 if(MSVC)
   target_compile_options(matrixalchemy PRIVATE /W4 /permissive-)

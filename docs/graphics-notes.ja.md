@@ -91,7 +91,7 @@ clipPosition = projection * view * model * objectPosition
 3. ステンシルバッファ上で床になっている領域にだけ、平面投影の影を描く。
 4. 軸、ライトマーカー、浮遊キューブ、キャラクターを描く。
 5. キャラクターの描画パス内でアウトラインを描く。
-6. 任意でDear ImGuiのデバッグUIを描く。
+6. Dear ImGuiのデバッグUIを描く。
 
 床の影は意図的にシンプルです。現在のライト位置からY=0の床平面へオブジェクト形状を投影し、床領域にクリップして、半透明の暗い形状として重ねています。
 
@@ -258,8 +258,8 @@ VRM 0.xマテリアルがMToonの`_ShadeColor`を持っている場合、その�
 
 ## Debug UI
 
-Debug UIはconfigure時に任意で有効になります。
-Dear ImGuiとGLFW/OpenGL3バックエンドが見つかると、CMakeが`MATRIXALCHEMY_HAS_IMGUI`を定義し、`src/ui/DebugUi.cpp`をコンパイルします。
+Debug UIはアプリケーションの必須機能としてビルドします。
+CMakeはDear ImGuiとGLFW/OpenGL3バックエンドを要求し、`src/ui/DebugUi.cpp`をコンパイルします。
 
 デバッグパネルでは、学習中に便利な値を確認、調整できます。
 

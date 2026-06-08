@@ -32,7 +32,7 @@ The current sample opens a small animated OpenGL scene with:
 - mouse-driven orbit camera controls
 - an animated visible light marker
 - planar shadows projected onto the floor
-- optional Dear ImGui debug panel
+- Dear ImGui debug panel
 
 ## Tech Stack
 
@@ -63,8 +63,8 @@ be regenerated with:
 $ glad --reproducible --api gl:core=3.3 --out-path external/glad c
 ```
 
-Dear ImGui is optional at configure time. When `libimgui-dev` is available, the
-debug panel is enabled automatically through `pkg-config`.
+Dear ImGui is required. On Debian/WSLg, `libimgui-dev` provides the library and
+the GLFW/OpenGL3 backend headers used by the debug panel.
 
 Configure and build:
 
